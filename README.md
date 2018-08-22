@@ -16,6 +16,5 @@ is an example of isolation. For instance, if two transactions try to modify the 
 
 - **D**urable: once a change is committed, they are permanent and will not be lost.
 
-
-
+These properties guarantee the reliability needed for traditional applications, and explains, among other factors, why relational databases have dominated the market. However, over the past years, a tremendous amount of devices have been connected to the internet, exploding the demand for data storage. Web applications using relational databases were having performance issues to handle huge volumes of data and provide real time responses.
 
