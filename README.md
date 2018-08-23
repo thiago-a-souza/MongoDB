@@ -16,7 +16,7 @@ is an example of isolation. For instance, if two transactions try to modify the 
 
 - **D**urable: once a change is committed, they are permanent and will not be lost.
 
-These properties guarantee the reliability needed for traditional applications, and explains, among other factors, why relational databases have dominated the market. However, over the past years, a colossal number of devices have been connected to the internet, emerging new applications that store non-conventional data (e.g. photos, videos, posts, etc). The relational model was neither appropriate nor fast to solve these problems. Typical applications using relational databases require a high computing power because they involve complex joins to pull data from different tables. When the system has to respond to millions of users running operations on huge databases, using the relational model becomes a problem.
+These properties guarantee the reliability needed for traditional applications, and explains, among other factors, why relational databases have dominated the market. However, over the past years, a colossal number of devices have been connected to the internet, emerging new applications that store non-conventional data (e.g. photos, videos, posts, etc). The relational model was neither appropriate nor fast to solve these problems. Typical applications using relational databases require a high computing power because they involve complex joins to pull data from different tables. When the system has to respond to millions of users running operations on huge databases, using the relational model becomes a problem. To solve this problem, several non-relational databases were created, and the term NoSQL was coined to refer to them.
 
 
 
