@@ -34,3 +34,12 @@ In 2000, Eric Brewer outlined the CAP theorem, describing three desirable proper
 </p> 
 
 
+There are many NoSQL databases to solve a wide range of problems. They are often divided into four major categories: 
+
+
+| TYPE | DESCRIPTION | EXAMPLE |
+|:--------------------|:------------|:--------|
+|  Key-value stores <img width=300/>    |  It's the simplest NoSQL database model. Every key has a corresponding a value, similar to a hash map.  It's useful for caching purposes.| Redis |
+|  Document store | One of the most popular NoSQL database types. Store the data as a collection of documents, and it's usually specified in a JSON format.  | MongoDB, CouchDB |
+|  Column wide store  |  It uses tables, rows, and columns, but their operation is not similar to relational databases, for example, the set of columns can vary from a row to another. It's very popular in data-intensive applications like video-streaming, analytics, etc. | Cassandra, HBase |
+|  Graph database    | Designed to support vertexes and edges to represent graphs. It can be used to model the relationship of friends in a social network. | Neo4J |
