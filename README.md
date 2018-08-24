@@ -26,11 +26,5 @@ NoSQL databases take a completely opposite direction compared to traditional dat
 
 At a first glance, it may seem odd that NoSQL databases are *eventually consistent*. However, for some applications having the most recent data is not critical. For example, it's not really important that a post on a social network is not displayed immediately to all followers; it's ok that eventually they will be consistent. In fact, some NoSQL databases provide levels of consistency and availability, which can be configured according to the requirements. 
 
-In 2000, Eric Brewer outlined the CAP theorem, describing three desirable properties in distributed systems: consistency, availability, and partition tolerance. The theorem states that it's not possible to guarantee all three properties at the same time. Later, it was demonstrated that only two of these properties can be satisfied simultaneously. This is why NoSQL databases have to choose availability and partition tolerance over to consistency. On the other hand, consistency and availability are not negotiable in relational databases.
-
-- **Consistency:** means that the same data will be available to all requests
-
-- **Availability:** the system must be available to respond to all clients for read and write operations with low latency
-
-- **Partition tolerance:** the database can be split into different nodes and work in case of network failures
+In 2000, Eric Brewer outlined the CAP theorem, describing three desirable properties in distributed systems: consistency (the same data is be available to all requests), availability (all read/write requests are responded with low latency), and partition tolerance (the system can be split into different nodes and work in case of network failures). The theorem states that it's not possible to guarantee all three properties at the same time. Later, it was demonstrated that only two of these properties can be satisfied simultaneously. This is why NoSQL databases have to choose availability and partition tolerance over to consistency. On the other hand, consistency and availability are not negotiable in relational databases.
 
