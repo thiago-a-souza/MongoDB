@@ -11,7 +11,7 @@ Database systems based on the relational model support transactions. One or more
 
 - **Consistent:** ensures that when a transaction completes, successfully or not, the database will be in a valid state. In other words, all data written to the database must valid according to the rules defined, including constraints, column types, triggers, etc.
 
-- **Isolated:** implies that a transaction does not interfere with another one. Database locks, such as row or table locks, 
+- **Isolated:** implies that a transaction does not interfere with one another. Database locks, such as row or table locks, 
 is an example of isolation. For instance, if two transactions try to modify the same row(s), one will run and the other will wait or fail - depending how long the first transaction takes to complete.
 
 - **Durable:** once a change is committed, they are permanent and will not be lost.
@@ -28,4 +28,9 @@ At a first glance, it may seem odd that NoSQL databases are *eventually consiste
 
 In 2000, Eric Brewer outlined the CAP theorem, describing three desirable properties in distributed systems: consistency, availability, and partition tolerance. The theorem states that it's not possible to guarantee all three properties at the same time. Later, it was demonstrated that only two of these properties can be satisfied simultaneously. This is why NoSQL databases have to choose availability and partition tolerance over to consistency. On the other hand, consistency and availability are not negotiable in relational databases.
 
+- **Consistency:** means that the same data will be available to all requests
+
+- **Availability:** the system must be available to respond to all clients for read and write operations with low latency
+
+- **Partition tolerance:** the database can be split into different nodes and work in case of network failures
 
