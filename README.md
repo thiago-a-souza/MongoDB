@@ -24,6 +24,8 @@ NoSQL databases take a completely opposite direction compared to traditional dat
 - **Eventually Consistent:** unlike the consistency defined in ACID transactions, which ensures that the database will be in a valid state (without any invalid data), the consistency in BASE systems mean that the most recent data may not be available for a period of time but eventually it will be replicated in a consistent state.
 - **Soft State:** indicates that the state of the system may change even without any input for eventual consistency.
 
-At a first glance, it may seem odd that NoSQL databases are *eventually consistent*. However, for some applications having the most recent data is not critical. For example, it's not really important that a post on a social network is not displayed immediately to all followers; it's ok that eventually they will be consistent. In fact, some NoSQL databases provide levels of consistency and availability, which can be configured according to the problem. 
+At a first glance, it may seem odd that NoSQL databases are *eventually consistent*. However, for some applications having the most recent data is not critical. For example, it's not really important that a post on a social network is not displayed immediately to all followers; it's ok that eventually they will be consistent. In fact, some NoSQL databases provide levels of consistency and availability, which can be configured according to the requirements. 
 
-In a distributed environment, there are three fundamental components involved: consistency, availability, and partitioning. 
+In 2000, Eric Brewer outlined the CAP theorem, describing three desirable properties in distributed systems: consistency, availability, and partition tolerance. The theorem states that it's not possible to guarantee all three properties at the same time. Later, it was demonstrated that only two of these properties can be satisfied simultaneously. This is why NoSQL databases have to choose availability and partition tolerance over to consistency. On the other hand, consistency and availability are not negotiable in relational databases.
+
+
