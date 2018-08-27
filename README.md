@@ -67,7 +67,7 @@ Despite the recent popularity of NoSQL databases, they are not replacing traditi
 
 # MongoDB
 
-In 2007, a startup called 10gen started working on a PaaS to host web applications. They realized that the existing database platforms were not appropriate for the web in terms of scalability, availability, partitioning, and flexibility to handle complex data structures. And with that, they started building their own NoSQL database, MongoDB, using JSON-based documents  store the data.
+In 2007, a startup called 10gen started working on a PaaS to host web applications. They realized that the existing database platforms were not appropriate for the web in terms of scalability, availability, partitioning, and flexibility to handle complex data structures. And with that, they started building their own NoSQL database, called MongoDB, using JSON-based documents  store the data.
 
 
 
