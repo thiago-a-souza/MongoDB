@@ -45,10 +45,23 @@ There are many NoSQL databases to solve a wide range of problems. They are often
 |  Graph database    | Designed to support vertexes and edges to represent graphs. It can be used to model the relationship of friends in a social network. | Neo4J |
 
 
-- **Non-relational:**
+Contrary to relational databases, which provide standard features across different vendors, NoSQL databases were created to solve specific problems that were not appropriate for the relational model. In consequence, NoSQL databases are different from each other in several aspects, including how the data is stored and accessed. However, the following  characteristics are frequently present in NoSQL databases.
 
-- **Horizontal Scalability:**
 
-- **Schema-free:**
+- **Horizontal Scalability:** there are two types of scalability: horizontal (i.e. scale out) and vertical (i.e. scale up). Distributed systems that are horizontally scalable expand their performance by adding more computing nodes. On the other hand, vertical scalable systems require replacing the existing hardware to increase their performance. Unlike RDBMS, NoSQL databases were designed to scale out using commodity hardware. 
 
-- **Highly distributable:**
+- **Highly distributable:** scaling out allows NoSQL databases to store the data on multiple nodes, rather than keeping huge datasets in a single location.
+
+- **Schema-free:** relational databases require data types to be defined up-front, and all rows of the same column must have the same type. Conversely, NoSQL databases don't require schemas, so the data structure doesn't need to be defined ahead of time and can evolve over time, giving more control to developers to change what will be stored.
+
+- **Denormalization:** the normalization process enhances the data consistency by not duplicating the same data on multiple tables, but it comes at a cost. Joining tables requires high processing power, which impacts performance.
+
+- **No Joins:** NoSQL databases don't support joins as it severely impacts performance. In consequence, the data must be denormalized, making queries faster and easier to implement.
+
+- **No Foreign Keys:** because there are no joins and the data should be denormalized, foreign keys are not available in NoSQL databases.
+
+- **Query-based design:** designing a database application using the relational model involves describing entities, relationships, constraints, etc. Once created, queries can be designed based on the data model implemented. By contrast, modeling a NoSQL application takes the opposite direction. Queries should be designed first and then the data around them. As a result, the underlying structure will store the data required for targeted queries.
+
+
+
+
