@@ -54,7 +54,7 @@ Contrary to relational databases, which provide standard features across differe
 
 - **Schema-free:** relational databases require data types to be defined up-front, and all rows of the same column must have the same type. Conversely, NoSQL databases don't require schemas, so the data structure doesn't need to be defined ahead of time and can evolve over time, giving more control to developers to change what will be stored.
 
-- **Denormalization:** the normalization process enhances the data consistency by not duplicating the same data on multiple tables, but it comes at a cost. Joining tables requires high processing power, which impacts performance.
+- **Denormalization:** the normalization process enhances the data consistency by not duplicating the same data on multiple tables, but it comes at a cost. Joining tables requires high processing power, which impacts performance. For this reason, the data is denormalized in NoSQL databases.
 
 - **No Joins:** NoSQL databases don't support joins as it severely impacts performance. In consequence, the data must be denormalized, making queries faster and easier to implement.
 
