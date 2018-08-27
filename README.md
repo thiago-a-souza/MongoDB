@@ -41,7 +41,7 @@ There are many NoSQL databases to solve a wide range of problems. They are often
 |:--------------------|:------------|:--------|
 |  Key-value stores <img width=300/>    |  It's the simplest NoSQL database model. Data is stored in key-value pairs, similar to a hash map.  It's useful for caching purposes.| Redis |
 |  Document store | One of the most popular NoSQL database types. Store the data as a collection of documents, and it's usually specified in a JSON format.  | MongoDB, CouchDB |
-|  Column wide store  |  It uses tables, rows, and columns, but their operation is not similar to relational databases, for example, the set of columns can vary from a row to another. It's very popular in data-intensive applications like video-streaming, analytics, etc. | Cassandra, HBase |
+|  Column wide store  |  It uses tables, rows, and columns, but their operation is not similar to relational databases, for example, the set of columns can vary from a row to another. It's very popular in data-intensive applications like video-streaming. | Cassandra, HBase |
 |  Graph database    | Designed to support vertexes and edges to represent graphs. It can be used to model the relationship of friends in a social network. | Neo4J |
 
 
@@ -61,6 +61,8 @@ Contrary to relational databases, which provide standard features across differe
 - **No Foreign Keys:** because there are no joins and the data should be denormalized, foreign keys are not available in NoSQL databases.
 
 - **Query-based design:** designing a database application using the relational model involves describing entities, relationships, constraints, etc. Once created, queries can be designed based on the data model implemented. By contrast, modeling a NoSQL application takes the opposite direction. Queries should be designed first and then the data around them. As a result, the underlying structure will store the data required for targeted queries.
+
+Despite the recent popularity of NoSQL databases, they are not replacing traditional relational databases. In fact, some applications that could benefit from the NoSQL model will choose RDBMS because they have been used for decades, and people are more familiar with this solution. However, they have different purposes and each approach has pros and cons. RDBMS are best suited for applications that demand ACID transactions, non-negotiable data consistency, and strict schemas. On the other hand, applications handling huge volumes of data that require high performance, real-time responses, and consistency is not critical, NoSQL databases should be considered.
 
 
 
