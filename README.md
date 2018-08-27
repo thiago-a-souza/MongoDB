@@ -65,5 +65,9 @@ Contrary to relational databases, which provide standard features across differe
 Despite the recent popularity of NoSQL databases, they are not replacing traditional relational databases. In fact, some applications that could benefit from the NoSQL model will choose RDBMS because they have been used for decades, and people are more familiar with this solution. However, they have different purposes and each approach has pros and cons. RDBMS are best suited for applications that demand ACID transactions, non-negotiable data consistency, and strict schemas. On the other hand, applications handling huge volumes of data that require high performance, real-time responses, and consistency is not critical, NoSQL databases should be considered.
 
 
+# MongoDB
+
+In 2007, a startup called 10gen started working on a PaaS to host web applications. They realized that the existing database platforms were not appropriate for the web in terms of scalability, availability, partitioning, and flexibility to handle complex data structures. And with that, MongoDB was born as a JSON-based document store NoSQL database.
+
 
 
