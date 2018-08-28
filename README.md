@@ -71,4 +71,5 @@ In 2007, a startup called 10gen started working on a PaaS to host web applicatio
 
 JavaScript Object Notation (JSON) has been widely adopted because it can describe complex data structures in a human readable format. Because JSON is language-independent, it's commonly used to interact with heterogeneous environments. Also, JSON documents are schemaless, so it allows documents to have different fields, making them easier to evolve over time. These factors explain why MongoDB uses a JSON-based format called BSON - data is encoded in a binary format for performance and storage purposes.  
 
+MongoDB organizes the data into **databases, collections, documents, and fields**. In the relational model, documents are equivalent to rows, fields correspond to columns, collections (a group of documents) are similar to tables, and databases (a group of collections) are similar to Oracle schemas. Initially, transactions were supported only at the document level, in other words, ACID properties were guaranteed only within fields of the same document. Starting in version 4.0, MongoDB also supports multi-document transactions at a high performance cost.
 
