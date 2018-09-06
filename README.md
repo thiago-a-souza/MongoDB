@@ -5,7 +5,7 @@ Thiago Alexandre Domingues de Souza
 
 The relational database model, introduced by E.F. Codd in 1970, is considered one of the greatest breakthroughs in computer history. This model has a strong mathematical foundation based on the set theory to describe the relationship between tables. To certify that these relations are properly designed, the relational model provides the normalization process, which ensures the data consistency and eliminates redundancy. As a result, the data can be retrieved from a single table or joined with multiple tables using the well-known standard query language (SQL). 
 
-Database systems based on the relational model support transactions. One or more database operations, such as reading, deleting, updating, or inserting data, are combined into a single unit called transaction. Combining statements into a single transaction allows running multiple changes, and then at the end of the transaction, either apply (i.e. commit) or revert (i.e. rollback) all of them. Relational database management systems (RDBMS) follow ACID transactions:
+Database systems based on the relational model support transactions. One or more database operations, such as reading, deleting, updating, or inserting data, are combined into a single unit called transaction. Combining statements into a single transaction allows running multiple changes, and then at the end of the transaction, either apply (i.e. commit) or revert (i.e. rollback) all of them. Relational database management systems (RDBMS) must support these properties, defined as ACID transactions:
 
 - **Atomic:** basically means "all or nothing"; a transaction is completely applied, or nothing is performed.
 
@@ -52,7 +52,7 @@ Contrary to relational databases, which provide standard features across differe
 
 - **Highly distributable:** scaling out allows NoSQL databases to store the data on multiple nodes, rather than keeping huge datasets in a single location.
 
-- **Schema-free:** relational databases require data types to be defined up-front, and all rows of the same column must have the same type. Conversely, NoSQL databases don't require schemas, so the data structure doesn't need to be defined ahead of time and can evolve over time, giving more control to developers to change what will be stored.
+- **Schema-free:** relational databases require data types to be defined up-front, and all rows of the same column must have the same type. Conversely, NoSQL databases don't require schemas, so the data structure doesn't need to be predefined and can evolve over time, giving more control to developers to change what will be stored.
 
 - **Denormalization:** the normalization process enhances the data consistency by not duplicating the same data on multiple tables, but it comes at a cost. Joining tables requires high processing power, which impacts performance. For this reason, the data is denormalized in NoSQL databases.
 
@@ -62,7 +62,7 @@ Contrary to relational databases, which provide standard features across differe
 
 - **Query-based design:** designing a database application using the relational model involves describing entities, relationships, constraints, etc. Once created, queries can be designed based on the data model implemented. By contrast, modeling a NoSQL application takes the opposite direction. Queries should be designed first and then the data around them. As a result, the underlying structure will store the data required for targeted queries.
 
-Despite the recent popularity of NoSQL databases, they are not replacing traditional relational databases. In fact, some applications that could benefit from the NoSQL model will choose RDBMS because they have been used for decades, and people are more familiar with this solution. However, they have different purposes and each approach has pros and cons. RDBMS are best suited for applications that demand ACID transactions, non-negotiable data consistency, and strict schemas. On the other hand, applications handling huge volumes of data that require high performance, real-time responses, and consistency is not critical, NoSQL databases should be considered.
+Despite the recent popularity of NoSQL databases, they are not replacing traditional relational databases. In fact, some applications that could benefit from the NoSQL model would still choose RDBMS because they have been used for decades, and people are more familiar with this solution. However, they have different purposes and each approach has pros and cons. RDBMS are best suited for applications that demand ACID transactions, non-negotiable data consistency, and strict schemas. On the other hand, NoSQL databases are recommended for applications handling huge volumes of data that require high performance, real-time responses, and not critical levels of data consistency.
 
 
 # MongoDB
