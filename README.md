@@ -80,6 +80,38 @@ MongoDB is continuously  evolving to accomodate new features. Initially, transac
 
 Replica set and sharding are completely different processes. A replica set contains the very same data across different nodes for availability and redundancy purposes. On the other hand, sharding or partitioning splits the data across multiple nodes, so every node has its own subset of the entire dataset. As a result, the database can scale out when a single node cannot fulfill the performance demand. MongoDB supports auto-sharding, distributing and load-balancing the data across different nodes automatically. Consequently, it provides high throughputs even on very large datasets.
 
+## Mongo Shell
+
+MongoDB comes with mongo shell, a CLI for managing and interacting with the data. Because mongo shell is a Javascript-based tool, it also allows running any Javascript code. The shell is a process called *mongo* that connects to a *mongod* instance, representing the MongoDB server, and assigns the current database to the variable *db* - this variable is updated whenever the database is switched.
+
+
+```
+// display all databases
+> show databases
+admin        0.000GB
+local        0.947GB
+
+// switch to a database - creates the database if it does not exist
+> use mydb
+switched to db mydb
+
+// show the current database
+> db
+mydb
+
+// insert a document into a collection - creates the collection if it does not exist
+> db.books.insertOne({"title" : "Robinson Crusoe", "author" : "Daniel Defoe" })
+{
+	"acknowledged" : true,
+	"insertedId" : ObjectId("5b9191312c544c23552a793d")
+}
+
+// display all collections 
+> show collections
+books
+```
+
+
 
 # References 
 
