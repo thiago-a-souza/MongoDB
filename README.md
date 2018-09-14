@@ -139,9 +139,24 @@ function () {
 }
 ```
 
+## CRUD
+
+In contrast to relational databases, MongoDB does not support SQL to perform CRUD operations. Instead, it provides APIs to supported programming languages that can access the database and execute queries. These functions take documents as parameters, including the data, filters, and other options. Depending on the programming language used, additional boilerplate code is required to perform these operations. The commands described in this document refers to Javascript syntax used by  Mongo shell. For examples in other programming languages, visit the documentation at [(2)](#references).
+
+### Create
+
+### Read
+
+### Update
+
+### Delete
+
+
 
 
 # References 
 
 (1) MongoDB Documentation - Write Concern - https://docs.mongodb.com/manual/reference/write-concern/
+
+(2) MongoDB CRUD Operations - https://docs.mongodb.com/manual/crud/
 
