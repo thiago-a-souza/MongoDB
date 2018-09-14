@@ -156,7 +156,9 @@ For obvious reasons, this function does not allow inserting multiple documents.
 
 Syntax:
 
-```db.collection.insertOne(<document>, { writeConcern: <document> })```
+```
+db.collection.insertOne(<document>, { writeConcern: <document> })
+```
 
 Examples:
 
@@ -201,7 +203,28 @@ Examples:
 { "_id" : 20 }
 ```
 
+#### save
 
+Inserts one or more documents if the *_id* is not provided, otherwise it replaces existing documents by running an *update* with the *upsert* parameter set to true.
+
+Syntax:
+
+```
+db.collection.save(<document>, { writeConcern: <document> })
+```
+
+Example:
+
+```
+> db.books.save({"title" : "Leonardo da Vinci"})
+
+> db.books.find({"title" : "Leonardo da Vinci"})
+{ "_id" : ObjectId("5b9c11f6d44947754a8d4370"), "title" : "Leonardo da Vinci" }
+
+// existing document is replaced
+> db.books.find({ "author" : "Walter Isaacson"})
+{ "_id" : ObjectId("5b9c11f6d44947754a8d4370"), "author" : "Walter Isaacson" }
+```
 
 
 ### Read
