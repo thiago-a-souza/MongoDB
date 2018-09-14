@@ -171,7 +171,7 @@ Examples:
 
 #### insertMany
 
-Function loads an array of documents. It allows inserting a single document, but it must be in an array. By default, the  documents are inserted in the sequence provided. Setting the *ordered* parameter to *false* allows MongoDB reorder inserts for an enhanced load. In case *insertMany* produces an error, it stops where the failure occured if *ordered* is set to true (default), otherwise it continues trying to load all documents if it's set to false.
+Function loads an array of documents. It allows inserting a single document, but it must be in an array. By default,  documents are inserted in the sequence provided. Setting the *ordered* parameter to *false* allows MongoDB reorder inserts for an enhanced load. In case *insertMany* produces an error, it stops where the failure occured if *ordered* is set to true (default), otherwise it continues trying to load all documents if it's set to false.
 
 Syntax:
 
