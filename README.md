@@ -141,9 +141,41 @@ function () {
 
 ## CRUD
 
-In contrast to relational databases, MongoDB does not support SQL to perform CRUD operations. Instead, it provides APIs to supported programming languages that can access the database and execute queries. These functions take documents as parameters, including the data, filters, and other options. Depending on the programming language used, additional boilerplate code is required to perform these operations. The commands described in this document refers to Javascript syntax used by  Mongo shell. For examples in other programming languages, visit the documentation at [(2)](#references).
+In contrast to relational databases, MongoDB does not support SQL to perform CRUD operations. Instead, it provides APIs to popular programming languages that can access the database and execute queries. These functions take documents as parameters, including the data, filters, and other options. Depending on the programming language used, additional boilerplate code is required to perform these operations. The commands described in this document refers to Javascript syntax used by  Mongo shell. For examples in other programming languages, visit the documentation at [(2)](#references).
 
 ### Create
+
+Prior to version 3.2, inserting one or multiple documents into a collection was performed using the same *insert* function. This is still allowed for backward compatibility, but more appropriate functions were introduced, according to the number of documents loaded: *insertOne* and *insertMany*.
+
+If the document loaded does not specify an unique *_id* field, MongoDB creates automatically an *ObjectId*. This field represents the document's primary key, in other words, there are no duplicate documents with the same *_id* in the collection.
+
+#### insertOne
+
+For obvious reasons, this function does not allow inserting multiple documents.
+
+```
+> db.books.insertOne({"title" : "1984", "author" : "George Orwell" } )
+
+> doc = { "title" : "Fahrenheit 451" , "author" : "Ray Bradburry" }
+> db.books.insertOne(doc)
+
+
+```
+
+#### insertMany
+
+```
+> db.books.insertMany([
+    {"title" : "The Old Man and The Sea", "author" : "Ernest Hemingway"},
+    {"title" : "Great Expectations", "author" : "Charles Dickens"} ])
+    
+> arr = [{"title" : "The Great Gatsby", "author" : "F. Scott Fitzgerald"}, 
+         {"title" : "A Study in Scarlet", "author" : "Arthur Conan Doyle"}]
+> db.books.insertMany(arr)
+```
+
+
+
 
 ### Read
 
