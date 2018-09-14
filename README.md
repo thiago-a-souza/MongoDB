@@ -111,7 +111,7 @@ mydb
 books
 
 // javascript operations like loops are supported
-> for(i=1; i<=10; i++){
+> for(i=1; i<=1000000; i++){
 ... db.testing.insertOne({"name" : "test-" + i })
 ... }
 
