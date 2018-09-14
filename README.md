@@ -153,16 +153,31 @@ If the document loaded does not specify an unique *_id* field, MongoDB creates a
 
 For obvious reasons, this function does not allow inserting multiple documents.
 
+
+Syntax:
+
+```db.collection.insertOne(<document>, { writeConcern: <document> })```
+
+Examples:
+
 ```
 > db.books.insertOne({"title" : "1984", "author" : "George Orwell" } )
 
 > doc = { "title" : "Fahrenheit 451" , "author" : "Ray Bradburry" }
 > db.books.insertOne(doc)
-
-
 ```
 
 #### insertMany
+
+Function loads an array of documents. It allows inserting a single document, but it must be in an array. By default, the  documents are inserted in the sequence provided. Setting the *ordered* parameter to *false* allows MongoDB reorder inserts for an enhanced load. In case *insertMany* produces an error, it stops where the failure occured if *ordered* is set to true (default), otherwise it continues trying to load all documents if it's set to false.
+
+Syntax:
+
+```
+db.collection.insertMany( [ <document 1> , ... ], { writeConcern: <document>, ordered: <boolean> } )
+```
+
+Examples:
 
 ```
 > db.books.insertMany([
@@ -172,6 +187,18 @@ For obvious reasons, this function does not allow inserting multiple documents.
 > arr = [{"title" : "The Great Gatsby", "author" : "F. Scott Fitzgerald"}, 
          {"title" : "A Study in Scarlet", "author" : "Arthur Conan Doyle"}]
 > db.books.insertMany(arr)
+
+// ordered is set to true by default; it stops where it fails
+> db.test.insertMany([{ "_id" : 1 }, { "_id" : 1 }, { "_id" : 2 } ])
+> db.test.find()
+{ "_id" : 1 }
+
+// ordered set to false; try to load remaining documents
+> db.test.insertMany([{ "_id" : 10 }, { "_id" : 10 }, { "_id" : 20 } ], { ordered : false } )
+> db.test.find()
+{ "_id" : 1 }
+{ "_id" : 10 }
+{ "_id" : 20 }
 ```
 
 
