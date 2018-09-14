@@ -109,6 +109,34 @@ mydb
 // display all collections 
 > show collections
 books
+
+// javascript operations like loops are supported
+> for(i=1; i<=10; i++){
+... db.testing.insertOne({"name" : "test-" + i })
+... }
+
+// display shell related commands
+> help
+	show dbs                     show database names
+	show collections             show collections in current database
+	show users                   show users in current database
+	show profile                 show most recent system.profile entries with time >= 1ms
+	show logs                    show the accessible logger names
+	...
+
+// typing the function without parentheses displays the function code 
+> db.testing.drop
+function () {
+    if (arguments.length > 0)
+        throw Error("drop takes no argument");
+    var ret = this._db.runCommand({drop: this.getName()});
+    if (!ret.ok) {
+        if (ret.errmsg == "ns not found")
+            return false;
+        throw _getErrorWithCode(ret, "drop failed: " + tojson(ret));
+    }
+    return true;
+}
 ```
 
 
