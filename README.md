@@ -213,7 +213,7 @@ Syntax:
 db.collection.save(<document>, { writeConcern: <document> })
 ```
 
-Example:
+Examples:
 
 ```
 > db.books.save({"title" : "Leonardo da Vinci"})
@@ -228,6 +228,54 @@ Example:
 
 
 ### Read
+
+There are two popular alternatives to access the data: *find* and *findOne*. Both have the same arguments, which are optional, but *find* returns a cursor object, whereas *findOne* returns a single document. 
+
+Syntax:
+
+```
+db.collection.find(query, projection)
+```
+
+Examples:
+
+```
+// display all documents in a pretty format
+> db.books.find().pretty()
+{
+	"_id" : ObjectId("5b9ecde73723816695dc2269"),
+	"title" : "1984",
+	"authors" : [
+		"George Orwell"
+	],
+	"binding" : "Mass Market Paperback",
+	"pages" : 328,
+	"publisher" : "Signet Classic",
+	"published" : 1961,
+	"language" : "English",
+	"isbn" : "0451524934",
+	"dimensions" : [
+		4.2,
+		0.9,
+		7.5
+	],
+	"rating" : 4.5,
+	"rank" : 106
+}
+... 
+
+
+// display only one document
+> db.books.find().limit(1)
+> db.books.findOne()
+
+// display books where binding is paperback
+> db.books.find({ "binding" : "Paperback" })
+
+// display books where binding is paperback and language is english
+> db.books.find({ "binding" : "Paperback", "language" : "English" })
+```
+
 
 ### Update
 
