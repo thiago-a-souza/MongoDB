@@ -147,7 +147,7 @@ In contrast to relational databases, MongoDB does not support SQL to perform CRU
 
 Prior to version 3.2, inserting one or multiple documents into a collection was performed using the same *insert* function. This is still allowed for backward compatibility, but more appropriate functions were introduced, according to the number of documents loaded: *insertOne* and *insertMany*.
 
-If the document loaded does not specify an unique *_id* field, MongoDB creates automatically an *ObjectId*. This field represents the document's primary key, in other words, there are no duplicate documents with the same *_id* in the collection.
+If the document loaded does not specify the unique *_id* field, MongoDB creates automatically an *ObjectId*. This field represents the document's primary key, in other words, there are no duplicate documents with the same *_id* in the collection.
 
 ### insertOne
 
@@ -288,6 +288,21 @@ Loading sample dataset:
 > db.laureates.find().limit(1)
 ```
 
+- **Showing only specific fields:** the projection argument defines the fields that should be displayed by providing the field name as the key and 1 as the value. By default, the *_id* is displayed, and to hide the value should be set to 0.
+
+```
+// display the first name and the id for all documents (first argument should be empty or null)
+> db.laureates.find({}, {"firstname" : 1})
+{ "_id" : ObjectId("5b9fb4c353cfac900ac29129"), "firstname" : "Wilhelm Conrad" }
+{ "_id" : ObjectId("5b9fb4c353cfac900ac2912a"), "firstname" : "Hendrik Antoon" }
+...
+
+// display only the first name for all documents (first argument should be empty or null)
+> db.laureates.find(null, {"firstname" : 1, "_id" : 0 })
+{ "firstname" : "Wilhelm Conrad" }
+{ "firstname" : "Hendrik Antoon" }
+...
+```
 
 
 ```
