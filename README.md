@@ -304,7 +304,7 @@ Loading sample dataset:
 ...
 ```
 
-- **Returning documents that match a criteria:** the query parameter specifies comma separated conditions that perform an implicit AND operation. In case a given field has to be specified multiple times, the *$and* operator should be used instead.
+- **Returning documents that match a criteria:** the query parameter specifies comma separated conditions that perform an implicit AND operation. In case a given field has to be specified multiple times, the *$and* operator should be used because it requires unique keys, so the last key that was used multiple times will be evaluated.
 
 ```
 // display laureates that were born in France
@@ -319,19 +319,38 @@ Loading sample dataset:
 
 ```
 // list prizes awarded after year 2000
-db.laureates.find({"prizes.year" : { $gt : 2000 } })
+> db.laureates.find({"prizes.year" : { $gt : 2000 } })
 
 // list prizes awarded between years 2000 and 2005
-db.laureates.find({"prizes.year" : { $gt : 2000, $lt : 2005 } })
+> db.laureates.find({"prizes.year" : { $gt : 2000, $lt : 2005 } })
 
 // laureates that were born in Italy or Belgium; $in requires an array
-db.laureates.find({"bornCountry" : { $in : ["Italy", "Belgium"] } })
+> db.laureates.find({"bornCountry" : { $in : ["Italy", "Belgium"] } })
 
 // matches all documents because the field does not exist and it was used the $nin operator
 > db.laureates.find({"fieldDoesNotExist" : { $nin : ["whatever"] } })
 ```
 
+- **Logical query operators:**  the operators *$and, $not, $nor,* and *$or* are performed on an array of expressions. The *$and* operator allows specifying multiple constraints on the same field.
 
+```
+// laureates who were born in Egypt or died in Australia
+> db.laureates.find({ $or : [ { "bornCountry" : "Egypt"}, { "diedCountry" : "Australia"}] })
+
+// laureates who were awared in physics AND chemistry
+> db.laureates.find({ $and : [ { "prizes.category" : "physics"}, { "prizes.category" : "chemistry"}] })
+
+// Multiple constraints on the same field with an implicit AND evaluates only the last one
+> db.laureates.find({ "prizes.category" : "physics", "prizes.category" : "chemistry"}).count()
+177
+// Query above is equivalent to selecting only chemistry winners
+> db.laureates.find({ "prizes.category" : "chemistry"}).count()
+177
+```
+
+- **Array query operators:** *$all, $elemMatch* and *$size*	
+
+- **Element query operators:** *$exists* and *$type*
 
 ### Update
 
