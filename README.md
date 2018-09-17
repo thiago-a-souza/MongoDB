@@ -237,43 +237,60 @@ Syntax:
 db.collection.find(query, projection)
 ```
 
+Loading sample dataset:
+
+```
+> load("/path/to/laureates.js")
+```
+
+
 Examples:
 
 ```
 // display all documents in a pretty format
-> db.books.find().pretty()
+> db.laureates.find().pretty()
 {
-	"_id" : ObjectId("5b9ecde73723816695dc2269"),
-	"title" : "1984",
-	"authors" : [
-		"George Orwell"
-	],
-	"binding" : "Mass Market Paperback",
-	"pages" : 328,
-	"publisher" : "Signet Classic",
-	"published" : 1961,
-	"language" : "English",
-	"isbn" : "0451524934",
-	"dimensions" : [
-		4.2,
-		0.9,
-		7.5
-	],
-	"rating" : 4.5,
-	"rank" : 106
+	"_id" : ObjectId("5b9fb4c353cfac900ac29129"),
+	"firstname" : "Wilhelm Conrad",
+	"surname" : "Röntgen",
+	"born" : "1845-03-27",
+	"died" : "1923-02-10",
+	"bornCountry" : "Prussia (now Germany)",
+	"bornCountryCode" : "DE",
+	"bornCity" : "Lennep (now Remscheid)",
+	"diedCountry" : "Germany",
+	"diedCountryCode" : "DE",
+	"diedCity" : "Munich",
+	"gender" : "male",
+	"prizes" : [
+		{
+			"year" : 1901,
+			"category" : "physics",
+			"share" : 1,
+			"motivation" : "in recognition of the extraordinary services he has rendered by the discovery of the remarkable rays subsequently named after him",
+			"affiliations" : [
+				{
+					"name" : "Munich University",
+					"city" : "Munich",
+					"country" : "Germany"
+				}
+			]
+		}
+	]
 }
+
 ... 
 
 
 // display only one document
-> db.books.find().limit(1)
-> db.books.findOne()
+> db.laureates.find().limit(1)
+> db.laureates.findOne()
 
-// display books where binding is paperback
-> db.books.find({ "binding" : "Paperback" })
+// display laureates that were born in France
+> db.laureates.find({"bornCountry" : "France"})
 
-// display books where binding is paperback and language is english
-> db.books.find({ "binding" : "Paperback", "language" : "English" })
+// display laureates that were born in France and died in USA
+> db.laureates.find({"bornCountry" : "France", "diedCountry" : "USA"} )
 ```
 
 
