@@ -350,7 +350,18 @@ Loading sample dataset:
 
 - **Array query operators:** *$all, $elemMatch* and *$size*	
 
-- **Element query operators:** *$exists* and *$type*
+- **Element query operators:** the *$exists* operator returns documents that contains (or not) a specific field, whereas the *$type* operator selects documents that have a field with a given data type.
+
+```
+// laureates that don't have the field born
+db.laureates.find({born : {$exists : false }})
+
+// documents where the year is an int
+db.laureates.find({ "prizes.year" : { $type : "int" }})
+
+// documents where the prizes field is an array
+db.laureates.find({ "prizes" : { $type : "array" }})
+```
 
 ### Update
 
