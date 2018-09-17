@@ -288,7 +288,7 @@ Loading sample dataset:
 > db.laureates.find().limit(1)
 ```
 
-- **Showing only specific fields:** the projection argument defines the fields that should be displayed by providing the field name as the key and 1 as the value. By default, the *_id* is displayed, and to hide the value should be set to 0.
+- **Showing only specific fields:** the projection argument defines fields that should be displayed by providing the field name as the key and 1 as the value. By default, the *_id* is displayed, and to hide the value should be set to 0.
 
 ```
 // display the first name and the id for all documents (first argument should be empty or null)
@@ -304,14 +304,33 @@ Loading sample dataset:
 ...
 ```
 
+- **Returning documents that match a criteria:** the query parameter specifies comma separated conditions that perform an implicit AND operation. In case a given field has to be specified multiple times, the *$and* operator should be used instead.
 
 ```
 // display laureates that were born in France
 > db.laureates.find({"bornCountry" : "France"})
 
-// display laureates that were born in France and died in USA
+// display laureates that were born in France AND died in USA
 > db.laureates.find({"bornCountry" : "France", "diedCountry" : "USA"} )
 ```
+
+
+- **Comparison query operators:** by default, queries match documents using the equality operator, but it also supports explicit comparison operators such as  *$eq, $gt, $gte, $lt, $lte, $ne, $in, $nin*. **Remarks:**  *$in* and *$nin* must be in an array; *$nin* matches values that are not in the array even if the field does not exist.
+
+```
+// list prizes awarded after year 2000
+db.laureates.find({"prizes.year" : { $gt : 2000 } })
+
+// list prizes awarded between years 2000 and 2005
+db.laureates.find({"prizes.year" : { $gt : 2000, $lt : 2005 } })
+
+// laureates that were born in Italy or Belgium; $in requires an array
+db.laureates.find({"bornCountry" : { $in : ["Italy", "Belgium"] } })
+
+// matches all documents because the field does not exist and it was used the $nin operator
+> db.laureates.find({"fieldDoesNotExist" : { $nin : ["whatever"] } })
+```
+
 
 
 ### Update
