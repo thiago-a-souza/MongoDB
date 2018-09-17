@@ -304,7 +304,7 @@ Loading sample dataset:
 ...
 ```
 
-- **Returning documents that match a criteria:** the query parameter specifies comma separated conditions that perform an implicit AND operation. In case a given field has to be specified multiple times, the *$and* operator should be used because it requires unique keys, so the last key that was used multiple times will be evaluated.
+- **Returning documents that match a criteria:** the query parameter specifies comma separated conditions that perform an implicit AND operation. In case a given field has to be specified multiple times, the *$and* operator should be used instead.
 
 ```
 // display laureates that were born in France
