@@ -315,7 +315,7 @@ Loading sample dataset:
 ```
 
 
-- **Comparison query operators:** by default, queries match documents using the equality operator, but it also supports explicit comparison operators such as  *$eq, $gt, $gte, $lt, $lte, $ne, $in, $nin*. **Remarks:**  *$in* and *$nin* must be in an array; *$nin* matches values that are not in the array even if the field does not exist.
+- **Comparison operators:** by default, queries match documents using the equality operator, but it also supports explicit comparison operators such as  *$eq, $gt, $gte, $lt, $lte, $ne, $in, $nin*. **Remarks:**  *$in* and *$nin* must be in an array; *$nin* matches values that are not in the array even if the field does not exist.
 
 ```
 // list prizes awarded after year 2000
@@ -331,7 +331,7 @@ Loading sample dataset:
 > db.laureates.find({"fieldDoesNotExist" : { $nin : ["whatever"] } })
 ```
 
-- **Logical query operators:**  the operators *$and, $not, $nor,* and *$or* are performed on an array of expressions. The *$and* operator allows specifying multiple constraints on the same field.
+- **Logical operators:**  the operators *$and, $not, $nor,* and *$or* are performed on an array of expressions. The *$and* operator allows specifying multiple constraints on the same field.
 
 ```
 // laureates who were born in Egypt or died in Australia
@@ -348,9 +348,9 @@ Loading sample dataset:
 177
 ```
 
-- **Array query operators:** *$all, $elemMatch* and *$size*	
 
-- **Element query operators:** the *$exists* operator returns documents that contains (or not) a specific field, whereas the *$type* operator selects documents that have a field with a given data type.
+
+- **Element operators:** the *$exists* operator returns documents that contains (or not) a specific field, whereas the *$type* operator selects documents that have a field with a given data type.
 
 ```
 // laureates that don't have the field born
@@ -361,6 +361,47 @@ db.laureates.find({ "prizes.year" : { $type : "int" }})
 
 // documents where the prizes field is an array
 db.laureates.find({ "prizes" : { $type : "array" }})
+```
+
+- **Array operators:** *$all* returns documents where all values match values stored in the array provided, regardless the order. *$size* returns documents where the field is an array with a given size. Multiple criterias on arrays are evaluated separately, and it can return incorrect documents. To prevent this side effect, *$elemMatch* forces multiple criterias to be evaluated together and return documents that has at least one item that match them.
+
+```
+db.example.insertMany([{"fruits" : ["orange", "apple"]},
+                       {"fruits" : ["orange", "apple", "lemon"]},
+                       {"fruits" : ["apple", "orange"]},
+                       {"fruits" : ["strawberry", "apple", "avocado", "orange"]},
+                       {"fruits" : ["grape", "pear", "apple"]}
+                      ]);
+// because it's a scalar comparison, it will match documents that have an orange
+> db.example.find({"fruits" : "orange"}).count()
+4
+
+// because it's an array comparison, it will match documents with the very same array
+> db.example.find({"fruits" : ["orange", "apple"]}).count()
+1
+
+// match documents that have both orange and apple, regardless the order
+> db.example.find({"fruits" : {$all : ["orange", "apple"]}}).count()
+4
+
+// find documents where the array fruits has two elements
+> db.example.find({"fruits" : { $size : 2 }}).count()
+2
+
+// collection to demonstrate $elemMatch
+db.test.insertMany([
+{"years" : [2000, 2005, 2020]},
+{"years" : [1990, 2006]},
+])
+
+// returns the document with years 2000, 2005, 2020 because each criteria is evaluated separately
+> db.test.find({ "years" : { $gt : 2005, $lt : 2020}})
+{ "_id" : ObjectId("5ba0026453cfac900ac294d0"), "years" : [ 2000, 2005, 2020 ] }
+{ "_id" : ObjectId("5ba0026453cfac900ac294d1"), "years" : [ 1990, 2006 ] }
+
+// only the document with the year 2006 match both criterias
+> db.test.find({ "years" : { $elemMatch : { $gt : 2005, $lt : 2020}}})
+{ "_id" : ObjectId("5ba0026453cfac900ac294d1"), "years" : [ 1990, 2006 ] }
 ```
 
 ### Update
