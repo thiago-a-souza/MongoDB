@@ -80,7 +80,7 @@ MongoDB is continuously  evolving to accomodate new features. Initially, transac
 
 Replica set and sharding are completely different processes. A replica set contains the very same data across different nodes for availability and redundancy purposes. On the other hand, sharding or partitioning splits the data across multiple nodes, so every node has its own subset of the entire dataset. As a result, the database can scale out when a single node cannot fulfill the performance demand. MongoDB supports auto-sharding, distributing and load-balancing the data across different nodes automatically. Consequently, it provides high throughputs even on very large datasets.
 
-## Mongo Shell
+# Mongo Shell
 
 MongoDB comes with mongo shell, a CLI for managing and interacting with the data. Because mongo shell is a Javascript-based tool, it also allows running any Javascript code. The shell is a process called *mongo* that connects to a *mongod* instance, representing the MongoDB server, and assigns the current database to the variable *db* - this variable is updated whenever the database is switched.
 
@@ -139,17 +139,17 @@ function () {
 }
 ```
 
-## CRUD
+# CRUD
 
 In contrast to relational databases, MongoDB does not support SQL to perform CRUD operations. Instead, it provides APIs to popular programming languages that can access the database and execute queries. These functions take documents as parameters, including the data, filters, and other options. Depending on the programming language used, additional boilerplate code is required to perform these operations. The commands described in this document refers to Javascript syntax used by  Mongo shell. For examples in other programming languages, visit the documentation at [(2)](#references).
 
-### Create
+## Create
 
 Prior to version 3.2, inserting one or multiple documents into a collection was performed using the same *insert* function. This is still allowed for backward compatibility, but more appropriate functions were introduced, according to the number of documents loaded: *insertOne* and *insertMany*.
 
 If the document loaded does not specify an unique *_id* field, MongoDB creates automatically an *ObjectId*. This field represents the document's primary key, in other words, there are no duplicate documents with the same *_id* in the collection.
 
-#### insertOne
+### insertOne
 
 For obvious reasons, this function does not allow inserting multiple documents.
 
@@ -169,7 +169,7 @@ Examples:
 > db.books.insertOne(doc)
 ```
 
-#### insertMany
+### insertMany
 
 Function loads an array of documents. It allows inserting a single document, but it must be in an array. By default,  documents are inserted in the sequence provided. Setting the *ordered* parameter to *false* allows MongoDB reorder inserts for an enhanced load. In case *insertMany* produces an error, it stops where the failure occured if *ordered* is set to true (default), otherwise it continues trying to load all documents if it's set to false.
 
@@ -203,7 +203,7 @@ Examples:
 { "_id" : 20 }
 ```
 
-#### save
+### save
 
 Inserts one or more documents if the *_id* is not provided, otherwise it replaces existing documents by running an *update* with the *upsert* parameter set to true.
 
@@ -227,7 +227,7 @@ Examples:
 ```
 
 
-### Read
+## Read
 
 There are two popular alternatives to access the data: *find* and *findOne*. Both have the same arguments, which are optional, but *find* returns a cursor object, whereas *findOne* returns a single document. 
 
@@ -243,8 +243,7 @@ Loading sample dataset:
 > load("/path/to/laureates.js")
 ```
 
-
-Examples:
+- **Returning all documents:** use *find* without any arguments
 
 ```
 // display all documents in a pretty format
@@ -278,14 +277,20 @@ Examples:
 		}
 	]
 }
-
 ... 
+```
 
+- **Returning a single document:** use either *findOne* or *find* restricting the number of documents with *limit*
 
+```
 // display only one document
-> db.laureates.find().limit(1)
 > db.laureates.findOne()
+> db.laureates.find().limit(1)
+```
 
+
+
+```
 // display laureates that were born in France
 > db.laureates.find({"bornCountry" : "France"})
 
