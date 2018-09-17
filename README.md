@@ -350,7 +350,7 @@ Loading sample dataset:
 
 
 
-- **Element operators:** the *$exists* operator returns documents that contains (or not) a specific field, whereas the *$type* operator selects documents that have a field with a given data type.
+- **Element operators:** *$exists* returns documents that contains (or not) a specific field, whereas *$type* selects documents that have a field with a given data type.
 
 ```
 // laureates that don't have the field born
