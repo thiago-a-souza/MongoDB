@@ -340,7 +340,7 @@ db.collection.find(query, projection)
 
 ### Count
 
-there are two *count* functions, one that execute on collections and the other runs on cursors. The first one has a syntax similar to *find* and also can execute without arguments against a collection, while the second doesn't take parameters. Executing the function without arguments returns approximate results based on the collection's metadata.
+There are two *count* functions: *collection.count* and *cursor.count*. The first one has a syntax similar to *find* and also can execute without arguments, while the second doesn't take parameters. Executing the function without arguments returns approximate results based on the collection's metadata.
 
 ```
 // syntax
@@ -357,7 +357,7 @@ db.laureates.count({ "bornCountry" : "Canada" })
 
 ### Distinct
 
-finds *distinct* values for a field passed as a string (not a document) and returns an array.
+Returns *distinct* values for a field passed as a string parameter and returns an array.
 
 ```
 // syntax - field is a string
@@ -374,7 +374,9 @@ finds *distinct* values for a field passed as a string (not a document) and retu
 
 ### Comparison operators
 
-default, queries match documents using the equality operator, but it also supports explicit comparison operators such as  *$eq, $gt, $gte, $lt, $lte, $ne, $in, $nin*. **Remarks:**  *$in* and *$nin* must be in an array; *$nin* matches values that are not in the array even if the field does not exist.
+By default, queries match documents using the equality operator, but it also supports explicit comparison operators such as  *$eq, $gt, $gte, $lt, $lte, $ne, $in, $nin*.
+
+**Remarks:**  *$in* and *$nin* must be in an array; *$nin* matches values that are not in the array even if the field does not exist.
 
 ```
 // list prizes awarded after year 2000
@@ -394,7 +396,8 @@ default, queries match documents using the equality operator, but it also suppor
 ```
 
 ### Logical operators
-the operators *$and, $not, $nor,* and *$or* are performed on an array of expressions. The *$and* operator allows specifying multiple constraints on the same field.
+
+Logical operators such as *$and, $not, $nor,* and *$or* are performed on an array of expressions. The *$and* operator allows specifying multiple constraints on the same field.
 
 ```
 // laureates who were born in Egypt or died in Australia
@@ -414,7 +417,11 @@ the operators *$and, $not, $nor,* and *$or* are performed on an array of express
 
 
 ### Element operators
-*$exists* returns documents that contains (or not) a specific field, whereas *$type* selects documents that have a field with a given data type.
+
+There are two element operators:
+
+- *$exists* returns documents that contains (or not) a specific field
+- *$type* selects documents that have a field with a given data type
 
 ```
 // laureates that don't have the field born
@@ -429,7 +436,9 @@ db.laureates.find({ "prizes" : { $type : "array" }})
 
 ### Array operators
 
-*$all* returns documents where all values match values stored in the array provided, regardless the order. *$size* returns documents where the field is an array with a given size. Multiple criterias on arrays are evaluated separately, and it can return incorrect documents. To prevent this side effect, *$elemMatch* forces multiple criterias to be evaluated together and return documents that has at least one item that match them.
+- *$all* returns documents where all values match values stored in the array provided, regardless the order.
+- *$size* returns documents where the field is an array with a given size. Multiple criterias on arrays are evaluated separately, and it can return incorrect documents. To prevent this side effect, 
+- *$elemMatch* forces multiple criterias to be evaluated together and return documents that has at least one item that match them.
 
 ```
 db.example.insertMany([{"fruits" : ["orange", "apple"]},
