@@ -479,6 +479,22 @@ db.test.insertMany([
 
 ### Cursors
 
+The *find* command returns a cursor of objects, and it's up to the API to handle the results. Mongo shell automatically displays the first 20 documents, and the *it* command displays the next 20 results. However, if the command is not executed in mongo shell, the items should be iterated manually to display the results.
+
+```
+// looping through the cursor result
+> var cur = db.laureates.find({ "prizes.category" : "physics" }, {"_id" : 0, "firstname" : 1 });
+> while(cur.hasNext()){
+    printjson(cur.next())
+  }
+```
+
+- ***cursor.count()*** 
+- ***cursor.limit()*** 
+- ***cursor.skip()*** 
+- ***cursor.sort()*** 
+
+
 ## Update
 
 ## Delete
