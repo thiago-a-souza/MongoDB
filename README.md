@@ -175,13 +175,13 @@ If the document loaded does not specify the unique *_id* field, MongoDB creates 
 For obvious reasons, this function does not allow inserting multiple documents.
 
 
-Syntax:
+**Syntax:**
 
 ```
 db.collection.insertOne(<document>, { writeConcern: <document> })
 ```
 
-Examples:
+**Examples:**
 
 ```
 > db.books.insertOne({"title" : "1984", "author" : "George Orwell" } )
@@ -194,13 +194,13 @@ Examples:
 
 Function loads an array of documents. It allows inserting a single document, but it must be in an array. By default,  documents are inserted in the sequence provided. Setting the *ordered* parameter to *false* allows MongoDB reorder inserts for an enhanced load. In case *insertMany* produces an error, it stops where the failure occurred if *ordered* is set to true (default), otherwise it continues trying to load all documents if it's set to false.
 
-Syntax:
+**Syntax:**
 
 ```
 db.collection.insertMany( [ <document 1> , ... ], { writeConcern: <document>, ordered: <boolean> } )
 ```
 
-Examples:
+**Examples:**
 
 ```
 > db.books.insertMany([
@@ -228,13 +228,13 @@ Examples:
 
 Inserts one or more documents if the *_id* is not provided, otherwise it replaces existing documents by running an *update* with the *upsert* parameter set to true.
 
-Syntax:
+**Syntax:**
 
 ```
 db.collection.save(<document>, { writeConcern: <document> })
 ```
 
-Examples:
+**Examples:**
 
 ```
 > db.books.save({"title" : "Leonardo da Vinci"})
@@ -252,17 +252,19 @@ Examples:
 
 There are two popular alternatives to access the data: *find* and *findOne*. Both have the same arguments, which are optional, but *find* returns a cursor object, whereas *findOne* returns a single document. 
 
-Syntax:
+**Syntax:**
 
 ```
 db.collection.find(query, projection)
 ```
 
-Loading sample dataset:
+**Loading sample dataset:**
 
 ```
 > load("/path/to/laureates.js")
 ```
+
+**Examples:**
 
 - **Returning all documents:** use *find* without any arguments
 
