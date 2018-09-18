@@ -374,9 +374,9 @@ Returns *distinct* values for a field passed as a string parameter and returns a
 
 ### Comparison operators
 
-By default, queries match documents using the equality operator, but it also supports explicit comparison operators such as  *$eq, $gt, $gte, $lt, $lte, $ne, $in, $nin*.
+By default, queries match documents using the equality operator, but it also supports explicit comparison operators such as  ***$eq, $gt, $gte, $lt, $lte, $ne, $in,*** and  ***$nin***.
 
-**Remarks:**  *$in* and *$nin* must be in an array; *$nin* matches values that are not in the array even if the field does not exist.
+**Remarks:**  *$in* and *$nin* must be in an array; *$nin* matches values that are not in the array, even if the field does not exist.
 
 ```
 // list prizes awarded after year 2000
@@ -397,7 +397,7 @@ By default, queries match documents using the equality operator, but it also sup
 
 ### Logical operators
 
-Logical operators such as *$and, $not, $nor,* and *$or* are performed on an array of expressions. The *$and* operator allows specifying multiple constraints on the same field.
+The logical operators ***$and, $not, $nor,*** and ***$or*** are performed on an array of expressions. The *$and* operator allows specifying multiple constraints on the same field.
 
 ```
 // laureates who were born in Egypt or died in Australia
