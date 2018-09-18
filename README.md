@@ -304,7 +304,7 @@ Loading sample dataset:
 ...
 ```
 
-- **Returning documents that match a criteria:** the query parameter specifies comma separated conditions that perform an implicit AND operation. In case a given field has to be specified multiple times, the *$and* operator should be used instead.
+- **Documents that match a criteria:** the query parameter specifies comma separated conditions that perform an implicit AND operation. In case a given field has to be specified multiple times, the *$and* operator should be used instead.
 
 ```
 // display laureates that were born in France
@@ -315,11 +315,50 @@ Loading sample dataset:
 ```
 
 
-- **Comparison operators:** by default, queries match documents using the equality operator, but it also supports explicit comparison operators such as  *$eq, $gt, $gte, $lt, $lte, $ne, $in, $nin*. **Remarks:**  *$in* and *$nin* must be in an array; *$nin* matches values that are not in the array even if the field does not exist.
+### Count
+
+there are two *count* functions, one that execute on collections and the other runs on cursors. The first one has a syntax similar to *find* and also can execute without arguments against a collection, while the second doesn't take parameters. Executing the function without arguments returns approximate results based on the collection's metadata.
+
+```
+// syntax
+// db.collection.count(query, options)
+// cursor.count()
+
+// operations are equivalent
+> db.laureates.find().count()
+> db.laureates.count()
+
+// syntax accepts a query
+db.laureates.count({ "bornCountry" : "Canada" })
+```
+
+### Distinct
+
+finds *distinct* values for a field passed as a string (not a document) and returns an array.
+
+```
+// syntax - field is a string
+// db.collection.distinct(field, query, options)
+
+// distinct values by bornCountry
+> db.laureates.distinct("bornCountry")
+
+// distinct categories awarded to women
+> db.laureates.distinct("prizes.category", { "gender" : "female"})
+```
+
+
+
+### Comparison operators
+
+default, queries match documents using the equality operator, but it also supports explicit comparison operators such as  *$eq, $gt, $gte, $lt, $lte, $ne, $in, $nin*. **Remarks:**  *$in* and *$nin* must be in an array; *$nin* matches values that are not in the array even if the field does not exist.
 
 ```
 // list prizes awarded after year 2000
 > db.laureates.find({"prizes.year" : { $gt : 2000 } })
+
+// comparison operators also applies to strings
+> db.laureates.find({"firstname" : { $lt : "B" }})
 
 // list prizes awarded between years 2000 and 2005
 > db.laureates.find({"prizes.year" : { $gt : 2000, $lt : 2005 } })
@@ -331,7 +370,8 @@ Loading sample dataset:
 > db.laureates.find({"fieldDoesNotExist" : { $nin : ["whatever"] } })
 ```
 
-- **Logical operators:**  the operators *$and, $not, $nor,* and *$or* are performed on an array of expressions. The *$and* operator allows specifying multiple constraints on the same field.
+### Logical operators
+the operators *$and, $not, $nor,* and *$or* are performed on an array of expressions. The *$and* operator allows specifying multiple constraints on the same field.
 
 ```
 // laureates who were born in Egypt or died in Australia
@@ -350,7 +390,8 @@ Loading sample dataset:
 
 
 
-- **Element operators:** *$exists* returns documents that contains (or not) a specific field, whereas *$type* selects documents that have a field with a given data type.
+### Element operators
+*$exists* returns documents that contains (or not) a specific field, whereas *$type* selects documents that have a field with a given data type.
 
 ```
 // laureates that don't have the field born
@@ -363,7 +404,9 @@ db.laureates.find({ "prizes.year" : { $type : "int" }})
 db.laureates.find({ "prizes" : { $type : "array" }})
 ```
 
-- **Array operators:** *$all* returns documents where all values match values stored in the array provided, regardless the order. *$size* returns documents where the field is an array with a given size. Multiple criterias on arrays are evaluated separately, and it can return incorrect documents. To prevent this side effect, *$elemMatch* forces multiple criterias to be evaluated together and return documents that has at least one item that match them.
+### Array operators
+
+*$all* returns documents where all values match values stored in the array provided, regardless the order. *$size* returns documents where the field is an array with a given size. Multiple criterias on arrays are evaluated separately, and it can return incorrect documents. To prevent this side effect, *$elemMatch* forces multiple criterias to be evaluated together and return documents that has at least one item that match them.
 
 ```
 db.example.insertMany([{"fruits" : ["orange", "apple"]},
@@ -404,9 +447,11 @@ db.test.insertMany([
 { "_id" : ObjectId("5ba0026453cfac900ac294d1"), "years" : [ 1990, 2006 ] }
 ```
 
-### Update
+### Cursors
 
-### Delete
+## Update
+
+## Delete
 
 
 
