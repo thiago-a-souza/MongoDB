@@ -479,7 +479,7 @@ db.test.insertMany([
 
 ### Cursors
 
-The *find* command returns a cursor of objects, and it's up to the API to handle the results. Mongo shell automatically displays the first 20 documents, and the *it* command displays the next 20 results. However, if the command is not executed in mongo shell, the items should be iterated manually to display the results.
+The *find* command returns a cursor of objects, and it's up to the API to handle the results. Mongo shell automatically displays the first 20 documents, and the ***it*** command displays the next 20 results. However, if the command is not executed in mongo shell, the items should be iterated manually to display them.
 
 ```
 // looping through the cursor result
