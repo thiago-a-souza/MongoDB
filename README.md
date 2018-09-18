@@ -418,10 +418,8 @@ Logical operators such as *$and, $not, $nor,* and *$or* are performed on an arra
 
 ### Element operators
 
-There are two element operators:
-
-- *$exists* returns documents that contains (or not) a specific field
-- *$type* selects documents that have a field with a given data type
+- ***$exists*** returns documents that contains (or not) a specific field
+- ***$type*** selects documents that have a field with a given data type
 
 ```
 // laureates that don't have the field born
@@ -436,9 +434,9 @@ db.laureates.find({ "prizes" : { $type : "array" }})
 
 ### Array operators
 
-- *$all* returns documents where all values match values stored in the array provided, regardless the order.
-- *$size* returns documents where the field is an array with a given size. Multiple criterias on arrays are evaluated separately, and it can return incorrect documents. To prevent this side effect, 
-- *$elemMatch* forces multiple criterias to be evaluated together and return documents that has at least one item that match them.
+- ***$all*** returns documents where all values match values stored in the array provided, regardless the order.
+- ***$size*** returns documents where the field is an array with a given size. Multiple criterias on arrays are evaluated separately, and it can return incorrect documents. To prevent this side effect, 
+- ***$elemMatch*** forces multiple criterias to be evaluated together and return documents that has at least one item that match them.
 
 ```
 db.example.insertMany([{"fruits" : ["orange", "apple"]},
