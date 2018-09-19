@@ -20,6 +20,9 @@ Thiago Alexandre Domingues de Souza
      * [Array operators](#array-operators)     
      * [Cursors](#cursors)          
   * [Update](#update)
+     * [updateOne](#updateone)  
+     * [updateMany](#updatemany)  
+     * [Update Operators](#update-operators)  
   * [Delete](#delete)  
 
 # NoSQL
@@ -170,7 +173,7 @@ Prior to version 3.2, inserting one or multiple documents into a collection was 
 
 If the document loaded does not specify the unique *_id* field, MongoDB creates automatically an *ObjectId*. This field represents the document's primary key, in other words, there are no duplicate documents with the same *_id* in the collection.
 
-### insertOne
+### insertOne()
 
 For obvious reasons, this function does not allow inserting multiple documents.
 
@@ -532,6 +535,45 @@ To iterate and manipulate the data, the cursor object provides several methods. 
 
 
 ## Update
+
+There are three update functions: *update*, *updateOne*, and *updateMany*. The first method, *update*, can replace the entire document using a key/value pair syntax as the update parameter or modify specific fields through update operators (e.g. *$set*, *$inc*, *$rename*, etc). By default, *update* affects a single document, but it allows updating multiple documents if update operators  are used. The other update functions, *updateOne* and *updateMany*, have a similar syntax, and allows only update operators, throwing an error if the key/value pair syntax is used.
+
+### update
+
+```
+// syntax
+db.collection.update(query, update, options)
+
+> db.people.insertMany([ {"name" : "john", "age" : 25 },
+                         {"name" : "peter", "age" : 36 },
+                         {"name" : "alex", "age" : 36 }
+                       ])
+> db.people.find()
+{ "_id" : ObjectId("5ba2589953cfac900ac294e8"), "name" : "john", "age" : 25 }
+{ "_id" : ObjectId("5ba2589953cfac900ac294e9"), "name" : "peter", "age" : 36 }
+{ "_id" : ObjectId("5ba2589953cfac900ac294ea"), "name" : "alex", "age" : 36 }
+
+// replaces all fields, except the _id
+> db.people.update({"name" : "john"}, {"gender" : "male"})
+> db.people.find()
+{ "_id" : ObjectId("5ba2589953cfac900ac294e8"), "gender" : "male" }
+{ "_id" : ObjectId("5ba2589953cfac900ac294e9"), "name" : "peter", "age" : 36 }
+{ "_id" : ObjectId("5ba2589953cfac900ac294ea"), "name" : "alex", "age" : 36 }
+
+// it cannot replace multiple documents
+> db.people.update({"age" : "36"}, {"gender" : "male"})
+WriteResult({ "nMatched" : 0, "nUpserted" : 0, "nModified" : 0 })
+```
+
+### updateOne
+
+```
+
+```
+
+### updateMany
+
+### Update Operators
 
 ## Delete
 
