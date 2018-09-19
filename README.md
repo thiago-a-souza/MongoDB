@@ -346,7 +346,7 @@ db.collection.find(query, projection)
 There are two *count* functions: *collection.count* and *cursor.count*. The first one has a syntax similar to *find* and also can execute without arguments, while the second doesn't take a query. Executing the function without arguments returns approximate results based on the collection's metadata.
 
 ```
-// syntax
+// syntaxes
 // db.collection.count(query, options)
 // cursor.count()
 
@@ -542,36 +542,65 @@ There are three update functions: *update*, *updateOne*, and *updateMany*. The f
 
 ```
 // syntax
-db.collection.update(query, update, options)
+// db.collection.update(query, update, options)
 
 > db.people.insertMany([ {"name" : "john", "age" : 25 },
                          {"name" : "peter", "age" : 36 },
                          {"name" : "alex", "age" : 36 }
                        ])
 > db.people.find()
-{ "_id" : ObjectId("5ba2589953cfac900ac294e8"), "name" : "john", "age" : 25 }
-{ "_id" : ObjectId("5ba2589953cfac900ac294e9"), "name" : "peter", "age" : 36 }
-{ "_id" : ObjectId("5ba2589953cfac900ac294ea"), "name" : "alex", "age" : 36 }
+{ "_id" : ObjectId("5ba286f753cfac900ac294ee"), "name" : "john", "age" : 25 }
+{ "_id" : ObjectId("5ba286f753cfac900ac294ef"), "name" : "peter", "age" : 36 }
+{ "_id" : ObjectId("5ba286f753cfac900ac294f0"), "name" : "alex", "age" : 36 }
 
 // replaces all fields, except the _id
 > db.people.update({"name" : "john"}, {"gender" : "male"})
 > db.people.find()
-{ "_id" : ObjectId("5ba2589953cfac900ac294e8"), "gender" : "male" }
-{ "_id" : ObjectId("5ba2589953cfac900ac294e9"), "name" : "peter", "age" : 36 }
-{ "_id" : ObjectId("5ba2589953cfac900ac294ea"), "name" : "alex", "age" : 36 }
+{ "_id" : ObjectId("5ba286f753cfac900ac294ee"), "gender" : "male" }
+{ "_id" : ObjectId("5ba286f753cfac900ac294ef"), "name" : "peter", "age" : 36 }
+{ "_id" : ObjectId("5ba286f753cfac900ac294f0"), "name" : "alex", "age" : 36 }
 
 // it cannot replace multiple documents
 > db.people.update({"age" : "36"}, {"gender" : "male"})
 WriteResult({ "nMatched" : 0, "nUpserted" : 0, "nModified" : 0 })
+
+// modifying only specific fields with $set
+> db.people.update({"_id" : ObjectId("5ba286f753cfac900ac294ee")}, { $set : {"name" : "john", "age" : 25}})
+> db.people.find({"_id" : ObjectId("5ba286f753cfac900ac294ee")})
+{ "_id" : ObjectId("5ba286f753cfac900ac294ee"), "gender" : "male", "name" : "john", "age" : 25 }
 ```
 
 ### updateOne
 
 ```
+// syntax
+// db.collection.updateOne(filter, update, options)
 
+// document before update
+> db.people.find({"name" : "john"})
+{ "_id" : ObjectId("5ba286f753cfac900ac294ee"), "gender" : "male", "name" : "john", "age" : 25 }
+
+// incrementing the age by 1
+> db.people.updateOne({"name" : "john"}, {$inc : { "age" : 1 }})
+
+// document after update
+> db.people.find({"name" : "john"})
+{ "_id" : ObjectId("5ba286f753cfac900ac294ee"), "gender" : "male", "name" : "john", "age" : 26 }
 ```
 
 ### updateMany
+
+```
+// syntax
+// db.collection.updateMany(filter, update, options)
+
+> db.people.updateMany({"age" : { $gte : 30 , $lt : 40 }}, { $set : { "group" : "thirties"}})
+
+> db.people.find()
+{ "_id" : ObjectId("5ba286f753cfac900ac294ee"), "gender" : "male", "name" : "john", "age" : 26 }
+{ "_id" : ObjectId("5ba286f753cfac900ac294ef"), "name" : "peter", "age" : 36, "group" : "thirties" }
+{ "_id" : ObjectId("5ba286f753cfac900ac294f0"), "name" : "alex", "age" : 36, "group" : "thirties" }
+```
 
 ### Update Operators
 
