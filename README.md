@@ -340,7 +340,7 @@ db.collection.find(query, projection)
 
 ### Count
 
-There are two *count* functions: *collection.count* and *cursor.count*. The first one has a syntax similar to *find* and also can execute without arguments, while the second doesn't take parameters. Executing the function without arguments returns approximate results based on the collection's metadata.
+There are two *count* functions: *collection.count* and *cursor.count*. The first one has a syntax similar to *find* and also can execute without arguments, while the second doesn't take a query. Executing the function without arguments returns approximate results based on the collection's metadata.
 
 ```
 // syntax
@@ -481,6 +481,8 @@ db.test.insertMany([
 
 The *find* command returns a cursor of objects, and it's up to the API to handle the results. Mongo shell automatically displays the first 20 documents, and the ***it*** command displays the next 20 results. However, if the command is not executed in mongo shell, the items should be iterated manually to display them.
 
+To iterate and manipulate the data, the cursor object provides several methods. They are efficient because the *find* command takes into account cursor methods before sending the request to the database, rather than submitting the request and then running cursor commands. Cursor methods that return another cursor (e.g. skip, limit, sort) can be chained together, regardless the order the outcome will be the same.
+
 ```
 // looping through the cursor result
 > var cur = db.laureates.find({ "prizes.category" : "physics" }, {"_id" : 0, "firstname" : 1 });
@@ -489,10 +491,44 @@ The *find* command returns a cursor of objects, and it's up to the API to handle
   }
 ```
 
-- ***cursor.count()*** 
-- ***cursor.limit()*** 
-- ***cursor.skip()*** 
-- ***cursor.sort()*** 
+- ***cursor.count()*** returns the number of documents referenced by the cursor. Unlike the *collection.count*, the *cursor.count* doesn't accept a query parameter.
+
+```
+> db.laureates.find().count()
+```
+
+- ***cursor.limit()*** set a max limit on the number of documents returned.
+
+```
+> db.laureates.find().limit(3)
+```
+
+- ***cursor.skip()*** skip a specified number of results; useful for pagination results.
+
+```
+// skip 10 results
+> db.laureates.find().skip(10)
+
+// skip 10 results and displays only 10 results
+> db.laureates.find().skip(10).limit(10)
+// chaining cursor functions return the same result
+> db.laureates.find().limit(10).skip(10)
+```
+
+- ***cursor.sort()*** take as argument a key/value pair representing the field and the direction, respectively, in ascending (1) or descending (-1) order.
+
+```
+// sort laureates by their firstname in ascending order
+> db.laureates.find().sort({"firstname" : 1})
+
+// sort results by year in descending order and category in ascending order
+> db.laureates.find().sort({"prizes.year" : -1, "prizes.category" : 1})
+
+// chaining skip, limit, and sort returns the same result regardless the order
+> db.laureates.find().limit(5).skip(5).sort({"firstname" : 1})
+> db.laureates.find().skip(5).sort({"firstname" : 1}).limit(5)
+> db.laureates.find().sort({"firstname" : 1}).limit(5).skip(5)
+```
 
 
 ## Update
