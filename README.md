@@ -604,6 +604,69 @@ WriteResult({ "nMatched" : 0, "nUpserted" : 0, "nModified" : 0 })
 
 ### Update Operators
 
+
+- ***$set*** modifies a field 
+- ***$unset*** removes a field
+- ***$rename*** renames a field
+- ***$inc*** increments by a specified number
+- ***$mul*** multiplies by a specified number
+- ***$min*** **and** ***$max*** updates only if the field is less/greater than min/max
+- ***$setOnInsert*** when the upsert option is enabled, it sets values in case of inserts
+
+```
+db.users.drop()
+db.users.insertOne(
+  {
+  "_id" : 1,
+  "name" : "bob",
+  "address" : { "street" : "1000 5th Ave", "city" : "New York", "state" : "ny" },      
+  "age" : 30,
+  "limit" : 1000.00,
+  "score" : 50
+  }
+ )
+
+// modifying and adding field
+> db.users.updateOne({"_id" : 1}, {$set : {"name" : "Bob", "favcolor" : "green"}})
+> db.users.find({"_id": 1}, {"_id" : 0, "name" : 1, "favcolor" : 1})
+{ "name" : "Bob", "favcolor" : "green" }
+
+// removing field
+> db.users.updateOne({"_id" : 1}, {$unset : {"favcolor" : ""}})
+
+// renaming field
+> db.users.updateOne({"_id" : 1}, {$rename : {"address" : "addr"}})
+> db.users.find({"_id": 1}, {"_id" : 0, "name" : 1, "addr" : 1})
+{ "name" : "Bob", "addr" : { "street" : "1000 5th Ave", "city" : "New York", "state" : "ny" } }
+
+// updating embedded document
+> db.users.find({"_id": 1}, {"_id" : 0, "name" : 1, "addr" : 1})
+{ "name" : "Bob", "addr" : { "street" : "1000 5th Ave", "city" : "New York", "state" : "NY" } }
+
+// incrementing age by 1 and multiplying limit by 3
+> db.users.updateOne({"_id" : 1}, {$inc : {"age" : 1}, $mul : {"limit" : 3}})
+> db.users.find({"_id": 1}, {"_id" : 0, "name" : 1, "age" : 1, "limit" : 1})
+{ "name" : "Bob", "age" : 31, "limit" : 3000 }
+
+// updates only if the current score is less than 80
+> db.users.updateOne({"_id" : 1}, {$inc : {"age" : 1}, $max : {"score" : 80}})
+> db.users.find({"_id": 1}, {"_id" : 0, "name" : 1, "score" : 1})
+{ "name" : "Bob", "score" : 80 }
+```
+
+- **Positional operator** 
+- ***$addToSet***
+- ***$pop***
+- ***$pull***
+- ***$pullAll***
+- ***$push***
+  - ***$each***
+  - ***$slice***
+  - ***$sort***
+  - ***$position***
+
+
+
 ## Delete
 
 
