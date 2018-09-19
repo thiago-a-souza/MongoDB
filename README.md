@@ -614,8 +614,7 @@ WriteResult({ "nMatched" : 0, "nUpserted" : 0, "nModified" : 0 })
 - ***$setOnInsert*** when the upsert option is enabled, it sets values in case of inserts
 
 ```
-db.users.drop()
-db.users.insertOne(
+> db.users.insertOne(
   {
   "_id" : 1,
   "name" : "bob",
@@ -655,17 +654,32 @@ db.users.insertOne(
 ```
 
 - **Positional operator** 
-- ***$addToSet***
-- ***$pop***
-- ***$pull***
-- ***$pullAll***
-- ***$push***
+- ***$addToSet*** adds value to array unless it already exists
+- ***$pop*** removes the first (-1) or the last (1) item from the array
+- ***$pull*** removes items that match a criteria
+- ***$pullAll*** removes items that match values from an array
+- ***$push*** appends an item to an array
   - ***$each***
   - ***$slice***
   - ***$sort***
   - ***$position***
 
+```
+db.example.drop()
+db.example.insertOne({"_id": 1, "data" : [1, 2, 3, 4]})
 
+> db.example.update({"_id" : 1}, { $addToSet : { "data" : 5 }})
+> db.example.find()
+{ "_id" : 1, "data" : [ 1, 2, 3, 4, 5 ] }
+
+// adding an array of items with $addToSet requires the $each operator
+> db.example.update({"_id" : 1}, { $addToSet : { "data" : { $each : [10,20,30]} }})
+> db.example.find()
+{ "_id" : 1, "data" : [ 1, 2, 3, 4, 5, 10, 20, 30 ] }
+
+
+
+```
 
 ## Delete
 
