@@ -653,7 +653,6 @@ WriteResult({ "nMatched" : 0, "nUpserted" : 0, "nModified" : 0 })
 { "name" : "Bob", "score" : 80 }
 ```
 
-- **Positional operator** 
 - ***$addToSet*** adds value to array unless it already exists
 - ***$pop*** removes the first (-1) or the last (1) item from the array
 - ***$pull*** removes items that match a criteria
@@ -662,50 +661,59 @@ WriteResult({ "nMatched" : 0, "nUpserted" : 0, "nModified" : 0 })
   - ***$each*** allows appending array items into the document's array 
   - ***$slice*** limits the resulting array with the initial/final items using a positive/negative argument
   - ***$sort*** sorts the array
-  - ***$position*** location where the data should be appended
+  - ***$position*** location where the data should be appended - requires $each
+- **Positional $ operator** identifies an element in the array without specifying the index; the array field name must appear in the query
+
 
 ```
 db.example.drop()
 db.example.insertOne({"_id": 1, "data" : [1, 2, 3, 4]})
 
+// adding an item if it does not exist
 > db.example.update({"_id" : 1}, { $addToSet : { "data" : 5 }})
 > db.example.find()
 { "_id" : 1, "data" : [ 1, 2, 3, 4, 5 ] }
 
+// modifying an item from an array position
+> db.example.update({"_id" : 1}, { $set : { "data.2" : 300 }})
+> db.example.find()
+{ "_id" : 1, "data" : [ 1, 2, 300, 4, 5 ] }
+
+
 // adding an array of items with $addToSet requires the $each operator
 > db.example.update({"_id" : 1}, { $addToSet : { "data" : { $each : [10,20,30]} }})
 > db.example.find()
-{ "_id" : 1, "data" : [ 1, 2, 3, 4, 5, 10, 20, 30 ] }
+{ "_id" : 1, "data" : [ 1, 2, 300, 4, 5, 10, 20, 30 ] }
 
 // removing the last item
 > db.example.updateOne({"_id" : 1 }, {$pop : { data : 1 }})
 > db.example.find()
-{ "_id" : 1, "data" : [ 1, 2, 3, 4, 5, 10, 20 ] }
+{ "_id" : 1, "data" : [ 1, 2, 300, 4, 5, 10, 20 ] }
 
 // removing the first item
 > db.example.updateOne({"_id" : 1 }, {$pop : { data : -1 }})
 > db.example.find()
-{ "_id" : 1, "data" : [ 2, 3, 4, 5, 10, 20 ] }
+{ "_id" : 1, "data" : [ 2, 300, 4, 5, 10, 20 ] }
 
-// removing items >= 3 and <= 4
-> db.example.updateOne({"_id" : 1 }, {$pull : { data : {$gte : 3, $lte : 4} }})
+// removing items >= 2 and <= 4
+> db.example.updateOne({"_id" : 1 }, {$pull : { data : {$gte : 2, $lte : 4} }})
 > db.example.find()
-{ "_id" : 1, "data" : [ 2, 5, 10, 20 ] }
+{ "_id" : 1, "data" : [ 300, 5, 10, 20 ] }
 
 // removing items listed in the array
 > db.example.updateOne({"_id" : 1 }, {$pullAll : { data : [2, 10] }})
 > db.example.find()
-{ "_id" : 1, "data" : [ 5, 20 ] }
+{ "_id" : 1, "data" : [ 300, 5, 20 ] }
 
 // appending an item
 > db.example.updateOne({"_id" : 1 }, {$push : { data : 8 }})
 > db.example.find()
-{ "_id" : 1, "data" : [ 5, 20, 8 ] }
+{ "_id" : 1, "data" : [ 300, 5, 20, 8 ] }
 
 // appending an array of items with $each
 > db.example.updateOne({"_id" : 1 }, {$push : { data : { $each : [ 17, 12, 31, 5] } }})
 > db.example.find()
-{ "_id" : 1, "data" : [ 5, 20, 8, 17, 12, 31, 5 ] }
+{ "_id" : 1, "data" : [ 300, 5, 20, 8, 17, 12, 31, 5 ] }
 
 // appends two elements and  keeps only the last five elements in the resulting array
 > db.example.updateOne({"_id" : 1 }, {$push : { data : { $each : [100, 200], $slice : -5  } }})
@@ -717,10 +725,20 @@ db.example.insertOne({"_id": 1, "data" : [1, 2, 3, 4]})
 > db.example.find()
 { "_id" : 1, "data" : [ 5, 12, 25, 31, 100, 200 ] }
 
-// apends an item, sort the array and keep only the last 4 elements
+// appends an item, sort the array and keep only the last 4 elements
 > db.example.updateOne({"_id" : 1 }, {$push : { data : { $each : [73], $sort : 1, $slice : -4  } }})
 > db.example.find()
 { "_id" : 1, "data" : [ 31, 73, 100, 200 ] }
+
+// inserting an item into the index three
+> db.example.updateOne({"_id" : 1 }, {$push : { data : {$each : [19], $position : 3  }}})
+> db.example.find()
+{ "_id" : 1, "data" : [ 31, 73, 100, 19, 200 ] }
+
+// positional $ operator - finding and changing a value from an array
+> db.example.updateOne({"_id" : 1, "data" : 73 }, {$set : { "data.$" : 85}})
+> db.example.find()
+{ "_id" : 1, "data" : [ 31, 85, 100, 19, 200 ] }
 ```
 
 ## Delete
