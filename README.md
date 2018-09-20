@@ -538,36 +538,56 @@ To iterate and manipulate the data, the cursor object provides several methods. 
 
 There are three update functions: *update*, *updateOne*, and *updateMany*. The first method, *update*, can replace the entire document using a key/value pair syntax as the update parameter or modify specific fields through update operators (e.g. *$set*, *$inc*, *$rename*, etc). By default, *update* affects a single document, but it allows updating multiple documents if update operators  are used. The other update functions, *updateOne* and *updateMany*, have a similar syntax, and allows only update operators, throwing an error if the key/value pair syntax is used.
 
+As expected, the update functions modifies only matching documents, not changing anything if there are no matches. However,  enabling the *upsert* option allows inserting the data as a new document if no matches are found.
+
 ### update
 
 ```
 // syntax
 // db.collection.update(query, update, options)
 
-> db.people.insertMany([ {"name" : "john", "age" : 25 },
-                         {"name" : "peter", "age" : 36 },
-                         {"name" : "alex", "age" : 36 }
+> db.people.drop()
+> db.people.insertMany([ {"_id" : 1, "name" : "john", "age" : 25 },
+                         {"_id" : 2, "name" : "peter", "age" : 36 },
+                         {"_id" : 3, "name" : "alex", "age" : 36 }
                        ])
 > db.people.find()
-{ "_id" : ObjectId("5ba286f753cfac900ac294ee"), "name" : "john", "age" : 25 }
-{ "_id" : ObjectId("5ba286f753cfac900ac294ef"), "name" : "peter", "age" : 36 }
-{ "_id" : ObjectId("5ba286f753cfac900ac294f0"), "name" : "alex", "age" : 36 }
+{ "_id" : 1, "name" : "john", "age" : 25 }
+{ "_id" : 2, "name" : "peter", "age" : 36 }
+{ "_id" : 3, "name" : "alex", "age" : 36 }
 
-// replaces all fields, except the _id
+// replacing all fields, except the _id
 > db.people.update({"name" : "john"}, {"gender" : "male"})
 > db.people.find()
-{ "_id" : ObjectId("5ba286f753cfac900ac294ee"), "gender" : "male" }
-{ "_id" : ObjectId("5ba286f753cfac900ac294ef"), "name" : "peter", "age" : 36 }
-{ "_id" : ObjectId("5ba286f753cfac900ac294f0"), "name" : "alex", "age" : 36 }
+{ "_id" : 1, "gender" : "male" }
+{ "_id" : 2, "name" : "peter", "age" : 36 }
+{ "_id" : 3, "name" : "alex", "age" : 36 }
 
 // it cannot replace multiple documents
 > db.people.update({"age" : "36"}, {"gender" : "male"})
 WriteResult({ "nMatched" : 0, "nUpserted" : 0, "nModified" : 0 })
 
 // modifying only specific fields with $set
-> db.people.update({"_id" : ObjectId("5ba286f753cfac900ac294ee")}, { $set : {"name" : "john", "age" : 25}})
-> db.people.find({"_id" : ObjectId("5ba286f753cfac900ac294ee")})
-{ "_id" : ObjectId("5ba286f753cfac900ac294ee"), "gender" : "male", "name" : "john", "age" : 25 }
+> db.people.update({"_id" : 1}, { $set : {"name" : "john", "age" : 25}})
+> db.people.find({"_id" : 1})
+{ "_id" : 1, "gender" : "male", "age" : 25, "name" : "john" }
+
+// upsert enabled
+> db.people.update({"name" : "bob"}, { $set : {"age" : 45}}, { "upsert" : true })
+> db.people.find({"name" : "bob"})
+{ "_id" : ObjectId("5ba3d75056dfe3533fda9c50"), "name" : "bob", "age" : 45 }
+
+// _id cannot be updated
+> db.people.update({"name" : "bob"}, { $set : {"_id" : 4}})
+WriteResult({
+	"nMatched" : 0,
+	"nUpserted" : 0,
+	"nModified" : 0,
+	"writeError" : {
+		"code" : 66,
+		"errmsg" : "Performing an update on the path '_id' would modify the immutable field '_id'"
+	}
+})
 ```
 
 ### updateOne
@@ -578,14 +598,14 @@ WriteResult({ "nMatched" : 0, "nUpserted" : 0, "nModified" : 0 })
 
 // document before update
 > db.people.find({"name" : "john"})
-{ "_id" : ObjectId("5ba286f753cfac900ac294ee"), "gender" : "male", "name" : "john", "age" : 25 }
+{ "_id" : 1, "gender" : "male", "age" : 25, "name" : "john" }
 
 // incrementing the age by 1
 > db.people.updateOne({"name" : "john"}, {$inc : { "age" : 1 }})
 
 // document after update
 > db.people.find({"name" : "john"})
-{ "_id" : ObjectId("5ba286f753cfac900ac294ee"), "gender" : "male", "name" : "john", "age" : 26 }
+{ "_id" : 1, "gender" : "male", "age" : 26, "name" : "john" }
 ```
 
 ### updateMany
@@ -597,9 +617,11 @@ WriteResult({ "nMatched" : 0, "nUpserted" : 0, "nModified" : 0 })
 > db.people.updateMany({"age" : { $gte : 30 , $lt : 40 }}, { $set : { "group" : "thirties"}})
 
 > db.people.find()
-{ "_id" : ObjectId("5ba286f753cfac900ac294ee"), "gender" : "male", "name" : "john", "age" : 26 }
-{ "_id" : ObjectId("5ba286f753cfac900ac294ef"), "name" : "peter", "age" : 36, "group" : "thirties" }
-{ "_id" : ObjectId("5ba286f753cfac900ac294f0"), "name" : "alex", "age" : 36, "group" : "thirties" }
+> db.people.find()
+{ "_id" : 1, "gender" : "male", "age" : 26, "name" : "john" }
+{ "_id" : 2, "name" : "peter", "age" : 36, "group" : "thirties" }
+{ "_id" : 3, "name" : "alex", "age" : 36, "group" : "thirties" }
+{ "_id" : ObjectId("5ba3d75056dfe3533fda9c50"), "name" : "bob", "age" : 45 }
 ```
 
 ### Update Operators
@@ -614,6 +636,7 @@ WriteResult({ "nMatched" : 0, "nUpserted" : 0, "nModified" : 0 })
 - ***$setOnInsert*** when the upsert option is enabled, it sets values in case of inserts
 
 ```
+> db.users.drop()
 > db.users.insertOne(
   {
   "_id" : 1,
@@ -666,8 +689,8 @@ WriteResult({ "nMatched" : 0, "nUpserted" : 0, "nModified" : 0 })
 
 
 ```
-db.example.drop()
-db.example.insertOne({"_id": 1, "data" : [1, 2, 3, 4]})
+> db.example.drop()
+> db.example.insertOne({"_id": 1, "data" : [1, 2, 3, 4]})
 
 // adding an item if it does not exist
 > db.example.update({"_id" : 1}, { $addToSet : { "data" : 5 }})
@@ -678,7 +701,6 @@ db.example.insertOne({"_id": 1, "data" : [1, 2, 3, 4]})
 > db.example.update({"_id" : 1}, { $set : { "data.2" : 300 }})
 > db.example.find()
 { "_id" : 1, "data" : [ 1, 2, 300, 4, 5 ] }
-
 
 // adding an array of items with $addToSet requires the $each operator
 > db.example.update({"_id" : 1}, { $addToSet : { "data" : { $each : [10,20,30]} }})
