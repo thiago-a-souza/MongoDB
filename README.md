@@ -178,7 +178,7 @@ Prior to version 3.2, inserting one or multiple documents into a collection was 
 
 If the document loaded does not specify the unique *_id* field, MongoDB creates automatically an *ObjectId*. This field represents the document's primary key, in other words, there are no duplicate documents with the same *_id* in the collection.
 
-### insertOne()
+### insertOne
 
 For obvious reasons, this function does not allow inserting multiple documents.
 
@@ -255,6 +255,70 @@ db.collection.save(<document>, { writeConcern: <document> })
 { "_id" : ObjectId("5b9c11f6d44947754a8d4370"), "author" : "Walter Isaacson" }
 ```
 
+### findAndModify
+
+Modifies and returns one document. It can also insert a new document if the *upsert* option is enabled. By default, it returns the document before the modification takes place, but it can return the modified document if the *new* option is enabled.
+
+**Syntax:**
+
+```
+db.collection.findAndModify({
+    query: <document>,
+    sort: <document>,
+    remove: <boolean>,
+    update: <document>,
+    new: <boolean>,
+    fields: <document>,
+    upsert: <boolean>,
+    bypassDocumentValidation: <boolean>,
+    writeConcern: <document>,
+    collation: <document>,
+    arrayFilters: [ <filterdocument1>, ... ]
+});
+```
+
+**Examples:**
+
+```
+> db.people.drop()
+> db.people.insertMany([ {"_id" : 1, "name" : "john", "age" : 20 },
+                         {"_id" : 2, "name" : "peter", "age" : 25 },
+                         {"_id" : 3, "name" : "john", "age" : 38 },
+                         {"_id" : 4, "name" : "peter", "age" : 40 },
+                        ])
+
+> db.people.findAndModify({ "query" : { "name" : "john" }, 
+                            "sort" : { "age" : 1}, 
+                            "update" : { $inc : { "age" : 1 } }})                        
+{ "_id" : 1, "name" : "john", "age" : 20 } 
+> db.people.find()                          
+{ "_id" : 1, "name" : "john", "age" : 21 }
+{ "_id" : 2, "name" : "peter", "age" : 25 }
+{ "_id" : 3, "name" : "john", "age" : 38 }
+{ "_id" : 4, "name" : "peter", "age" : 40 }
+
+> db.people.findAndModify({ "query" : { "name" : "alex" }, 
+                            "update" : { $set : { "age" : 22 } },
+                            "upsert" : true
+                           })                        
+null 
+> db.people.find() 
+{ "_id" : 1, "name" : "john", "age" : 21 }
+{ "_id" : 2, "name" : "peter", "age" : 25 }
+{ "_id" : 3, "name" : "john", "age" : 38 }
+{ "_id" : 4, "name" : "peter", "age" : 40 }
+{ "_id" : ObjectId("5ba42be856dfe3533fdab900"), "name" : "alex", "age" : 22 }
+
+> db.people.findAndModify({ "query" : { "name" : "peter" }, 
+                            "sort" : { "age" : -1}, 
+                            "remove" : true })           
+{ "_id" : 4, "name" : "peter", "age" : 40 }                                     
+> db.people.find()                          
+{ "_id" : 1, "name" : "john", "age" : 21 }
+{ "_id" : 2, "name" : "peter", "age" : 25 }
+{ "_id" : 3, "name" : "john", "age" : 38 }
+{ "_id" : ObjectId("5ba42be856dfe3533fdab900"), "name" : "alex", "age" : 22 }
+```
 
 ## Read
 
