@@ -24,6 +24,9 @@ Thiago Alexandre Domingues de Souza
      * [updateMany](#updatemany)  
      * [Update Operators](#update-operators)  
   * [Delete](#delete)  
+     * [remove](#remove)
+     * [deleteOne and deleteMany](#deleteone-and-deletemany)     
+
 
 # NoSQL
 
@@ -166,6 +169,8 @@ function () {
 # CRUD
 
 In contrast to relational databases, MongoDB does not support SQL to perform CRUD operations. Instead, it provides APIs to popular programming languages that can access the database and execute queries. These functions take documents as parameters, including the data, filters, and other options. Depending on the programming language used, additional boilerplate code is required to perform these operations. The commands described in this document refers to Javascript syntax used by  Mongo shell. For examples in other programming languages, visit the documentation at [(2)](#references).
+
+Older versions does not support ACID transactions to insert/update/delete multiple documents. As a result, concurrent requests might see different results while the documents are being modified. However, each individual insert/update/delete operation is atomic, so users will not see a half-modified document.
 
 ## Create
 
@@ -540,6 +545,8 @@ There are three update functions: *update*, *updateOne*, and *updateMany*. The f
 
 As expected, the update functions modifies only matching documents, not changing anything if there are no matches. However,  enabling the *upsert* option allows inserting the data as a new document if no matches are found.
 
+
+
 ### update
 
 ```
@@ -636,9 +643,9 @@ WriteResult({
 - ***$set*** modifies a field 
 - ***$unset*** removes a field
 - ***$rename*** renames a field
-- ***$inc*** increments by a specified number
-- ***$mul*** multiplies by a specified number
-- ***$min*** **and** ***$max*** updates only if the field is less/greater than min/max
+- ***$inc*** increments a field by a specified number
+- ***$mul*** multiplies a field by a specified number
+- ***$min*** **and** ***$max*** updates a field only if the field is less/greater than min/max
 - ***$setOnInsert*** when the upsert option is enabled, it sets values in case of inserts
 
 ```
@@ -771,6 +778,51 @@ WriteResult({
 
 ## Delete
 
+Before release 3.0, deleting documents was performed with the *remove* method, and it deletes everything that matches a criteria. Although *remove* is still supported, it's recommended to use either *deleteOne* or *deleteMany* according to the number of documents that should be deleted. All three methods have a syntax similar to *find*, but they require a query, otherwise they throw an error. In addition to the delete methods, all documents can be removed using the *drop* function, which is preferred to remove all documents from a large collection.
+
+
+### remove
+
+```
+> db.example.drop()
+> for(i=1; i<=1000; i++){
+    db.example.insertOne({"_id" : i })
+  }
+ 
+// deleting rows where the id is greater than 500 
+> db.example.remove({"_id" : {$gt : 500}})  
+> db.example.count()
+500
+
+// deleting all documents
+> db.example.remove({})
+> db.example.count()
+0  
+```
+
+### deleteOne and deleteMany
+
+```
+> db.example.drop()
+> for(i=1; i<=1000; i++){
+    db.example.insertOne({"_id" : i })
+  }
+
+// deletes only the first matching occurrence
+> db.example.deleteOne({"_id" : {$gt : 500}})  
+> db.example.count()
+999
+
+// deletes all matching documents
+> db.example.deleteMany({"_id" : {$gt : 500}})  
+> db.example.count()
+500
+
+// delete everything
+> db.example.deleteMany({})
+> db.example.count()
+0
+```
 
 
 
