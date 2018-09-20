@@ -659,10 +659,10 @@ WriteResult({ "nMatched" : 0, "nUpserted" : 0, "nModified" : 0 })
 - ***$pull*** removes items that match a criteria
 - ***$pullAll*** removes items that match values from an array
 - ***$push*** appends an item to an array
-  - ***$each***
-  - ***$slice***
-  - ***$sort***
-  - ***$position***
+  - ***$each*** allows appending array items into the document's array 
+  - ***$slice*** limits the resulting array with the initial/final items using a positive/negative argument
+  - ***$sort*** sorts the array
+  - ***$position*** location where the data should be appended
 
 ```
 db.example.drop()
@@ -707,7 +707,20 @@ db.example.insertOne({"_id": 1, "data" : [1, 2, 3, 4]})
 > db.example.find()
 { "_id" : 1, "data" : [ 5, 20, 8, 17, 12, 31, 5 ] }
 
+// appends two elements and  keeps only the last five elements in the resulting array
+> db.example.updateOne({"_id" : 1 }, {$push : { data : { $each : [100, 200], $slice : -5  } }})
+> db.example.find()
+{ "_id" : 1, "data" : [ 12, 31, 5, 100, 200 ] }
 
+// appends an item and sort the resulting array in ascending order
+> db.example.updateOne({"_id" : 1 }, {$push : { data : { $each : [25], $sort : 1  } }})
+> db.example.find()
+{ "_id" : 1, "data" : [ 5, 12, 25, 31, 100, 200 ] }
+
+// apends an item, sort the array and keep only the last 4 elements
+> db.example.updateOne({"_id" : 1 }, {$push : { data : { $each : [73], $sort : 1, $slice : -4  } }})
+> db.example.find()
+{ "_id" : 1, "data" : [ 31, 73, 100, 200 ] }
 ```
 
 ## Delete
