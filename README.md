@@ -588,6 +588,14 @@ WriteResult({
 		"errmsg" : "Performing an update on the path '_id' would modify the immutable field '_id'"
 	}
 })
+
+// increment all ages by 1; multiple updates require the multi option
+> db.people.update({}, { $inc : { age : 1 } }, {"multi" : true})
+> db.people.find()
+{ "_id" : 1, "gender" : "male", "age" : 27, "name" : "john" }
+{ "_id" : 2, "name" : "peter", "age" : 37, "group" : "thirties" }
+{ "_id" : 3, "name" : "alex", "age" : 37, "group" : "thirties" }
+{ "_id" : ObjectId("5ba3d75056dfe3533fda9c50"), "name" : "bob", "age" : 46 }
 ```
 
 ### updateOne
@@ -598,14 +606,14 @@ WriteResult({
 
 // document before update
 > db.people.find({"name" : "john"})
-{ "_id" : 1, "gender" : "male", "age" : 25, "name" : "john" }
+{ "_id" : 1, "gender" : "male", "age" : 27, "name" : "john" }
 
 // incrementing the age by 1
 > db.people.updateOne({"name" : "john"}, {$inc : { "age" : 1 }})
 
 // document after update
 > db.people.find({"name" : "john"})
-{ "_id" : 1, "gender" : "male", "age" : 26, "name" : "john" }
+{ "_id" : 1, "gender" : "male", "age" : 28, "name" : "john" }
 ```
 
 ### updateMany
@@ -615,13 +623,11 @@ WriteResult({
 // db.collection.updateMany(filter, update, options)
 
 > db.people.updateMany({"age" : { $gte : 30 , $lt : 40 }}, { $set : { "group" : "thirties"}})
-
 > db.people.find()
-> db.people.find()
-{ "_id" : 1, "gender" : "male", "age" : 26, "name" : "john" }
-{ "_id" : 2, "name" : "peter", "age" : 36, "group" : "thirties" }
-{ "_id" : 3, "name" : "alex", "age" : 36, "group" : "thirties" }
-{ "_id" : ObjectId("5ba3d75056dfe3533fda9c50"), "name" : "bob", "age" : 45 }
+{ "_id" : 1, "gender" : "male", "age" : 28, "name" : "john" }
+{ "_id" : 2, "name" : "peter", "age" : 37, "group" : "thirties" }
+{ "_id" : 3, "name" : "alex", "age" : 37, "group" : "thirties" }
+{ "_id" : ObjectId("5ba3d75056dfe3533fda9c50"), "name" : "bob", "age" : 46 }
 ```
 
 ### Update Operators
