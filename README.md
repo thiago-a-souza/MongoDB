@@ -677,6 +677,35 @@ db.example.insertOne({"_id": 1, "data" : [1, 2, 3, 4]})
 > db.example.find()
 { "_id" : 1, "data" : [ 1, 2, 3, 4, 5, 10, 20, 30 ] }
 
+// removing the last item
+> db.example.updateOne({"_id" : 1 }, {$pop : { data : 1 }})
+> db.example.find()
+{ "_id" : 1, "data" : [ 1, 2, 3, 4, 5, 10, 20 ] }
+
+// removing the first item
+> db.example.updateOne({"_id" : 1 }, {$pop : { data : -1 }})
+> db.example.find()
+{ "_id" : 1, "data" : [ 2, 3, 4, 5, 10, 20 ] }
+
+// removing items >= 3 and <= 4
+> db.example.updateOne({"_id" : 1 }, {$pull : { data : {$gte : 3, $lte : 4} }})
+> db.example.find()
+{ "_id" : 1, "data" : [ 2, 5, 10, 20 ] }
+
+// removing items listed in the array
+> db.example.updateOne({"_id" : 1 }, {$pullAll : { data : [2, 10] }})
+> db.example.find()
+{ "_id" : 1, "data" : [ 5, 20 ] }
+
+// appending an item
+> db.example.updateOne({"_id" : 1 }, {$push : { data : 8 }})
+> db.example.find()
+{ "_id" : 1, "data" : [ 5, 20, 8 ] }
+
+// appending an array of items with $each
+> db.example.updateOne({"_id" : 1 }, {$push : { data : { $each : [ 17, 12, 31, 5] } }})
+> db.example.find()
+{ "_id" : 1, "data" : [ 5, 20, 8, 17, 12, 31, 5 ] }
 
 
 ```
