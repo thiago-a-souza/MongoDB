@@ -909,7 +909,7 @@ Indexes can be manipulated using the methods *createIndex*, *dropIndex*, and *ge
 
 ## Index Types
 
-Several index types are supported to benefit a wide range of purposes. 
+Several index types are supported for a wide range of purposes. 
 
 ### Single Field Indexes
 
