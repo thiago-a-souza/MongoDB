@@ -27,6 +27,17 @@ Thiago Alexandre Domingues de Souza
   * [Delete](#delete)  
      * [remove](#remove)
      * [deleteOne and deleteMany](#deleteone-and-deletemany)     
+- [Indexes](#indexes)     
+  * [Index Types](#index-types)
+     * [Single Field Indexes](#single-field-indexes)  
+     * [Compound Indexes](#compound-indexes)  
+     * [Multikey Indexes](#multikey-indexes)  
+     * [Geo Indexes](#geo-indexes)  
+     * [Text Indexes](#text-indexes)  
+  * [Index Options](#index-options)  
+    * [Unique](#unique) 
+    * [Sparse](#sparse) 
+    * [TTL](#ttl) 
 
 
 # NoSQL
@@ -888,6 +899,133 @@ Before release 3.0, deleting documents was performed with the *remove* method, a
 > db.example.count()
 0
 ```
+
+# Indexes
+
+Similar to traditional databases, MongoDB also provides indexes for a faster query execution, avoiding a full collection scan. Because indexes maintain B-trees data structures, there is a cost to perform writes, which is compensated by read operations. Also, indexes are ordered by their value, which makes sort operations much more efficient. Obviously, the query used influences if an index will be used or not. To verify the actual execution plan, the *explain* method should be used.
+
+Indexes can be manipulated using the methods *createIndex*, *dropIndex*, and *getIndexes*. The syntax to create or drop an index is similar to *sort*, which requires the field name and the sort order.
+
+
+## Index Types
+
+Several index types are supported to benefit a wide range of purposes. 
+
+### Single Field Indexes
+
+This is the most basic index type. It allows creating indexes on a single field, including embedded fields, in ascending or descending order. 
+
+
+```
+> db.people.drop()
+> db.people.insertMany([ 
+  {"_id" : 1, "name" : "john",  "age" : 25, "addr" : { "city" : "new york", "state" : "ny"}},
+  {"_id" : 2, "name" : "peter", "age" : 36, "addr" : { "city" : "los angeles", "state" : "ca"}},
+  {"_id" : 3, "name" : "alex",  "age" : 36, "addr" : { "city" : "miami", "state" : "fl"}}
+ ])
+		       
+// only the _id unique index is present
+> db.people.getIndexes()
+[
+  {
+    "v" : 2,
+    "key" : {
+      "_id" : 1
+    },
+    "name" : "_id_",
+    "ns" : "mydb.people"
+  }
+]
+
+// collection scan: there are no indexes on the field
+> db.people.find({"name" : "john" }).explain()
+   ...
+   "winningPlan" : {
+     "stage" : "COLLSCAN",
+     "filter" : {
+        "name" : {
+           "$eq" : "john"
+        }
+     },
+     "direction" : "forward"
+   },
+   ...
+
+// creating an index on name in ascending order
+> db.people.createIndex({"name" : 1})
+
+// index scan: field has an index now
+> db.people.find({"name" : "john" }).explain()
+   ...
+   "winningPlan" : {
+      "stage" : "FETCH",
+      "inputStage" : {
+         "stage" : "IXSCAN",
+         ...
+
+// creating an index on an embedded field
+> db.people.createIndex({"addr.state" : -1})
+
+// index scan: both branches have indexes
+> db.people.find({$or : [{"name" : "john" }, { "addr.state" : "ca"}] })
+
+// collection scan: only one branch has an index
+> db.people.find({$or : [{"name" : "john" }, { "age" : "36"}] })
+
+// index scan: there's only one branch an it contains an index
+> db.people.find({"name" : "john", "age" : 25 })
+```
+
+### Compound Indexes
+
+For single field indexes, the sorting direction using an index cannot make a query to perform a collection scan because it can follow either directions. On the other hand, queries using compound keys must use the same or the opposite sort order specified in the index, otherwise it will perform a collection scan. In addition to that, having a compound index does not mean that any combination of index fields can be used to execute an index scan. Only queries using index prefixes can benefit from index scans. For example, consider the compound index (A, B, C), an index scan will be used for queries using (A), (A,B) or (A,B,C), and a collection scan will used for (B), or (B,C).
+
+
+```
+> db.people.drop()
+> db.people.insertMany([ 
+  {"_id" : 1, "name" : "john",  "age" : 25, "title" : "Mr."
+  {"_id" : 2, "name" : "peter", "age" : 36, "title" : "Dr.
+  {"_id" : 3, "name" : "alex",  "age" : 36, "title" : "Mr."
+ ])
+ 
+> db.people.createIndex({ "name" : 1, "age" : -1 })
+
+// index scan: name is a prefix 
+> db.people.find({"name" : "john"})
+
+// index scan: prefix fields
+> db.people.find({"name" : "john", "age" : 25})
+
+// collection scan: age is not a prefix
+> db.people.find({"age" : 36})
+
+// index scan: the same order of the indexes
+> db.people.find().sort({"name" : 1, "age" : -1 })
+
+// index scan: the opposite order of the indexes
+> db.people.find().sort({"name" : -1, "age" : 1 })
+
+// collection scan: order is not the same/opposite
+> db.people.find().sort({"name" : 1, "age" : 1 })
+
+// collection scan: order is not the same/opposite
+> db.people.find().sort({"name" : -1, "age" : -1 })
+
+// index scan: regardless the sort order, the query is a prefix
+> db.people.find({"name" : "john"}).sort({"name" : -1, "age" : -1 })
+```
+
+### Multikey Indexes
+### Geo Indexes
+### Text Indexes
+
+## Index Options
+### Unique
+### Sparse
+### TTL
+
+
 
 
 
