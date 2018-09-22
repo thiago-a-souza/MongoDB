@@ -1017,6 +1017,37 @@ For single field indexes, the sorting direction using an index cannot make a que
 ```
 
 ### Multikey Indexes
+
+MongoDB allows indexing arrays of scalars or embedded documents with multikey indexes. However, they should be carefully 
+because the size of the index can grow very fast depending on the number of documents and the size of the array.
+Compound multikey indexes is also possible, but at most one field can be an array. If a compound index already exists in a collection, it will not allow violating this rule with an insert/update.
+
+```
+> db.collection.drop()
+> db.collection.insertOne({ "_id" : 1, "a" : 10, "b" : [10, 15, 17, 19]})
+
+// creating multikey index is similar to any other index
+> db.collection.createIndex({"a": 1, "b" : 1})
+
+// index scan: isMultiKey indicates a multikey index
+> db.collection.find({"a" : 10, "b" : 17}).explain()
+   "stage" : "IXSCAN",
+   ...
+   "indexName" : "a_1_b_1",
+   "isMultiKey" : true,
+   ...
+
+// collection scan: b is not a prefix
+> db.collection.find({"b" : 17})
+
+// error: compound multikey index allow at most one array
+> db.collection.insertOne({ "_id" : 2, "a" : [20, 21], "b" : [23, 25, 29]})
+
+// correct: only one field is an array
+> db.collection.insertOne({ "_id" : 2, "a" : [20, 21], "b" : 23})
+```
+
+
 ### Geo Indexes
 ### Text Indexes
 
