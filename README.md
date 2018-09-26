@@ -520,7 +520,7 @@ db.laureates.find({ "prizes" : { $type : "array" }})
 
 - ***$all*** returns documents where all values match values stored in the array provided, regardless the order.
 - ***$size*** returns documents where the field is an array with a given size. Multiple criterias on arrays are evaluated separately, and it can return incorrect documents. To prevent this side effect, 
-- ***$elemMatch*** forces multiple criterias to be evaluated together and return documents that has at least one item that match them.
+- ***$elemMatch*** it should be used queries using arrays with multiple criterias because it forces each condition to be evaluated.
 
 ```
 db.example.insertMany([{"fruits" : ["orange", "apple"]},
@@ -559,6 +559,24 @@ db.test.insertMany([
 // only the document with the year 2006 match both criterias
 > db.test.find({ "years" : { $elemMatch : { $gt : 2005, $lt : 2020}}})
 { "_id" : ObjectId("5ba0026453cfac900ac294d1"), "years" : [ 1990, 2006 ] }
+
+
+// another collection to demonstrate $elemMatch
+> db.weather.drop()
+> db.weather.insertMany([
+ {"_id" : 1, temperatures : [{"station" : "a", temp : 32 }, {"station" : "b", temp : 25 } ]},
+ {"_id" : 2, temperatures : [{"station" : "a", temp : 18 }, {"station" : "c", temp : 30 } ]},
+ {"_id" : 3, temperatures : [{"station" : "a", temp : 30 }]}
+])
+
+// incorrectly finds document id 2 because it matches one condition
+> db.weather.find({"temperatures.station" : "a", "temperatures.temp" : 30})
+{ "_id" : 2, "temperatures" : [ { "station" : "a", "temp" : 18 }, { "station" : "c", "temp" : 30 } ] }
+{ "_id" : 3, "temperatures" : [ { "station" : "a", "temp" : 30 } ] }
+
+// $elemMatch forces both conditions to be evaluated
+> db.weather.find({"temperatures" : { $elemMatch : { "station" : "a", "temp" : 30 }}})
+{ "_id" : 3, "temperatures" : [ { "station" : "a", "temp" : 30 } ] }
 ```
 
 ### Cursors
@@ -902,7 +920,7 @@ Before release 3.0, deleting documents was performed with the *remove* method, a
 
 # Indexes
 
-Similar to traditional databases, MongoDB also provides indexes for a faster query execution, avoiding a full collection scan. Because indexes maintain B-trees data structures, there is a cost to perform writes, which is compensated by read operations. Also, indexes are ordered by their value, which makes sort operations much more efficient. Obviously, the query used influences if an index will be used or not. To verify the actual execution plan, the *explain* method should be used.
+Similar to traditional databases, MongoDB also provides indexes for a faster query execution, avoiding a full collection scan. Because indexes maintain B-trees data structures, there is a cost to perform writes, which is compensated by read operations. Also, indexes are ordered by their value, making sort operations much more efficient. Obviously, the query used influences if an index will be used or not. To verify the actual execution plan, the *explain* method should be used.
 
 Indexes can be manipulated using the methods *createIndex*, *dropIndex*, and *getIndexes*. The syntax to create or drop an index is similar to *sort*, which requires the field name and the sort order.
 
@@ -913,7 +931,7 @@ Several index types are supported for a wide range of purposes.
 
 ### Single Field Indexes
 
-This is the most basic index type. It allows creating indexes on a single field, including embedded fields, in ascending or descending order. 
+This is the most basic index type. It allows creating indexes on a single field, including embedded fields, in ascending or descending order. If a non-index column is used to sort the documents, it will perform an in-memory sorting - it fails if the sorting operation exceeds 32mb.
 
 
 ```
@@ -974,19 +992,57 @@ This is the most basic index type. It allows creating indexes on a single field,
 
 // index scan: there's only one branch an it contains an index
 > db.people.find({"name" : "john", "age" : 25 })
+
+// index scan and in-memory sorting: query is using a filter but the sort is not (stage is sort)
+> db.people.find({name : "john"}).sort({ "age" : 1 }).
+   ...
+   "winningPlan" : {
+      "stage" : "SORT",
+      "sortPattern" : {
+         "age" : 1 
+      },
+      "inputStage" : {
+         "stage" : "SORT_KEY_GENERATOR",
+         "inputStage" : {
+             "stage" : "FETCH",
+             "inputStage" : {
+                "stage" : "IXSCAN",
+                "keyPattern" : {
+                   "name" : 1
+                },
+                ...				
+				
+// index scan and index sorting: query and sort are using indexes
+> db.people.find({name : "john"}).sort({ "addr.state" : 1 }).explain()
+   ...
+   "winningPlan" : {
+      "stage" : "FETCH",
+      "filter" : {
+         "name" : {
+            "$eq" : "john"
+         }
+      },
+      "inputStage" : {
+         "stage" : "IXSCAN",
+         "keyPattern" : {
+            "addr.state" : -1
+         },
+         ...	        
 ```
 
 ### Compound Indexes
 
-For single field indexes, the sorting direction using an index cannot make a query to perform a collection scan because it can follow either directions. On the other hand, queries using compound keys must use the same or the opposite sort order specified in the index, otherwise it will perform a collection scan. In addition to that, having a compound index does not mean that any combination of index fields can be used to execute an index scan. Only queries using index prefixes can benefit from index scans. For example, consider the compound index (A, B, C), an index scan will be used for queries using (A), (A,B) or (A,B,C), and a collection scan will used for (B), or (B,C).
+Having a compound index does not mean that any combination of index fields can be used to execute an index scan. Only queries using index prefixes can benefit from index scans. For example, consider the compound index (A, B, C), an index scan will be used for queries using (A), (A,B) or (A,B,C), and a collection scan will used for (B), or (B,C).
+ 
+For single field indexes, the sorting direction using an index cannot make a query to perform a collection scan because it can follow either directions. On the other hand, queries using compound keys must use the same or the opposite sort order specified in the index, otherwise it will perform a collection scan. In addition to that, 
 
 
 ```
 > db.people.drop()
 > db.people.insertMany([ 
-  {"_id" : 1, "name" : "john",  "age" : 25, "title" : "Mr."
-  {"_id" : 2, "name" : "peter", "age" : 36, "title" : "Dr.
-  {"_id" : 3, "name" : "alex",  "age" : 36, "title" : "Mr."
+  {"_id" : 1, "name" : "john",  "age" : 25},
+  {"_id" : 2, "name" : "peter", "age" : 36},
+  {"_id" : 3, "name" : "alex",  "age" : 36},
  ])
  
 > db.people.createIndex({ "name" : 1, "age" : -1 })
@@ -1000,19 +1056,19 @@ For single field indexes, the sorting direction using an index cannot make a que
 // collection scan: age is not a prefix
 > db.people.find({"age" : 36})
 
-// index scan: the same order of the indexes
+// index scan and index sort: the same order of the indexes
 > db.people.find().sort({"name" : 1, "age" : -1 })
 
-// index scan: the opposite order of the indexes
+// index scan and index sort: the opposite order of the indexes
 > db.people.find().sort({"name" : -1, "age" : 1 })
 
-// collection scan: order is not the same/opposite
+// collection scan and in-memory sorting: order is not the same/opposite
 > db.people.find().sort({"name" : 1, "age" : 1 })
 
-// collection scan: order is not the same/opposite
+// collection scan and in-memory sorting: order is not the same/opposite
 > db.people.find().sort({"name" : -1, "age" : -1 })
 
-// index scan: regardless the sort order, the query is a prefix
+// index scan and in-memory sorting: query is a prefix but the sorting order is not the same/opposite
 > db.people.find({"name" : "john"}).sort({"name" : -1, "age" : -1 })
 ```
 
@@ -1045,11 +1101,14 @@ Compound multikey indexes is also possible, but at most one field can be an arra
 
 // correct: only one field is an array
 > db.collection.insertOne({ "_id" : 2, "a" : [20, 21], "b" : 23})
+
 ```
 
 
 ### Geo Indexes
 ### Text Indexes
+
+### Sorting
 
 ## Index Options
 ### Unique
