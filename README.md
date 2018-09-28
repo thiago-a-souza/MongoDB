@@ -931,7 +931,8 @@ Several index types are supported for a wide range of purposes.
 
 ### Single Field Indexes
 
-This is the most basic index type. It allows creating indexes on a single field, including embedded fields, in ascending or descending order. If a non-index column is used to sort the documents, it will perform an in-memory sorting - it fails if the sorting operation exceeds 32mb.
+This is the most basic index type. It allows creating indexes on a single field, including embedded fields, in ascending or descending order. If a non-index column is used to sort the documents, it will perform an in-memory sorting.
+Sort operations that use indexes have a better performance because they take advantage of index data structures to sort the results, rather than moving the data to memory and sorting. In addition to that, in-memory sorting fails if the operation exceeds 32mb.
 
 
 ```
@@ -1034,18 +1035,20 @@ This is the most basic index type. It allows creating indexes on a single field,
 
 Having a compound index does not mean that any combination of index fields can be used to execute an index scan. Only queries using index prefixes can benefit from index scans. For example, consider the compound index (A, B, C), an index scan will be used for queries using (A), (A,B) or (A,B,C), and a collection scan will used for (B), or (B,C).
  
-For single field indexes, the sorting direction using an index cannot make a query to perform a collection scan because it can follow either directions. On the other hand, queries using compound keys must use the same or the opposite sort order specified in the index, otherwise it will perform a collection scan. In addition to that, 
+For single field indexes, the sorting direction using an index cannot make a query to perform a collection scan because it can follow either directions. On the other hand, queries using compound keys must use the same or the opposite sort order specified in the index, otherwise it will an in-memory sorting. In addition to that, it's also possible to benefit from index sorting without a prefix index in the sorting clause, as long as the query has the preceding prefix and they use an equality operator.
 
 
 ```
 > db.people.drop()
 > db.people.insertMany([ 
-  {"_id" : 1, "name" : "john",  "age" : 25},
-  {"_id" : 2, "name" : "peter", "age" : 36},
-  {"_id" : 3, "name" : "alex",  "age" : 36},
+  {"_id" : 1, "name" : "john",  "age" : 25, "country" : "usa"},
+  {"_id" : 2, "name" : "peter", "age" : 36, "country" : "canada"},
+  {"_id" : 3, "name" : "lisa",  "age" : 19, "country" : "australia"},
+  {"_id" : 4, "name" : "alex",  "age" : 36, "country" : "uk"},
+  {"_id" : 5, "name" : "susan",  "age" : 28, "country" : "usa"}
  ])
  
-> db.people.createIndex({ "name" : 1, "age" : -1 })
+> db.people.createIndex({ "name" : 1, "age" : -1, "country" : 1 })
 
 // index scan: name is a prefix 
 > db.people.find({"name" : "john"})
@@ -1053,7 +1056,7 @@ For single field indexes, the sorting direction using an index cannot make a que
 // index scan: prefix fields
 > db.people.find({"name" : "john", "age" : 25})
 
-// collection scan: age is not a prefix
+// collection scan: age alone is not a prefix
 > db.people.find({"age" : 36})
 
 // index scan and index sort: the same order of the indexes
@@ -1070,6 +1073,12 @@ For single field indexes, the sorting direction using an index cannot make a que
 
 // index scan and in-memory sorting: query is a prefix but the sorting order is not the same/opposite
 > db.people.find({"name" : "john"}).sort({"name" : -1, "age" : -1 })
+
+// index scan and index sort: because name/age use an equality operator and preceed country it uses an index sort
+> db.people.find({"name" : "john", "age" : 25}).sort({"country" : 1})
+
+// index scand and in-memory sort: name/age are prefix but age is not using an equality, that's why it's an in-memory sort
+> db.people.find({"name" : "john", "age" : {$gt : 20 } }).sort({"country" : 1})
 ```
 
 ### Multikey Indexes
