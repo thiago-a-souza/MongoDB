@@ -925,6 +925,43 @@ Similar to traditional databases, MongoDB also provides indexes for a faster que
 Indexes can be manipulated using the methods *createIndex*, *dropIndex*, and *getIndexes*. The syntax to create or drop an index is similar to *sort*, which requires the field name and the sort order.
 
 
+## Explain
+
+The explain methods display details about the query execution, such as the winning plan, including if it's running a collection scan or an index scan, the index used and their directions, the sorting strategy used (index or in-memory), etc. There are two explain methods available: *cursor.explain* and *collection.explain*. The first method works with *find* and *sort*, while the other supports  *find*, *update*, *remove*, *aggregate*, *count*, *distinct*, and *group*. Running the explain methods against *update* or *remove* does not modify the data. **Notice that *insert* is not supported**.
+
+By default, the explain methods displays the information using the *queryPlanner* mode, without actually running the query. The *executionStats* displays the query plan an executes the winning plan, showing stats about it
+
+```
+> db.example.drop()
+> for(i=1; i<=1000; i++){
+    db.example.insertOne({"_id" : i, "title" : "test-"+(i%10) })
+  }
+  
+  
+> db.example.find().explain()
+> db.example.explain().find()
+> db.example.find().sort({"title" : 1}).explain()
+> db.example.explain().find().sort({"title" : 1})
+
+// nothing is removed
+> db.example.explain().remove({})
+// nothing is updated
+> db.example.explain().update({"title" : "test-1"}, { $set : {"title" : "test-100"}})
+
+> db.example.explain().count()
+> db.example.explain().distinct("title")
+
+// explainable object
+> var obj = db.example.explain()
+> obj.find()
+> obj.remove({})
+> obj.count()
+> obj.distinct("title")
+```
+
+
+
+
 ## Index Types
 
 Several index types are supported for a wide range of purposes. 
