@@ -929,7 +929,7 @@ Indexes can be manipulated using the methods *createIndex*, *dropIndex*, and *ge
 
 The explain methods display details about the query execution, such as the winning plan, including if it's running a collection scan or an index scan, the index used and their directions, the sorting strategy used (index or in-memory), etc. There are two explain methods available: *cursor.explain* and *collection.explain*. The first method works with *find* and *sort*, while the other supports  *find*, *update*, *remove*, *aggregate*, *count*, *distinct*, and *group*. Running the explain methods against *update* or *remove* does not modify the data. **Notice that *insert* is not supported**.
 
-By default, the explain methods displays the information using the *queryPlanner* mode, without actually running the query. The *executionStats* displays the query plan an executes the winning plan, showing stats about it
+By default, the explain methods displays the information using the *queryPlanner* mode, without actually running the query. The *executionStats* displays the *queryPlanner* stats and also executes the winning plan, showing stats like the number of documents returned, execution time, etc. 
 
 ```
 > db.example.drop()
