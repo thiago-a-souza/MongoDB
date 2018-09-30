@@ -922,14 +922,22 @@ Before release 3.0, deleting documents was performed with the *remove* method, a
 
 Similar to traditional databases, MongoDB also provides indexes for a faster query execution, avoiding a full collection scan. Because indexes maintain B-trees data structures, there is a cost to perform writes, which is compensated by read operations. Also, indexes are ordered by their value, making sort operations much more efficient. Obviously, the query used influences if an index will be used or not. To verify the actual execution plan, the *explain* method should be used.
 
+When a query is executed, MongoDB looks at the query shape to identify index candidates that can satisfy the query, and then it creates different query plans to verify which one returns fastest results. The winning plan is stored in cache, so future queries with the same shape can use the same plan. Several circumstances can clear this cache, for example, rebuilding/adding/removing indexes, restarting the server, or when it exceeds a threshold of writes.
+
+
 Indexes can be manipulated using the methods *createIndex*, *dropIndex*, and *getIndexes*. The syntax to create or drop an index is similar to *sort*, which requires the field name and the sort order.
+
+
+
 
 
 ## Explain
 
 The explain methods display details about the query execution, such as the winning plan, including if it's running a collection scan or an index scan, the index used and their directions, the sorting strategy used (index or in-memory), etc. There are two explain methods available: *cursor.explain* and *collection.explain*. The first method works with *find* and *sort*, while the other supports  *find*, *update*, *remove*, *aggregate*, *count*, *distinct*, and *group*. Running the explain methods against *update* or *remove* does not modify the data. **Notice that *insert* is not supported**.
 
-By default, the explain methods displays the information using the *queryPlanner* mode, without actually running the query. The *executionStats* displays the *queryPlanner* stats and also executes the winning plan, showing stats like the number of documents returned, execution time, etc. Finally, the *allPlansExecution* executes all plans, including rejected plans.
+By default, the explain methods displays the information using the *queryPlanner* mode, without actually running the query. The *executionStats* displays the *queryPlanner* stats and also executes the winning plan, showing stats like the number of documents returned, keys examined, execution time, etc. Finally, the *allPlansExecution* executes all plans, including rejected plans.
+
+
 
 ```
 > db.example.drop()
@@ -957,9 +965,46 @@ By default, the explain methods displays the information using the *queryPlanner
 > obj.remove({})
 > obj.count()
 > obj.distinct("title")
+
+
+// explain methods
+> db.example.find().explain() // default: queryPlanner
+> db.example.find().explain("executionStats") 
+> db.example.find().explain("allPlansExecution")
 ```
 
+## Covered Query
 
+MongoDB allows running queries without examining any documents with covered queries. This situation happens when it uses an index scan and all fields returned are in the same index.
+
+```
+> db.example.drop()
+> for(i=1; i<=1000; i++){
+    db.example.insertOne({"_id" : i, "title" : "test-"+(i%10) })
+  }
+> db.example.createIndex({"title" : 1})  
+
+// Non-covered query: it examines all documents because it's showing all fields
+> db.example.find({"title" : "test-1"}).explain("executionStats")
+   ...
+   "executionStats" : {
+      "executionSuccess" : true,
+      "nReturned" : 100,
+      "executionTimeMillis" : 1,
+      "totalKeysExamined" : 100,
+      "totalDocsExamined" : 100,
+      ...
+// covered query: no documents are examined because it returns       
+> db.example.find({"title" : "test-1"}, {"title" : 1, "_id" : 0 }).explain("executionStats")   
+   ...
+   "executionStats" : {
+      "executionSuccess" : true,
+      "nReturned" : 100,
+      "executionTimeMillis" : 0,
+      "totalKeysExamined" : 100,
+      "totalDocsExamined" : 0,
+
+```
 
 
 ## Index Types
