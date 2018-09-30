@@ -920,15 +920,11 @@ Before release 3.0, deleting documents was performed with the *remove* method, a
 
 # Indexes
 
-Similar to traditional databases, MongoDB also provides indexes for a faster query execution, avoiding a full collection scan. Because indexes maintain B-trees data structures, there is a cost to perform writes, which is compensated by read operations. Also, indexes are ordered by their value, making sort operations much more efficient. Obviously, the query used influences if an index will be used or not. To verify the actual execution plan, the *explain* method should be used.
+Similar to traditional databases, MongoDB also provides indexes for a faster query execution, avoiding full collection scans. In general, indexes speed up reads and slow down writes. For inserts, indexes slow down writes because it has to add new nodes to the B-trees. For deletes, it depends if the operation is deleting everything or just some documents. Removing everything will cause all B-tree nodes to be removed, increasing the overhead. On the other hand, if just some documents are  deleted, the index can help finding the document, which improves the performance. For updates, indexes can also help finding documents but if the field modified is an index, there will be an overhead to modify B-tree nodes to apply this change. Updates may also increase the document size beyond the allocated space. In that case, the document must be moved to a new disk area, and all indexes should be updated to point to the new location. Despite all the overhead in writes, the cost usually compensates read operations.
 
 When a query is executed, MongoDB looks at the query shape to identify index candidates that can satisfy the query, and then it creates different query plans to verify which one returns fastest results. The winning plan is stored in cache, so future queries with the same shape can use the same plan. Several circumstances can clear this cache, for example, rebuilding/adding/removing indexes, restarting the server, or when it exceeds a threshold of writes.
 
-
-Indexes can be manipulated using the methods *createIndex*, *dropIndex*, and *getIndexes*. The syntax to create or drop an index is similar to *sort*, which requires the field name and the sort order.
-
-
-
+Indexes can be manipulated using the methods *createIndex*, *dropIndex*, and *getIndexes*. The syntax to create or drop an index is similar to *sort* because index values are ordered, allowing more efficient sort operations. Obviously, the query  influences if an index will be used or not. To verify the actual execution plan, the *explain* method should be used. To override the index identified, the method *hint* forces an alternative index to be executed.
 
 
 ## Explain
@@ -977,33 +973,36 @@ By default, the explain methods displays the information using the *queryPlanner
 
 MongoDB allows running queries without examining any documents with covered queries. This situation happens when it uses an index scan and all fields returned are in the same index.
 
-```
+```     
 > db.example.drop()
-> for(i=1; i<=1000; i++){
-    db.example.insertOne({"_id" : i, "title" : "test-"+(i%10) })
-  }
-> db.example.createIndex({"title" : 1})  
+> for(i=1; i<=1000; i++) {
+    db.example.insertOne({_id : i, a : (i*10), b : (i*10 + 1) , c : (i*100 + 1)})
+}
 
-// Non-covered query: it examines all documents because it's showing all fields
-> db.example.find({"title" : "test-1"}).explain("executionStats")
+> db.example.createIndex({ a : 1, b : 1 })
+> db.example.createIndex({ c : 1, d : 1 })
+
+// index scan and covered query: no documents are examined because indexes a and b are part of the query
+> db.example.find({a: { $gt : 300}, b : { $gt : 400} }, {_id : 0, a : 1, b : 1 }).explain("executionStats")
    ...
    "executionStats" : {
       "executionSuccess" : true,
-      "nReturned" : 100,
-      "executionTimeMillis" : 1,
-      "totalKeysExamined" : 100,
-      "totalDocsExamined" : 100,
-      ...
-// covered query: no documents are examined because it returns       
-> db.example.find({"title" : "test-1"}, {"title" : 1, "_id" : 0 }).explain("executionStats")   
-   ...
-   "executionStats" : {
-      "executionSuccess" : true,
-      "nReturned" : 100,
-      "executionTimeMillis" : 0,
-      "totalKeysExamined" : 100,
+      "nReturned" : 961,
+      "executionTimeMillis" : 2,
+      "totalKeysExamined" : 970,
       "totalDocsExamined" : 0,
+      ...
 
+// index scan and non-covered query: documents are examined because indexes c and d are not part of the query
+> db.example.find({a: { $gt : 300}, b : { $gt : 400} }, {_id : 0, c : 1, d : 1 }).explain("executionStats")
+   ...
+   "executionStats" : {
+      "executionSuccess" : true,
+      "nReturned" : 961,
+      "executionTimeMillis" : 2,
+      "totalKeysExamined" : 970,
+      "totalDocsExamined" : 961,
+      ...
 ```
 
 
@@ -1203,6 +1202,56 @@ Compound multikey indexes is also possible, but at most one field can be an arra
 
 ## Index Options
 ### Unique
+
+```
+> db.example.drop()
+> db.example.insertMany([{ a : 1, b : 10 }, 
+                         { a : 2, b : 20 }])
+
+> db.example.createIndex({ a : 1 }, { unique : true })
+
+// identifying unique indexes
+> db.example.getIndexes()
+[
+	{
+		"v" : 2,
+		"key" : {
+			"_id" : 1
+		},
+		"name" : "_id_",
+		"ns" : "mydb.example"
+	},
+	{
+		"v" : 2,
+		"unique" : true,
+		"key" : {
+			"a" : 1
+		},
+		"name" : "a_1",
+		"ns" : "mydb.example"
+	}
+]
+> 
+
+// error: unique index violation returns an error
+> db.example.insertOne({ a : 1, b : 1000})
+   "errmsg" : "E11000 duplicate key error collection: mydb.example index: a_1 dup key: { : 1.0 }",
+   
+
+> db.example.drop()
+> db.example.insertMany([{ a : 1, b : 10 }, 
+                         { a : 2, b : 20 }])
+
+// compound unique key
+> db.example.createIndex({ a : 1, b : 1 }, { unique : true })
+
+// correct: single field alone does not violate the unique index
+> db.example.insertOne({ a : 1, b : 1000})
+
+// error: duplicate keys
+> db.example.insertOne({ a : 2, b : 20})
+```
+
 ### Sparse
 ### TTL
 
