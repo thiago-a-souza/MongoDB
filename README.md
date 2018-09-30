@@ -1209,7 +1209,6 @@ This index option enforces unique values, including null values, for single or c
 > db.example.drop()
 > db.example.insertMany([{ a : 1, b : 10 }, 
                          { a : 2, b : 20 }])
-
 > db.example.createIndex({ a : 1 }, { unique : true })
 
 // identifying unique indexes
@@ -1233,7 +1232,6 @@ This index option enforces unique values, including null values, for single or c
 		"ns" : "mydb.example"
 	}
 ]
-> 
 
 // error: unique index violation
 > db.example.insertOne({ a : 1, b : 1000})
@@ -1242,7 +1240,6 @@ This index option enforces unique values, including null values, for single or c
 > db.example.drop()
 > db.example.insertMany([{ a : 1, b : 10 }, 
                          { a : 2, b : 20 }])
-
 // compound unique key
 > db.example.createIndex({ a : 1, b : 1 }, { unique : true })
 
