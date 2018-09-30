@@ -1203,6 +1203,8 @@ Compound multikey indexes is also possible, but at most one field can be an arra
 ## Index Options
 ### Unique
 
+This index option enforces unique values, including null values, for single or compound fields. It cannot store duplicate values or create a unique key on a collection that already has duplicate values on the specified key(s). Also, it allows creating a unique key on a missing field. 
+
 ```
 > db.example.drop()
 > db.example.insertMany([{ a : 1, b : 10 }, 
@@ -1249,6 +1251,16 @@ Compound multikey indexes is also possible, but at most one field can be an arra
 
 // error: unique compound index violation
 > db.example.insertOne({ a : 2, b : 20})
+
+
+> db.example.drop()
+> db.example.createIndex({ x : 1 }, { unique : true })
+
+// correct: x will be stored as null
+> db.example.insertOne({ a : 1 })
+
+// error: duplicate null for x
+> db.example.insertOne({ a : 2 })
 ```
 
 ### Sparse
