@@ -1233,9 +1233,8 @@ Compound multikey indexes is also possible, but at most one field can be an arra
 ]
 > 
 
-// error: unique index violation returns an error
+// error: unique index violation
 > db.example.insertOne({ a : 1, b : 1000})
-   "errmsg" : "E11000 duplicate key error collection: mydb.example index: a_1 dup key: { : 1.0 }",
    
 
 > db.example.drop()
@@ -1248,7 +1247,7 @@ Compound multikey indexes is also possible, but at most one field can be an arra
 // correct: single field alone does not violate the unique index
 > db.example.insertOne({ a : 1, b : 1000})
 
-// error: duplicate keys
+// error: unique compound index violation
 > db.example.insertOne({ a : 2, b : 20})
 ```
 
