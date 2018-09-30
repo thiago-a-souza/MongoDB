@@ -1203,7 +1203,7 @@ Compound multikey indexes is also possible, but at most one field can be an arra
 ## Index Options
 ### Unique
 
-This index option enforces unique values, including null values, for single or compound fields. It cannot store duplicate values or create a unique key on a collection that already has duplicate values on the specified key(s). Also, it allows creating a unique key on a missing field. 
+This index option enforces unique values, including nulls, for single or compound fields. It cannot store duplicate values or create a unique key on a collection that already has duplicate values on the specified key(s). Also, it allows creating a unique key on a missing field. 
 
 ```
 > db.example.drop()
