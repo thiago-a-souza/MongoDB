@@ -1201,9 +1201,44 @@ Compound multikey indexes is also possible, but at most one field can be an arra
 > db.collection.insertOne({ "_id" : 2, "a" : [20, 21], "b" : 23})
 ```
 
+### Text Indexes
+
+Text indexes creates tokens from strings or arrays so it can be searched more efficiently with indexes. This search is not case sensitive and also matches plural and singular words. A collection can have only one text index, but multiple fields are allowed. In addition to that, text indexes provide a matching score, so it can be displayed and sorted using the *$meta* operator.
+
+
+```
+> db.example.drop()
+
+> db.example.insertMany([
+{ _id : 1, fruits : "mango Apple pear ORANGES avocado " },
+{ _id : 2, fruits : "banana strawberry GRape lemon APPLES" },
+{ _id : 3, fruits : "orange" }
+])
+
+// creating a text index
+> db.example.createIndex({ "fruits" : "text" })
+
+> db.example.find({$text : { $search : "orange" } })
+{ "_id" : 3, "fruits" : "orange" }
+{ "_id" : 1, "fruits" : "mango Apple pear ORANGES avocado " }
+
+> db.example.find({$text : { $search : "banana apple" } })
+{ "_id" : 2, "fruits" : "banana strawberry GRape lemon APPLES" }
+{ "_id" : 1, "fruits" : "mango Apple pear ORANGES avocado " }
+
+> db.example.find( { $text : {$search : "banana apple"} }, { "my-text-score" : {$meta : "textScore" }  })
+{ "_id" : 1, "fruits" : "mango Apple pear ORANGES avocado ", "my-text-score" : 0.6 }
+{ "_id" : 2, "fruits" : "banana strawberry GRape lemon APPLES", "my-text-score" : 1.2 }
+
+> db.example.find( { $text : {$search : "banana apple"} }, { "my-text-score" : {$meta : "textScore" }  }).sort({ "my-text-score" : {$meta : "textScore" }  })
+{ "_id" : 2, "fruits" : "banana strawberry GRape lemon APPLES", "my-text-score" : 1.2 }
+{ "_id" : 1, "fruits" : "mango Apple pear ORANGES avocado ", "my-text-score" : 0.6 }
+
+```
+
 
 ### Geo Indexes
-### Text Indexes
+
 
 ## Index Options
 ### Unique
