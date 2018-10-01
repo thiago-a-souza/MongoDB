@@ -928,6 +928,13 @@ When a query is executed, MongoDB looks at the query shape to identify index can
 
 Indexes can be manipulated using the methods *createIndex*, *dropIndex*, and *getIndexes*. The syntax to create or drop an index is similar to *sort* because index values are ordered, allowing more efficient sort operations. Obviously, the query  influences if an index will be used or not. To verify the actual execution plan, the *explain* method should be used. To override the index identified, the method *hint* forces an alternative index to be executed.
 
+## Creating Indexes in Background
+
+By default, indexes are created in foreground, and the collection is blocked for read/write operations until the process completes. For long collections, indexes can be created in background, allowing reads and writes on the primary while the index is being created - secondaries will run in foreground, so queries will be blocked on secondaries.  Despite the term background, creating such index does not return to the shell until it completes, so another session should be opened to run other commands. In terms of performance, creating indexes in background take longer than in foreground.
+
+```
+> db.example.createIndex({"name" : 1}, {background : true})
+```
 
 ## Explain
 
@@ -1203,7 +1210,7 @@ Compound multikey indexes is also possible, but at most one field can be an arra
 
 ### Text Indexes
 
-Text indexes creates tokens from strings or arrays so it can be searched more efficiently with indexes. This search is not case sensitive and also matches plural and singular words. A collection can have only one text index, but multiple fields are allowed. In addition to that, text indexes provide a matching score, so it can be displayed and sorted using the *$meta* operator.
+Text indexes create tokens from strings or arrays so it can be searched more efficiently with indexes. This search is not case sensitive and also matches plural and singular words. A collection can have only one text index, but multiple fields are allowed. In addition to that, text indexes provide a matching score, so it can be displayed and sorted using the *$meta* operator.
 
 
 ```
@@ -1239,6 +1246,39 @@ Text indexes creates tokens from strings or arrays so it can be searched more ef
 
 ### Geo Indexes
 
+MongoDB supports *2d* indexes to find locations on a flat space and *2dsphere* for spherical geometries.
+
+```
+> db.museums.drop()
+> db.museums.insertMany([
+  {_id : 1 , name : "American Museum of Natural History", loc : [40.781397, -73.974010] },
+  {_id : 2 , name : "Louvre", loc : [48.860622, 2.337716] },
+  {_id : 3 , name : "National Gallery", loc : [51.508935, -0.128258] }
+  ])
+
+> db.museums.createIndex({ "loc" : "2dsphere" })
+
+// locations sorted by nearest pair of coordinates
+> db.museums.find( { "loc" : { $near : { $geometry : { type : "Point" , coordinates : [ 25.777519, -80.131284] } } } } )
+  { "_id" : 1, "name" : "American Museum of Natural History", "loc" : [ 40.781397, -73.97401 ] }
+  { "_id" : 3, "name" : "National Gallery", "loc" : [ 51.508935, -0.128258 ] }
+  { "_id" : 2, "name" : "Louvre", "loc" : [ 48.860622, 2.337716 ] }
+
+// find location within a circle - requires location and radius
+> db.museums.find( { "loc" : { $geoWithin : { $centerSphere : [ [ 48.0, 2.0 ] , 0.05 ] } } } )
+  { "_id" : 2, "name" : "Louvre", "loc" : [ 48.860622, 2.337716 ] }
+
+// find location within a polygon - last location must close the loop
+> db.museums.find( { "loc" : { $geoWithin : { $geometry : { type : "Polygon" , coordinates : [ [
+                               [51.544892, -0.132816],
+                               [51.471908, -0.165075],
+                               [51.472758, -0.065038],
+                               [51.544892, -0.132816]
+                               ] ]
+                      } } } } )
+  { "_id" : 3, "name" : "National Gallery", "loc" : [ 51.508935, -0.128258 ] }
+
+```
 
 ## Index Options
 ### Unique
@@ -1302,7 +1342,7 @@ This index option enforces unique values, including nulls, for single or compoun
 
 ### Sparse
 
-Sparse indexes contain only documents that contain the indexed field and it's not null. The sparse option combined with unique prevents loading duplicates but allows omitting the field - if only the unique option is used, it doesn't allow multiple documents missing the indexed field. Because the sparse index does not contain all documents, sort operations using a sparse index run a collection scan. The *hint* method can force a sparse index to be used but it may return incorrect results.
+Sparse indexes store only documents that contain the indexed field and it's not null. The sparse option combined with unique prevents loading duplicates but allows omitting the field - if only the unique option is used, it doesn't allow multiple documents missing the indexed field. Because the sparse index does not contain all documents, sort operations using a sparse index run a collection scan. The *hint* method can force a sparse index to be used but it may return incorrect results.
 
 
 ```
