@@ -28,6 +28,7 @@ Thiago Alexandre Domingues de Souza
      * [remove](#remove)
      * [deleteOne and deleteMany](#deleteone-and-deletemany)     
 - [Indexes](#indexes)     
+  * [Creating Indexes in Background](#creating-indexes-in-background)
   * [Explain](#explain)
   * [Covered Query](#covered-query)
   * [Index Types](#index-types)
