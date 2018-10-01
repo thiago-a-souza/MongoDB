@@ -28,6 +28,8 @@ Thiago Alexandre Domingues de Souza
      * [remove](#remove)
      * [deleteOne and deleteMany](#deleteone-and-deletemany)     
 - [Indexes](#indexes)     
+  * [Explain](#explain)
+  * [Covered Query](#covered-query)
   * [Index Types](#index-types)
      * [Single Field Indexes](#single-field-indexes)  
      * [Compound Indexes](#compound-indexes)  
@@ -1075,6 +1077,12 @@ Sort operations that use indexes have a better performance because they take adv
 // index scan: there's only one branch an it contains an index
 > db.people.find({"name" : "john", "age" : 25 })
 
+// collection scan: no index used
+> db.people.find()
+
+// index scan: sorting is using an index
+> db.people.find().sort({ "name" : 1 })
+
 // index scan and in-memory sorting: query is using a filter but the sort is not (stage is sort)
 > db.people.find({name : "john"}).sort({ "age" : 1 }).
    ...
@@ -1191,14 +1199,11 @@ Compound multikey indexes is also possible, but at most one field can be an arra
 
 // correct: only one field is an array
 > db.collection.insertOne({ "_id" : 2, "a" : [20, 21], "b" : 23})
-
 ```
 
 
 ### Geo Indexes
 ### Text Indexes
-
-### Sorting
 
 ## Index Options
 ### Unique
@@ -1261,6 +1266,39 @@ This index option enforces unique values, including nulls, for single or compoun
 ```
 
 ### Sparse
+
+Sparse indexes contain only documents that contain the indexed field and it's not null. The sparse option combined with unique prevents loading duplicates but allows omitting the field - if only the unique option is used, it doesn't allow multiple documents missing the indexed field. Because the sparse index does not contain all documents, sort operations using a sparse index run a collection scan. The *hint* method can force a sparse index to be used but it may return incorrect results.
+
+
+```
+> db.example.drop()
+> db.example.insertMany([ 
+  {"_id" : 1, "name" : "john",  "ssn" : "111-22-3333"},
+  {"_id" : 2, "name" : "peter", "ssn" : "123-45-6789"},
+  {"_id" : 3, "name" : "lisa",  "ssn" : "321-54-9876"},
+  {"_id" : 4, "name" : "alex"},
+  {"_id" : 5, "name" : "susan"}
+ ])
+ 
+> db.example.createIndex({ ssn : 1 }, { unique : true, sparse : true })
+> db.example.createIndex({ name : 1 })
+
+// index scan
+> db.example.find({ ssn : "321-54-9876"})
+
+// index scan and in-memory sort
+> db.example.find({ ssn : "321-54-9876"}).sort({ name : 1 })
+
+// collection scan
+> db.example.find().sort({ ssn : 1 })
+
+// forces index scan but will not return documents that don't have the ssn field
+> db.example.find().hint({ ssn : 1 }).explain()
+
+// index scan
+> db.example.find().sort({ name : 1 })
+```
+
 ### TTL
 
 This option removes documents after a specified time limit (in seconds) on a field whose value is either a date or an array of dates. In case of an array of dates, the minimum date is used to calculate the expiration limit. If the field does not exist or it's not a date, the document is not removed.
