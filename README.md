@@ -1263,6 +1263,44 @@ This index option enforces unique values, including nulls, for single or compoun
 ### Sparse
 ### TTL
 
+This option removes documents after a specified time limit (in seconds) on a field whose value is either a date or an array of dates. In case of an array of dates, the minimum date is used to calculate the expiration limit. If the field does not exist or it's not a date, the document is not removed.
+
+
+```
+> db.example.drop()
+> db.example.insertOne({ _id : 1, created : new Date()});
+
+> db.example.createIndex({ created : 1 }, { expireAfterSeconds : 120 });
+
+// identifying ttl indexes
+> db.example.getIndexes()
+[
+	{
+		"v" : 2,
+		"key" : {
+			"_id" : 1
+		},
+		"name" : "_id_",
+		"ns" : "mydb.example"
+	},
+	{
+		"v" : 2,
+		"key" : {
+			"created" : 1
+		},
+		"name" : "created_1",
+		"ns" : "mydb.example",
+		"expireAfterSeconds" : 120
+	}
+]
+
+// will not return data after 120 seconds
+> db.example.find();
+
+// document will not be removed because TTL field does not exist
+> db.example.insertOne({ _id : 2, title : "test" }
+```
+
 
 
 
