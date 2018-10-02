@@ -42,6 +42,14 @@ Thiago Alexandre Domingues de Souza
     * [Sparse](#sparse) 
     * [TTL](#ttl) 
 - [Data Modeling](#data-modeling)    
+  * [One-to-One](#one-to-one)
+  * [One-to-Many](#one-to-many)
+    * [One-to-Few](#one-to-few) 
+    * [One-to-Many](#one-to-many) 
+    * [One-to-Millions](#one-to-millions) 
+  * [Many-to-Many](#one-to-many)  
+
+
 
 # NoSQL
 
@@ -1430,37 +1438,77 @@ Unlike modeling the data for relational databases, designing documents must focu
 Documents can be embedded into another as long as the final size is at most 16Mb. It's important to highlight that  embedding is recommended only if the application is frequently accessing that information. If the embedded document is large enough to overload the memory and it's rarely used, a separate document should be created. 
 
 ```
-// person document
+> db.person.findOne()
+{ "_id" : 100, "name" : "joe", "age" : 30, "gender" : "male" }
+
+> db.address.findOne()
 {
-   "_id" : 100,
-   "name" : "joe",
-   "age" : 30,
-   "gender" : "male"
+	"_id" : ObjectId("5bb3d4081685d0df75e6aea7"),
+	"person_id" : 100,
+	"street" : "1071 5th Ave",
+	"city" : "New York",
+	"state" : "NY"
 }
 
-// address references person via person_id
+> db.person_addr.findOne()
 {
-   "person_id" : 100,
-   "street" : "1071 5th Ave",
-   "city" : "New York",
-   "state" : "NY"
-}
-
-// person with embedded address
-{
-   "_id" : 100,
-   "name" : "joe",
-   "age" : 30,
-   "gender" : "male",
-   "address" : {
-      "street" : "1071 5th Ave",
-      "city" : "New York",
-      "state" : "NY"
-   }
+	"_id" : 100,
+	"name" : "joe",
+	"age" : 30,
+	"gender" : "male",
+	"address" : {
+		"street" : "1071 5th Ave",
+		"city" : "New York",
+		"state" : "NY"
+	}
 }
 ```
 
 ## One-to-Many
+
+There's no single solution to address this relationship, so they can be divided into three categories: one-to-few, one-to-many, and one-to-millions.
+
+
+### One-to-Few
+
+If the relationship has only a few documents or items, it's fine embedding into an array, and it would allow the application to retrieve all data at once.
+
+```
+> db.person.findOne({ _id : 200 })
+{
+	"_id" : 200,
+	"name" : "susan",
+	"age" : 32,
+	"gender" : "female",
+	"addresses" : [
+		{
+			"street" : "55 Music Concourse Dr",
+			"city" : "San Francisco",
+			"state" : "CA"
+		},
+		{
+			"street" : "200 Larkin St",
+			"city" : "San Francisco",
+			"state" : "CA"
+		}
+	]
+}
+```
+
+### One-to-Many
+
+If the relationship has hundreds but less than thousands of items, an array of references on the one side should be used. This would require the application to join the data to get the referenced documents.
+
+```
+```
+
+### One-to-Squillions
+
+If the relationship has a very large number of items, the parent should reference the relationship, so the one side does not reach the maximum document size.
+
+```
+```
+
 
 ## Many-to-Many
 
