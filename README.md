@@ -41,7 +41,7 @@ Thiago Alexandre Domingues de Souza
     * [Unique](#unique) 
     * [Sparse](#sparse) 
     * [TTL](#ttl) 
-
+- [Data Modeling](#data-modeling)    
 
 # NoSQL
 
@@ -1414,6 +1414,55 @@ This option removes documents after a specified time limit (in seconds) on a fie
 // document will not be removed because TTL field does not exist
 > db.example.insertOne({ _id : 2, title : "test" }
 ```
+
+
+# Data Modeling
+
+The normalization process used by relational databases guarantee that the data is consistent across different tables. Among other rules, it does not allow multivalued fields nor nested relations, so the data must be stored in separate tables. This approach has a significant impact on performance because typical applications have to join several tables to pull all information needed. NoSQL databases, such as MongoDB, do not follow these rules and can benefit from embedded documents/arrays to avoid pulling data from other sources. To enforce this approach, MongoDB does not support foreign keys or joins. As a result, a document referencing another document (constraints in the SQL world), must be handled at the application level, in other words, the database will not ensure that the reference exists and does not join documents.
+
+Initially, atomic operations were supported at the document level, and it could not ensure that multi-document changes were either committed or rolled back. In fact, transactions on a document level can cover most demands for data integrity, since embedded documents and arrays keep in the same document the data that would be stored in different sources. However, some circumstances still require ACID transactions, and developers had to handle them at the application level. With the release 4.0, MongoDB introduced multi-document transactions to solve this problem.
+
+Unlike modeling the data for relational databases, designing documents must focus on the data access pattern, so the document should represent a typical usage in terms of read/write operations. As a result, the queries used should be discussed before creating the data model. The data model in MongoDB extends the traditional relationships (i.e. one-to-one, one-to-many and many-to-many) to take advantage of embedded documents and arrays.
+
+
+## One-to-One
+
+Documents can be embedded into another as long as the final size is at most 16Mb. It's important to highlight that  embedding is recommended only if the application is frequently accessing that information. If the embedded document is large enough to overload the memory and it's rarely used, a separate document should be created. 
+
+```
+// person document
+{
+   "_id" : 100,
+   "name" : "joe",
+   "age" : 30,
+   "gender" : "male"
+}
+
+// address references person via person_id
+{
+   "person_id" : 100,
+   "street" : "1071 5th Ave",
+   "city" : "New York",
+   "state" : "NY"
+}
+
+// person with embedded address
+{
+   "_id" : 100,
+   "name" : "joe",
+   "age" : 30,
+   "gender" : "male",
+   "address" : {
+      "street" : "1071 5th Ave",
+      "city" : "New York",
+      "state" : "NY"
+   }
+}
+```
+
+## One-to-Many
+
+## Many-to-Many
 
 
 
