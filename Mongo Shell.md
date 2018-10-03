@@ -1,3 +1,7 @@
+# Author
+
+Thiago Alexandre Domingues de Souza
+
 # Mongo Shell
 
 MongoDB comes with mongo shell, a CLI for managing and interacting with the data. Because mongo shell is a Javascript-based tool, it also allows running any Javascript code. The shell is a process called *mongo* that connects to a *mongod* instance, representing the MongoDB server, and assigns the current database to the variable *db* - this variable is updated whenever the database is switched.
