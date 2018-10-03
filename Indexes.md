@@ -1,3 +1,24 @@
+# Author
+
+Thiago Alexandre Domingues de Souza
+
+# Table of Contents
+
+- [Indexes](#indexes)     
+  * [Creating Indexes in Background](#creating-indexes-in-background)
+  * [Explain](#explain)
+  * [Covered Query](#covered-query)
+  * [Index Types](#index-types)
+     * [Single Field Indexes](#single-field-indexes)  
+     * [Compound Indexes](#compound-indexes)  
+     * [Multikey Indexes](#multikey-indexes)  
+     * [Geo Indexes](#geo-indexes)  
+     * [Text Indexes](#text-indexes)  
+  * [Index Options](#index-options)  
+    * [Unique](#unique) 
+    * [Sparse](#sparse) 
+    * [TTL](#ttl) 
+    
 # Indexes
 
 Similar to traditional databases, MongoDB also provides indexes for a faster query execution, avoiding full collection scans. In general, indexes speed up reads and slow down writes. For inserts, indexes slow down writes because it has to add new nodes to the B-trees. For deletes, it depends if the operation is deleting everything or just some documents. Removing everything will cause all B-tree nodes to be removed, increasing the overhead. On the other hand, if just some documents are  deleted, the index can help finding the document, which improves the performance. For updates, indexes can also help finding documents but if the field modified is an index, there will be an overhead to modify B-tree nodes to apply this change. Updates may also increase the document size beyond the allocated space. In that case, the document must be moved to a new disk area, and all indexes should be updated to point to the new location. Despite all the overhead in writes, the cost usually compensates read operations.
