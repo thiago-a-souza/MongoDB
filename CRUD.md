@@ -1,3 +1,30 @@
+# Author
+
+Thiago Alexandre Domingues de Souza
+
+# Table of Contents
+
+- [CRUD](#crud)
+  * [Create](#create)
+     * [insertOne](#insertone)
+     * [insertMany](#insertmany)
+     * [save](#save)  
+     * [findAndModify](#findandmodify)
+  * [Read](#read)
+     * [Count](#count)
+     * [Comparison operators](#comparison-operators)
+     * [Logical operators](#logical-operators)
+     * [Element operators](#element-operators)     
+     * [Array operators](#array-operators)     
+     * [Cursors](#cursors)          
+  * [Update](#update)
+     * [updateOne](#updateone)  
+     * [updateMany](#updatemany)  
+     * [Update Operators](#update-operators)  
+  * [Delete](#delete)  
+     * [remove](#remove)
+     * [deleteOne and deleteMany](#deleteone-and-deletemany)  
+
 # CRUD
 
 In contrast to relational databases, MongoDB does not support SQL to perform CRUD operations. Instead, it provides APIs to popular programming languages that can access the database and execute queries. These functions take documents as parameters, including the data, filters, and other options. Depending on the programming language used, additional boilerplate code is required to perform these operations. The commands described in this document refers to Javascript syntax used by  Mongo shell. For examples in other programming languages, visit the documentation at [(2)](#references).
