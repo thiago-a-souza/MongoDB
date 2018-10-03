@@ -42,10 +42,16 @@ Thiago Alexandre Domingues de Souza
     * [Sparse](#sparse) 
     * [TTL](#ttl) 
 - [Data Modeling](#data-modeling)    
-  * [One-to-One](#one-to-one)
-  * [One-to-Many](#one-to-many)
-  * [Many-to-Many](#many-to-many)  
-
+  * [Relationships](#relationships)
+    * [One-to-One](#one-to-one)
+    * [One-to-Many](#one-to-many)
+    * [Many-to-Many](#many-to-many)  
+  * [Tree Structures](#tree-structures)
+  * [GridFS](#tree-structures)
+  * [Views](#views)
+  * [Collations](#collations)  
+  * [NumberDecimal](#numberdecimal)
+  
 
 
 # NoSQL
@@ -1427,10 +1433,12 @@ The normalization process used by relational databases guarantee that the data i
 
 Initially, atomic operations were supported at the document level, and it could not ensure that multi-document changes were either committed or rolled back. In fact, transactions on a document level can cover most demands for data integrity, since embedded documents and arrays keep in the same document the data that would be stored in different sources. However, some circumstances still require ACID transactions, and developers had to handle them at the application level. With the release 4.0, MongoDB introduced multi-document transactions to solve this problem.
 
+## Relationships
+
 Unlike modeling the data for relational databases, designing documents must focus on the data access pattern, so the document should represent a typical usage in terms of read/write operations. As a result, the queries used should be discussed before creating the data model. The data model in MongoDB extends the traditional relationships (i.e. one-to-one, one-to-many and many-to-many) to take advantage of embedded documents and arrays. However, embedding should be used with caution to prevent spreading data inconsistencies across multiple collections. In addition to that, the final document size must be at most 16Mb, including embedded documents and references.
 
 
-## One-to-One
+### One-to-One
 
 Embedding a document into another makes it easier to access all the information with a single query. It's important to highlight that  embedding is recommended only if the application is frequently accessing that information. If the embedded document is large enough to overload the memory and it's rarely used, a separate document should be created. 
 
@@ -1461,7 +1469,7 @@ Embedding a document into another makes it easier to access all the information 
 }
 ```
 
-## One-to-Many
+### One-to-Many
 
 There's no single solution to address this relationship, so they can be divided into three categories: one-to-few, one-to-many, and one-to-millions.
 
@@ -1528,7 +1536,7 @@ There's no single solution to address this relationship, so they can be divided 
 ```
 
 
-## Many-to-Many
+### Many-to-Many
 
 Again, there are several alternatives to model this relationship, and the access pattern should drive the final solution. For example, if one side is frequently accessing the references but the other side is not, only that side should keep them. Otherwise, a reference can be stored on both sides. Alternatively, one side can embed the other if there are, but this should be used carefully to avoid spreading data inconsistencies accross different collections.
 
@@ -1612,7 +1620,11 @@ Again, there are several alternatives to model this relationship, and the access
 }
 ```
 
-
+## Tree Structures
+## GridFS
+## Views
+## Collations
+## NumberDecimal
 
 
 # References 
