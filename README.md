@@ -1621,6 +1621,70 @@ Again, there are several alternatives to model this relationship, and the access
 ```
 
 ## Tree Structures
+
+Because documents enable rich data structures, there are several alternatives to design trees, rather than referencing the parent node or left/right child nodes. Consider the tree illustrated in Figure 2 for the following data models.
+
+
+<p align="center">
+<img src="https://github.com/thiago-a-souza/tmp/blob/master/fig/model-tree.png"  height="50%" width="50%"> <br>
+  <b>Figure 2:</b> Sample Tree<a href="https://github.com/thiago-a-souza/tmp/blob/master/README.md#references"> (3)</a>
+</p> 
+
+- **Parent Reference:**
+```
+> db.categories.find()
+  { "_id" : "MongoDB", "parent" : "Databases" }
+  { "_id" : "dbm", "parent" : "Databases" }
+  { "_id" : "Databases", "parent" : "Programming" }
+  { "_id" : "Languages", "parent" : "Programming" }
+  { "_id" : "Programming", "parent" : "Books" }
+  { "_id" : "Books", "parent" : null }
+```
+
+- **Child References:**
+
+```
+> db.categories.find()
+  { "_id" : "MongoDB", "children" : [ ] }
+  { "_id" : "dbm", "children" : [ ] }
+  { "_id" : "Databases", "children" : [ "MongoDB", "dbm" ] }
+  { "_id" : "Languages", "children" : [ ] }
+  { "_id" : "Programming", "children" : [ "Databases", "Languages" ] }
+  { "_id" : "Books", "children" : [ "Programming" ] }
+```
+
+- **Ancestors References:**
+
+```
+> db.categories.find()
+  { "_id" : "MongoDB", "ancestors" : [ "Books", "Programming", "Databases" ], "parent" : "Databases" }
+  { "_id" : "dbm", "ancestors" : [ "Books", "Programming", "Databases" ], "parent" : "Databases" }
+  { "_id" : "Databases", "ancestors" : [ "Books", "Programming" ], "parent" : "Programming" }
+  { "_id" : "Languages", "ancestors" : [ "Books", "Programming" ], "parent" : "Programming" }
+  { "_id" : "Programming", "ancestors" : [ "Books" ], "parent" : "Books" }
+  { "_id" : "Books", "ancestors" : [ ], "parent" : null }
+```
+
+- **Path Reference:**
+
+```
+> db.categories.find()
+{ "_id" : "Books", "path" : null }
+{ "_id" : "Programming", "path" : ",Books," }
+{ "_id" : "Databases", "path" : ",Books,Programming," }
+{ "_id" : "Languages", "path" : ",Books,Programming," }
+{ "_id" : "MongoDB", "path" : ",Books,Programming,Databases," }
+{ "_id" : "dbm", "path" : ",Books,Programming,Databases," }
+
+// finding descendants
+> db.categories.find( { path: /,Programming,/ } )
+{ "_id" : "Databases", "path" : ",Books,Programming," }
+{ "_id" : "Languages", "path" : ",Books,Programming," }
+{ "_id" : "MongoDB", "path" : ",Books,Programming,Databases," }
+{ "_id" : "dbm", "path" : ",Books,Programming,Databases," }
+```
+
+
 ## GridFS
 ## Views
 ## Collations
@@ -1632,4 +1696,7 @@ Again, there are several alternatives to model this relationship, and the access
 (1) MongoDB Documentation - Write Concern - https://docs.mongodb.com/manual/reference/write-concern/
 
 (2) MongoDB CRUD Operations - https://docs.mongodb.com/manual/crud/
+
+(3) MongoDB Documentation - Model Tree Structures - https://docs.mongodb.com/master/applications/data-models-tree-structures/
+
 
