@@ -44,10 +44,7 @@ Thiago Alexandre Domingues de Souza
 - [Data Modeling](#data-modeling)    
   * [One-to-One](#one-to-one)
   * [One-to-Many](#one-to-many)
-    * [One-to-Few](#one-to-few) 
-    * [One-to-Many](#one-to-many) 
-    * [One-to-Millions](#one-to-millions) 
-  * [Many-to-Many](#one-to-many)  
+  * [Many-to-Many](#many-to-many)  
 
 
 
@@ -1469,9 +1466,7 @@ Documents can be embedded into another as long as the final size is at most 16Mb
 There's no single solution to address this relationship, so they can be divided into three categories: one-to-few, one-to-many, and one-to-millions.
 
 
-### One-to-Few
-
-If the relationship has only a few documents or items, it's fine embedding into an array, and it would allow the application to retrieve all data at once.
+- **One-to-Few:** if the relationship has only a few documents or items, it's fine embedding into an array, and it would allow the application to retrieve all data at once.
 
 ```
 > db.blog_posts.findOne()
@@ -1496,9 +1491,7 @@ If the relationship has only a few documents or items, it's fine embedding into 
 }
 ```
 
-### One-to-Many
-
-If the relationship has hundreds but less than thousands of items, embedding all documents into an array would exceed the maximum document size. As a result, it should be created an array of references on the one side. This would require the application to join the data to get the referenced documents.
+- **One-to-Many:**  if the relationship has hundreds but less than thousands of items, embedding all documents into an array would exceed the maximum document size. As a result, it should be created an array of references on the one side. This would require the application to join the data to get the referenced documents.
 
 ```
 > db.companies.find({ _id : 1 }).pretty()
@@ -1509,8 +1502,6 @@ If the relationship has hundreds but less than thousands of items, embedding all
 		100,
 		157,
 		192,
-		822,
-		124
 		...
 	]
 }
@@ -1521,21 +1512,105 @@ If the relationship has hundreds but less than thousands of items, embedding all
   { "_id" : 100, "name" : "iPad Air" }
   { "_id" : 157, "name" : "MacBook Pro 13" }
   { "_id" : 192, "name" : "Apple Watch" }
-  { "_id" : 822, "name" : "Apple TV" }
-  { "_id" : 124, "name" : "iPhone X" }
   ...
 ```
 
-### One-to-Squillions
-
-If the relationship has a very large number of items, the parent should reference the relationship, so the one side does not reach the maximum document size.
+- **One-to-Squillions:** if the relationship has a very large number of items, the parent should reference the relationship, so the one side does not reach the maximum document size.
 
 ```
+> db.users.findOne()
+  { "_id" : 100, "name" : "john", "age" : 20 }
+
+> db.products_viewed.find( { userid : 100 })
+  { "_id" : 1, "productid" : "281519", "userid" : 100 }
+  { "_id" : 3, "productid" : "281519", "userid" : 100 }
+  ...
 ```
 
 
 ## Many-to-Many
 
+Again, there are several alternatives to model a many-to-many relationship, and the access pattern should drive the final solution. For example, if one side is frequently accessing the references but the other side is not, only that side should maintain them. Otherwise, a reference can be stored on both sides. Alternatively, one side can embed the other if there are, but this should be used carefully to avoid spreading data inconsistencies accross different collections.
+
+- **Reference on a single side:**
+
+```
+> db.movies.findOne({_id : 20983})
+{
+	"_id" : "20983",
+	"title" : "Gladiator",
+	"year" : 2000,
+	"starring" : [
+		115,
+		132,
+		...
+	]
+}
+
+> c = db.movies.findOne({ _id : 20983 });
+
+> db.cast.find({ _id : { $in : c.starring }}).pretty()
+{
+	"_id" : 115,
+	"name" : "Russell Crowe",
+	"born" : "April 7, 1964",
+	"country" : "New Zealand"
+}
+...
+```
+
+- **Reference on both sides:**
+
+```
+> db.movies.findOne({ _id : 23516 })
+{
+	"_id" : 23516,
+	"title" : "Forrest Gump",
+	"year" : 1994,
+	"starring" : [
+		223,
+		351,
+		...
+	]
+}
+
+> db.cast.findOne({_id : 223 })
+{
+	"_id" : 223,
+	"name" : "Tom Hanks",
+	"born" : "July 9, 1956",
+	"country" : "USA",
+	"movieIDs" : [
+		23516,
+		18920,
+		...
+	]
+}
+```
+
+- **Embedding:**
+
+```
+> db.movies.findOne({_id : 78146})
+{
+	"_id" : 78146,
+	"title" : "Back to the Future",
+	"year" : 1985,
+	"starring" : [
+		{
+			"name" : "Michael J. Fox",
+			"born" : "June 9, 1961",
+			"country" : "Canada"
+		},
+		{
+			"name" : "Christopher Lloyd",
+			"born" : "October 22, 1938",
+			"country" : "USA"
+		}
+		...
+	]
+}
+```
 
 
 
