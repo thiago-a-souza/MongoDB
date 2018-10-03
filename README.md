@@ -1474,22 +1474,23 @@ There's no single solution to address this relationship, so they can be divided 
 If the relationship has only a few documents or items, it's fine embedding into an array, and it would allow the application to retrieve all data at once.
 
 ```
-> db.person.findOne({ _id : 200 })
+> db.blog_posts.findOne()
 {
-	"_id" : 200,
-	"name" : "susan",
-	"age" : 32,
-	"gender" : "female",
-	"addresses" : [
+	"_id" : 1,
+	"title" : "Post Title",
+	"url" : "http://www.example.com",
+	"comments" : [
 		{
-			"street" : "55 Music Concourse Dr",
-			"city" : "San Francisco",
-			"state" : "CA"
+			"title" : "First comment",
+			"comment" : "asdfg"
 		},
 		{
-			"street" : "200 Larkin St",
-			"city" : "San Francisco",
-			"state" : "CA"
+			"title" : "Second comment",
+			"comment" : "asdfg"
+		},
+		{
+			"title" : "Third comment",
+			"comment" : "asdfg"
 		}
 	]
 }
@@ -1497,9 +1498,32 @@ If the relationship has only a few documents or items, it's fine embedding into 
 
 ### One-to-Many
 
-If the relationship has hundreds but less than thousands of items, an array of references on the one side should be used. This would require the application to join the data to get the referenced documents.
+If the relationship has hundreds but less than thousands of items, embedding all documents into an array would exceed the maximum document size. As a result, it should be created an array of references on the one side. This would require the application to join the data to get the referenced documents.
 
 ```
+> db.companies.find({ _id : 1 }).pretty()
+{
+	"_id" : 1,
+	"name" : "Apple",
+	"products" : [
+		100,
+		157,
+		192,
+		822,
+		124
+		...
+	]
+}
+
+> p = db.companies.findOne({ _id : 1 });
+
+> db.products.find({ _id : { $in : p.products } })
+  { "_id" : 100, "name" : "iPad Air" }
+  { "_id" : 157, "name" : "MacBook Pro 13" }
+  { "_id" : 192, "name" : "Apple Watch" }
+  { "_id" : 822, "name" : "Apple TV" }
+  { "_id" : 124, "name" : "iPhone X" }
+  ...
 ```
 
 ### One-to-Squillions
