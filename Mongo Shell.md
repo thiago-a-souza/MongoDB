@@ -59,4 +59,7 @@ function () {
     }
     return true;
 }
+
+// drop current database and corresponding collections
+> db.dropDatabase()
 ```
