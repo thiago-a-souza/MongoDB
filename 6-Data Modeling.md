@@ -414,8 +414,14 @@ If an index has a collation different from the collection, it must be explicitly
 // index scan: index has the same collation as the collection
 > db.example.find({ name : "whatever" }).explain()
 
+// index scan and index sorting: sort is using an index that has the same locale as the collection  
+> db.example.find().sort({ name : 1 }).explain()
+
 // collection scan: index has a different collation
 > db.example.find({ city : "again" }).explain()
+
+// index scan and index sorting ****
+> db.example.find({ city : "again" }).sort({ name : 1}).explain()
 
 // index scan: collation explicitly defined matches existing index
 > db.example.find({ city : "whatever" }).collation({ locale : "fr" }).explain()
