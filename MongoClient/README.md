@@ -1,6 +1,6 @@
 # Compiling
 
-From the project root directory, where *pom.xml* was created, generate the jar running the command:
+From the project root directory, where *pom.xml* was created, generate the jar using the command:
 
 ```
 mvn package
