@@ -3,12 +3,12 @@ Thiago Alexandre Domingues de Souza
 
 # Table of Contents
 
-- [NoSQL](./NoSQL.md)
-- [MongoDB](./MongoDB.md)
-- [Mongo Shell](./Mongo%20Shell.md)
-- [CRUD](./CRUD.md)
-- [Indexes](./Indexes.md)     
-- [Data Modeling](./Data%20Modeling.md)    
+- [NoSQL](./1-NoSQL.md)
+- [MongoDB](./2-MongoDB.md)
+- [Mongo Shell](./3-Mongo%20Shell.md)
+- [CRUD](./4-CRUD.md)
+- [Indexes](./5-Indexes.md)     
+- [Data Modeling](./6-Data%20Modeling.md)    
 
 
 # References 
