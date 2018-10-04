@@ -8,7 +8,7 @@ Thiago Alexandre Domingues de Souza
 - [Mongo Shell](./3-Mongo%20Shell.md)
 - [CRUD](./4-CRUD.md)
 - [Indexes](./5-Indexes.md)     
-- [Data Modeling](#data-modeling)    
+- **[Data Modeling](#data-modeling)**
   * [Relationships](#relationships)
     * [One-to-One](#one-to-one)
     * [One-to-Many](#one-to-many)
