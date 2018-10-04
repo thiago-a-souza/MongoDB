@@ -9,7 +9,8 @@ Thiago Alexandre Domingues de Souza
 - **[Mongo Shell](#mongo-shell)**
 - [CRUD](./4-CRUD.md)
 - [Indexes](./5-Indexes.md)     
-- [Data Modeling](./6-Data%20Modeling.md)    
+- [Data Modeling](./6-Data%20Modeling.md)
+- [References](./README.md#references)
 
 
 # Mongo Shell
