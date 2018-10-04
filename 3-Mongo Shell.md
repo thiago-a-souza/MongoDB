@@ -6,7 +6,7 @@ Thiago Alexandre Domingues de Souza
 
 - [NoSQL](./1-NoSQL.md)
 - [MongoDB](./2-MongoDB.md)
-- [Mongo Shell](#mongo-shell)
+- **[Mongo Shell](#mongo-shell)**
 - [CRUD](./4-CRUD.md)
 - [Indexes](./5-Indexes.md)     
 - [Data Modeling](./6-Data%20Modeling.md)    
