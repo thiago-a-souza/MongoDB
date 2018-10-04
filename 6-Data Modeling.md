@@ -9,15 +9,15 @@ Thiago Alexandre Domingues de Souza
 - [CRUD](./4-CRUD.md)
 - [Indexes](./5-Indexes.md)     
 - **[Data Modeling](#data-modeling)**
-  * [Relationships](#relationships)
-    * [One-to-One](#one-to-one)
-    * [One-to-Many](#one-to-many)
-    * [Many-to-Many](#many-to-many)  
-  * [Tree Structures](#tree-structures)
-  * [GridFS](#tree-structures)
-  * [Views](#views)
-  * [Collations](#collations)  
-  * [NumberDecimal](#numberdecimal)  
+  * **[Relationships](#relationships)**
+    * **[One-to-One](#one-to-one)**
+    * **[One-to-Many](#one-to-many)**
+    * **[Many-to-Many](#many-to-many)**
+  * **[Tree Structures](#tree-structures)**
+  * **[GridFS](#tree-structures)**
+  * **[Views](#views)**
+  * **[Collations](#collations)**
+  * **[NumberDecimal](#numberdecimal)**
 
 
 # Data Modeling
