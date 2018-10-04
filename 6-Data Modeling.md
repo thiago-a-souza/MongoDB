@@ -317,7 +317,7 @@ fs.files
 
 ## Views
 
-The concept of views in relational databases is similar in MongoDB. It can transform complex queries into an easier format and also shows only required fields, hiding sensitive information. View documents cannot be modified, but changes to the underlying collection are propagated to the view. In addition to that, removing the source collection does not remove the corresponding view, rather it displays an empty collection, and the view reflects the data when the collection is populated. In terms of performance, views can take advantage of the source collection indexes to query and sort the data. Because views are essentially queries, they don't occupy the space of the documents displayed. Actually, a view can use another view as a source rather than a collection. Finally, when a view is created, a collection representing the view is produced as if it was a regular collection, and it's definition is stored in the *system.views* collection.
+The concept of views in relational databases is similar in MongoDB. It can transform complex queries into an easier format and also shows only required fields, hiding sensitive information. View's data cannot be modified, but changes to the underlying collection are propagated to the view. In addition to that, removing the source collection does not remove the corresponding view, rather it displays an empty collection, and the view reflects the data when the collection is populated. In terms of performance, views can take advantage of the source collection indexes to query and sort the data. Because views are essentially queries, they don't occupy the space of the documents displayed. Actually, a view can use another view as a source rather than a collection. Finally, when a view is created, a collection representing the view is produced as if it was a regular collection, and it's definition is stored in the *system.views* collection.
 
 
 ```
@@ -349,7 +349,76 @@ system.views
 > db.personView.drop()
 ```
 
-
-
 ## Collations
+
+
+Case-insensitive collation with strength 3:
+
+```
+> db.createCollection("ptStrength1", { collation : { locale: "pt", strength : 1}})
+> db.ptStrength1.insertMany([ {_id : 1, "str" : "ab"}, {_id : 2, str : "áb"}, {_id : 3, str : "Ab"}, {_id :4, str : "Áb"} ])  
+> db.ptStrength1.find().sort({"str" : 1 })
+  { "_id" : 1, "str" : "ab" }
+  { "_id" : 2, "str" : "áb" }
+  { "_id" : 3, "str" : "Ab" }
+  { "_id" : 4, "str" : "Áb" }
+> db.ptStrength1.find({ "str" : "ab" } ).sort({"str" : 1 })
+  { "_id" : 1, "str" : "ab" }
+  { "_id" : 2, "str" : "áb" }
+  { "_id" : 3, "str" : "Ab" }
+  { "_id" : 4, "str" : "Áb" }
+                            
+> db.createCollection("ptStrength3", { collation : { locale: "pt", strength : 3}})
+> db.ptStrength3.insertMany([ {_id : 1, "str" : "ab"}, {_id : 2, "str" : "áb"}, {_id : 3, "str" : "Ab"}, {_id : 4, "str" : "Áb"} ])                            
+
+> db.ptStrength3.find().sort({"str" : 1 })
+  { "_id" : 1, "str" : "ab" }
+  { "_id" : 3, "str" : "Ab" }
+  { "_id" : 2, "str" : "áb" }
+  { "_id" : 4, "str" : "Áb" }
+> db.ptStrength3.find({ "str" : "ab" } ).sort({"str" : 1 })
+{ "_id" : 1, "str" : "ab" }
+```
+
+
+If an index has a collation different from the collection, it must be explicitly declared, otherwise it will run a collection scan.
+
+```
+> db.createCollection("example", { collation : { locale: "pt"}})
+// index will inherit the collection collation
+> db.example.createIndex({name : 1})
+// index with a different collation
+> db.example.createIndex({city : 1}, {collation : { locale : "fr" }})
+// it's possible to create index on the same field with a different collation, but it's must provide a name
+> db.example.createIndex({city : 1}, {name : "cities-es", collation : { locale : "es" }})
+
+> db.example.getIndexes()
+   ...
+   "name" : "_id_",
+   "collation" : {
+      "locale" : "pt",
+       ...
+   "name" : "name_1",
+   "collation" : {
+      "locale" : "pt",
+       ...
+   "name" : "city_1",
+   "collation" : {
+      "locale" : "fr",
+       ...
+   "name" : "cities-es",
+   "collation" : {
+      "locale" : "es",
+       ...
+
+// index scan: index has the same collation as the collection
+> db.example.find({ name : "whatever" }).explain()
+
+// collection scan: index has a different collation
+> db.example.find({ city : "again" }).explain()
+
+// index scan: collation explicitly defined matches existing index
+> db.example.find({ city : "whatever" }).collation({ locale : "fr" }).explain()
+```
+
 ## NumberDecimal
