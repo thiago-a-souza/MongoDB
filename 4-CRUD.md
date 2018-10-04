@@ -7,28 +7,28 @@ Thiago Alexandre Domingues de Souza
 - [NoSQL](./1-NoSQL.md)
 - [MongoDB](./2-MongoDB.md)
 - [Mongo Shell](./3-Mongo%20Shell.md)
-- [CRUD](#crud)
-  * [Create](#create)
-     * [insertOne](#insertone)
-     * [insertMany](#insertmany)
-     * [save](#save)  
-     * [findAndModify](#findandmodify)
-  * [Read](#read)
-     * [Count](#count)
-     * [Comparison operators](#comparison-operators)
-     * [Logical operators](#logical-operators)
-     * [Element operators](#element-operators)     
-     * [Array operators](#array-operators)     
-     * [Cursors](#cursors)          
-  * [Update](#update)
-     * [updateOne](#updateone)  
-     * [updateMany](#updatemany)  
-     * [Update Operators](#update-operators)  
-  * [Delete](#delete)  
-     * [remove](#remove)
-     * [deleteOne and deleteMany](#deleteone-and-deletemany)  
-- [Indexes](./5-Indexes.md)     
-- [Data Modeling](./6-Data%20Modeling.md)    
+- **[CRUD](#crud)**
+  * **[Create](#create)**
+     * **[insertOne](#insertone)**
+     * **[insertMany](#insertmany)**
+     * **[save](#save)**
+     * **[findAndModify](#findandmodify)**
+  * **[Read](#read)**
+     * **[Count](#count)**
+     * **[Comparison operators](#comparison-operators)**
+     * **[Logical operators](#logical-operators)**
+     * **[Element operators](#element-operators)**   
+     * **[Array operators](#array-operators)**
+     * **[Cursors](#cursors)**
+  * **[Update](#update)**
+     * **[updateOne](#updateone)**
+     * **[updateMany](#updatemany)**
+     * **[Update Operators](#update-operators)**
+  * **[Delete](#delete)**
+     * **[remove](#remove)**
+     * **[deleteOne and deleteMany](#deleteone-and-deletemany)**
+- [Indexes](./5-Indexes.md)
+- [Data Modeling](./6-Data%20Modeling.md)
 
 
 # CRUD
