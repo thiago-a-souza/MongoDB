@@ -7,7 +7,7 @@ Thiago Alexandre Domingues de Souza
 - [MongoDB](./2-MongoDB.md)
 - [Mongo Shell](./3-Mongo%20Shell.md)
 - [CRUD](./4-CRUD.md)
-- [Indexes](./5-Indexes.md)     
+- [Indexes](./5-Indexes.md)
 - **[Data Modeling](#data-modeling)**
   * **[Relationships](#relationships)**
     * **[One-to-One](#one-to-one)**
@@ -18,7 +18,7 @@ Thiago Alexandre Domingues de Souza
   * **[Views](#views)**
   * **[Collations](#collations)**
   * **[NumberDecimal](#numberdecimal)**
-
+- [References](./README.md#references)
 
 # Data Modeling
 
