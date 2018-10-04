@@ -310,7 +310,41 @@ fs.files
 }
 ```
 
-
 ## Views
+
+The concept of views in relational databases is similar in MongoDB. It can transform complex queries into an easier format and also shows only required fields, hiding sensitive information. View documents cannot be modified, but changes to the underlying collection are propagated to the view. In addition to that, removing the source collection does not remove the corresponding view, rather it displays an empty collection, and the view reflects the data when the collection is populated. In terms of performance, views can take advantage of the source collection indexes to query and sort the data. Because views are essentially queries, they don't occupy the space of the documents displayed. When a view is created, a collection is created as if it was a regular collection, and it's definition is stored in the *system.views* collection.
+
+
+```
+> db.person.find()
+{ "_id" : 1, "name" : "john", "ssn" : "111-22-3333" }
+{ "_id" : 2, "name" : "peter", "ssn" : "123-45-6789" }
+{ "_id" : 3, "name" : "lisa", "ssn" : "321-54-9876" }
+
+> db.createView("personView", "person", [{ $project : {_id : 1, name : 1} }])
+
+> show collections
+person
+personView
+system.views
+
+> db.personView.find()
+{ "_id" : 1, "name" : "john" }
+{ "_id" : 2, "name" : "peter" }
+{ "_id" : 3, "name" : "lisa" }
+
+> db.personView.find({ _id : { $gte : 2 }}).sort({ "name" : 1 })
+{ "_id" : 3, "name" : "lisa" }
+{ "_id" : 2, "name" : "peter" }
+
+> db.system.views.find()
+{ "_id" : "testing.personView", "viewOn" : "person", "pipeline" : [ { "$project" : { "_id" : 1, "name" : 1 } } ] }
+
+// dropping a view 
+> db.personView.drop()
+```
+
+
+
 ## Collations
 ## NumberDecimal
