@@ -4,6 +4,10 @@ Thiago Alexandre Domingues de Souza
 
 # Table of Contents
 
+- [NoSQL](./1-NoSQL.md)
+- [MongoDB](./2-MongoDB.md)
+- [Mongo Shell](./3-Mongo%20Shell.md)
+- [CRUD](./4-CRUD.md)
 - [Indexes](#indexes)     
   * [Creating Indexes in Background](#creating-indexes-in-background)
   * [Explain](#explain)
@@ -18,6 +22,8 @@ Thiago Alexandre Domingues de Souza
     * [Unique](#unique) 
     * [Sparse](#sparse) 
     * [TTL](#ttl) 
+- [Data Modeling](./6-Data%20Modeling.md)  
+
     
 # Indexes
 
