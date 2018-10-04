@@ -5,7 +5,7 @@ Thiago Alexandre Domingues de Souza
 # Table of Contents
 
 - [NoSQL](./1-NoSQL.md)
-- [MongoDB](#mongodb)
+- **[MongoDB](#mongodb)**
 - [Mongo Shell](./3-Mongo%20Shell.md)
 - [CRUD](./4-CRUD.md)
 - [Indexes](./5-Indexes.md)     
