@@ -2,6 +2,16 @@
 
 Thiago Alexandre Domingues de Souza
 
+# Table of Contents
+
+- [NoSQL](./1-NoSQL.md)
+- [MongoDB](#mongodb)
+- [Mongo Shell](./3-Mongo%20Shell.md)
+- [CRUD](./4-CRUD.md)
+- [Indexes](./5-Indexes.md)     
+- [Data Modeling](./6-Data%20Modeling.md)    
+
+
 # MongoDB
 
 In 2007, a startup called 10gen started working on a PaaS to host web applications. They realized that the existing database platforms were not appropriate for the web in terms of scalability, availability, partitioning, and flexibility to handle complex data structures. And with that, they started building their own NoSQL database: MongoDB. To accomplish these goals, they had to compromise several aspects from the traditional relational model (e.g. transactions, joins, normalization, etc) to create their document database.
