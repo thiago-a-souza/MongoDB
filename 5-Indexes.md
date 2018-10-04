@@ -8,20 +8,20 @@ Thiago Alexandre Domingues de Souza
 - [MongoDB](./2-MongoDB.md)
 - [Mongo Shell](./3-Mongo%20Shell.md)
 - [CRUD](./4-CRUD.md)
-- [Indexes](#indexes)     
-  * [Creating Indexes in Background](#creating-indexes-in-background)
-  * [Explain](#explain)
-  * [Covered Query](#covered-query)
-  * [Index Types](#index-types)
-     * [Single Field Indexes](#single-field-indexes)  
-     * [Compound Indexes](#compound-indexes)  
-     * [Multikey Indexes](#multikey-indexes)  
-     * [Geo Indexes](#geo-indexes)  
-     * [Text Indexes](#text-indexes)  
-  * [Index Options](#index-options)  
-    * [Unique](#unique) 
-    * [Sparse](#sparse) 
-    * [TTL](#ttl) 
+- **[Indexes](#indexes)**
+  * **[Creating Indexes in Background](#creating-indexes-in-background)**
+  * **[Explain](#explain)**
+  * **[Covered Query](#covered-query)**
+  * **[Index Types](#index-types)**
+     * **[Single Field Indexes](#single-field-indexes)**
+     * **[Compound Indexes](#compound-indexes)**
+     * **[Multikey Indexes](#multikey-indexes)**
+     * **[Geo Indexes](#geo-indexes)**
+     * **[Text Indexes](#text-indexes)**
+  * **[Index Options](#index-options)**
+    * **[Unique](#unique)**
+    * **[Sparse](#sparse)**
+    * **[TTL](#ttl)**
 - [Data Modeling](./6-Data%20Modeling.md)  
 
     
