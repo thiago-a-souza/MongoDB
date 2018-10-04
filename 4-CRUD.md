@@ -29,6 +29,7 @@ Thiago Alexandre Domingues de Souza
      * **[deleteOne and deleteMany](#deleteone-and-deletemany)**
 - [Indexes](./5-Indexes.md)
 - [Data Modeling](./6-Data%20Modeling.md)
+- [References](./README.md#references)
 
 
 # CRUD
