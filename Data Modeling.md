@@ -274,6 +274,23 @@ Because documents enable rich data structures, there are several alternatives to
 
 
 ## GridFS
+
+Because the maximum document size is 16Mb, MongoDB provides GridFS to store large files. By default, it splits the original file into chunks of 255Kb, allowing the driver to return the complete file or specific parts. GridFS stores chunks in the *fs.chunks* collection and the metatada for each file is stored in *fs.files*
+
+
+```java
+MongoClient mongoClient = new MongoClient(new MongoClientURI("mongodb://localhost:27017"));
+MongoDatabase db = mongoClient.getDatabase("testing");
+
+GridFSBucket gridFSBucket = GridFSBuckets.create(db);
+
+InputStream streamToUploadFrom = new FileInputStream(new File("/path/to/file"));
+
+ObjectId id = gridFSBucket.uploadFromStream("my-large-file", streamToUploadFrom);
+System.out.println("_id : " + id);
+```
+
+
 ## Views
 ## Collations
 ## NumberDecimal
