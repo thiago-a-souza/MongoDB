@@ -22,7 +22,8 @@ Thiago Alexandre Domingues de Souza
     * **[Unique](#unique)**
     * **[Sparse](#sparse)**
     * **[TTL](#ttl)**
-- [Data Modeling](./6-Data%20Modeling.md)  
+- [Data Modeling](./6-Data%20Modeling.md)
+- [References](./README.md#references)
 
     
 # Indexes
