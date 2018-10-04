@@ -4,6 +4,9 @@ Thiago Alexandre Domingues de Souza
 
 # Table of Contents
 
+- [NoSQL](./1-NoSQL.md)
+- [MongoDB](./2-MongoDB.md)
+- [Mongo Shell](./3-Mongo%20Shell.md)
 - [CRUD](#crud)
   * [Create](#create)
      * [insertOne](#insertone)
@@ -24,6 +27,9 @@ Thiago Alexandre Domingues de Souza
   * [Delete](#delete)  
      * [remove](#remove)
      * [deleteOne and deleteMany](#deleteone-and-deletemany)  
+- [Indexes](./5-Indexes.md)     
+- [Data Modeling](./6-Data%20Modeling.md)    
+
 
 # CRUD
 
