@@ -11,7 +11,7 @@ Thiago Alexandre Domingues de Souza
 - [Indexes](./5-Indexes.md)     
 - [Data Modeling](./6-Data%20Modeling.md)
 - [Aggregation](./7-Aggregation.md)
-- **[Replication](#replication.md)**
+- **[Replication](#replication)**
 - [Sharding](./9-Sharding.md)
 - [Server Tools](./10-Server%20Tools.md)
 - [Storage Engines](./11-Storage%20Engines.md)
