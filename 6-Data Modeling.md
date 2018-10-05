@@ -383,48 +383,66 @@ Case-insensitive collation with strength 3:
 
 If an index has a collation different from the collection, it must be explicitly declared, otherwise it will run a collection scan.
 
-```
-> db.createCollection("example", { collation : { locale: "pt"}})
-// index will inherit the collection collation
-> db.example.createIndex({name : 1})
-// index with a different collation
-> db.example.createIndex({city : 1}, {collation : { locale : "fr" }})
-// it's possible to create index on the same field with a different collation, but it's must provide a name
-> db.example.createIndex({city : 1}, {name : "cities-es", collation : { locale : "es" }})
 
-> db.example.getIndexes()
-   ...
+
+```
+> db.createCollection("employees", { collation : { locale: "en"}})
+// index will inherit the collection collation
+> db.employees.createIndex( { role : 1 } )
+// index with a different collation
+> db.employees.createIndex( { city : 1 }, { collation : { locale : "pt" }})
+// index on the same field, but different collation
+> db.employees.createIndex( { city : 1 }, { name : "city-ru", collation : { locale : "ru" }})
+
+
+// listing index collations
+> db.employees.getIndexes()
    "name" : "_id_",
    "collation" : {
-      "locale" : "pt",
-       ...
-   "name" : "name_1",
+      "locale" : "en",
+        ...
+   "name" : "role_1",
    "collation" : {
-      "locale" : "pt",
-       ...
+      "locale" : "en",
+        ...
    "name" : "city_1",
    "collation" : {
-      "locale" : "fr",
-       ...
-   "name" : "cities-es",
+      "locale" : "pt",
+        ...
+   "name" : "city-ru",
    "collation" : {
-      "locale" : "es",
-       ...
+      "locale" : "ru",
+        ...
 
-// index scan: index has the same collation as the collection
-> db.example.find({ name : "whatever" }).explain()
 
-// index scan and index sorting: sort is using an index that has the same locale as the collection  
-> db.example.find().sort({ name : 1 }).explain()
+// index scan and index sort: role has the same collation as the index
+> db.employees.find().sort({ role : 1 })
 
-// collection scan: index has a different collation
-> db.example.find({ city : "again" }).explain()
+// collection scan and in-memory sort: city has a different collation
+> db.employees.find().sort({ city : 1 })
 
-// index scan and index sorting ****
-> db.example.find({ city : "again" }).sort({ name : 1}).explain()
+// index scan and index sort: explicitly declaring the index collation
+> db.employees.find().sort({ city : 1 }).collation({ locale : "pt" })
 
-// index scan: collation explicitly defined matches existing index
-> db.example.find({ city : "whatever" }).collation({ locale : "fr" }).explain()
+// index scan: role has the same collation
+> db.employees.find({role : ""})
+
+// collection scan: city has a different collation
+> db.employees.find({city : ""})
+
+// index scan and index sort: explicitly declaring the index collation
+> db.employees.find({city : ""}).collation({ locale : "ru" })
+
+// index scan and index sort:
+> db.employees.find({city : ""}).sort({ role : 1 })
+
+// index scan and in-memory sort: city has a different collation
+> db.employees.find({role : ""}).sort({ city : 1 }).explain()
+
+// index scan and index sort: explicitly declaring the index collation
+> db.employees.find({role : ""}).collation({ locale : "pt" }).sort({ city : 1 })
 ```
+
+
 
 ## NumberDecimal
