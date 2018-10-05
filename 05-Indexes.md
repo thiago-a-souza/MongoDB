@@ -23,6 +23,11 @@ Thiago Alexandre Domingues de Souza
     * **[Sparse](#sparse)**
     * **[TTL](#ttl)**
 - [Data Modeling](./06-Data%20Modeling.md)
+- [Aggregation](./07-Aggregation.md)
+- [Replication](./08-Replication.md)
+- [Sharding](./09-Sharding.md)
+- [Server Tools](./10-Server%20Tools.md)
+- [Storage Engines](./11-Storage%20Engines.md)
 - [References](./README.md#references)
 
     
