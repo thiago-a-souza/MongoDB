@@ -351,7 +351,7 @@ system.views
 
 ## Collations
 
-Collations are used to compare strings based on language rules. Unless specified, results are sorted using a binary comparison. Collactions can be defined at several levels (e.g. collections, indexes, and CRUD), and more specific levels override general configurations. For CRUD operations, only functions that queries data (e.g. *find*, *remove*, *update*, etc) support collactions. Because *insert* does not query the data, it does not allow collations. In general, the collation is declared as an argument in the method, but for *find* and *sort* the function *cursor.collation* should be used. 
+Collations are used to compare strings based on language rules. Unless specified, results are sorted using a binary comparison. Collations can be defined at several levels (e.g. collections, indexes, and CRUD), but collection's collation is used, except when an alternative configuration is provided. For CRUD operations, only functions that queries data (e.g. *find*, *remove*, *update*, etc) support collations. Because *insert* does not query data, it does not allow collations. In general, the collation is declared as an argument in the method, but for *find* and *sort* the function *cursor.collation* is used.
 
 Although several fields are available, only *locale* is mandatory. Another key field is *strength*, allowing five levels of comparisons.
 
