@@ -10,7 +10,7 @@ Thiago Alexandre Domingues de Souza
 - [CRUD](./4-CRUD.md)
 - [Indexes](./5-Indexes.md)     
 - [Data Modeling](./6-Data%20Modeling.md)
-- [Aggregation](#aggregation)
+- **[Aggregation](#aggregation)**
 - [Replication](./8-Replication.md)
 - [Sharding](./9-Sharding.md)
 - [Server Tools](./10-Server%20Tools.md)
