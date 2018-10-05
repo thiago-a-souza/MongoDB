@@ -34,6 +34,7 @@ When a query is executed, MongoDB looks at the query shape to identify index can
 
 Indexes can be manipulated using the methods *createIndex*, *dropIndex*, and *getIndexes*. The syntax to create or drop an index is similar to *sort* because index values are ordered, allowing more efficient sort operations. Obviously, the query  influences if an index will be used or not. To verify the actual execution plan, the *explain* method should be used. To override the index identified, the method *hint* forces an alternative index to be executed.
 
+
 ## Creating Indexes in Background
 
 By default, indexes are created in foreground, and the collection is blocked for read/write operations until the process completes. For long collections, indexes can be created in background, allowing reads and writes on the primary while the index is being created - secondaries will run in foreground, so queries will be blocked on secondaries.  Despite the term background, creating such index does not return to the shell until it completes, so another session should be opened to run other commands. In terms of performance, creating indexes in background take longer than in foreground.
@@ -130,6 +131,7 @@ Several index types are supported for a wide range of purposes.
 This is the most basic index type. It allows creating indexes on a single field, including embedded fields, in ascending or descending order. If a non-index column is used to sort the documents, it will perform an in-memory sorting.
 Sort operations that use indexes have a better performance because they take advantage of index data structures to sort the results, rather than moving the data to memory and sorting. In addition to that, in-memory sorting fails if the operation exceeds 32mb.
 
+**Index scan is performed whenever *find()* or *sort()* use indexes, and an index sorting is executed if *sort()* use indexes, otherwise it runs in-memory sorting.**
 
 ```
 > db.people.drop()
