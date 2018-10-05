@@ -36,7 +36,7 @@ Thiago Alexandre Domingues de Souza
 
 In contrast to relational databases, MongoDB does not support SQL to perform CRUD operations. Instead, it provides APIs to popular programming languages that can access the database and execute queries. These functions take documents as parameters, including the data, filters, and other options. Depending on the programming language used, additional boilerplate code is required to perform these operations. The commands described in this document refers to Javascript syntax used by  Mongo shell. For examples in other programming languages, visit the documentation at [(2)](#references).
 
-Older versions does not support ACID transactions to insert/update/delete multiple documents. As a result, concurrent requests might see different results while the documents are being modified. However, each individual insert/update/delete operation is atomic, so users will not see a half-modified document.
+Older versions do not support ACID transactions to insert/update/delete multiple documents. As a result, concurrent requests might see different results while the documents are being modified. However, each individual insert/update/delete operation is atomic, so users will not see a half-modified document.
 
 ## Create
 
@@ -491,7 +491,7 @@ To iterate and manipulate the data, the cursor object provides several methods. 
 
 There are three update functions: *update*, *updateOne*, and *updateMany*. The first method, *update*, can replace the entire document using a key/value pair syntax as the update parameter or modify specific fields through update operators (e.g. *$set*, *$inc*, *$rename*, etc). By default, *update* affects a single document, but it allows updating multiple documents if update operators  are used. The other update functions, *updateOne* and *updateMany*, have a similar syntax, and allows only update operators, throwing an error if the key/value pair syntax is used.
 
-As expected, the update functions modifies only matching documents, not changing anything if there are no matches. However,  enabling the *upsert* option allows inserting the data as a new document if no matches are found.
+As expected, the update functions modify only matching documents, not changing anything if there are no matches. However,  enabling the *upsert* option allows inserting the data as a new document if no matches are found.
 
 
 
