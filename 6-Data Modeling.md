@@ -464,8 +464,8 @@ Unless an index specifies a collation, indexes created inherit the collation fro
 
 BSON supports several data types not available in the JSON specification.
 
-- ***Date()*** *Date()* returns the current date as a string, while *new Date()* returns a *Date* object
-- ***ISODate()*** *ISODate()* returns a *Date* object
+- ***Date()*** *Date()* returns the current date as a string, while *new Date()* returns an *ISODate* object
+- ***ISODate()*** *ISODate()* returns an *ISODate* object
 - ***ObjectId()*** wrapper class to store document IDs
 - ***NumberLong()*** by default, all numbers in mongo shell have a 64-bit double representation; this wrapper stores 64-bit integers.
 - ***NumberInt()*** wrapper stores 32-bit integers
