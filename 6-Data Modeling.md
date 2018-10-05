@@ -351,7 +351,7 @@ system.views
 
 ## Collations
 
-Collations are used to compare strings based on language rules. Unless specified, results are sorted using a binary comparison. Collations can be defined at several levels (e.g. collections, indexes, and CRUD), but collection's collation is used, except when an alternative configuration is provided. The method *db.getCollectionInfos()* can be used to identify the default collaction for each collection. For CRUD operations, only functions that queries data (e.g. *find*, *remove*, *update*, etc) support collations. Because *insert* does not query data, it does not allow collations. In general, the collation is declared as an argument in the method, but for *find* and *sort* the function *cursor.collation* is used.
+Collations are used to compare strings based on language rules. Unless specified, results are sorted using a binary comparison. Collations can be defined at several levels (e.g. collections, indexes, and CRUD), but collection's collation is used, except when an alternative configuration is provided. The method *db.getCollectionInfos()* can be used to identify the default collation for each collection. For CRUD operations, only functions that queries data (e.g. *find*, *remove*, *update*, etc) support collations. Because *insert* does not query data, it does not allow collations. In general, the collation is declared as an argument in the method, but for *find* and *sort* the function *cursor.collation* is used.
 
 Although several fields are available, only *locale* is mandatory. Another key field is *strength*, allowing five levels of comparisons.
 
@@ -451,7 +451,7 @@ Unless an index specifies a collation, indexes created inherit the collation fro
 
 > exp = db.employees.explain()
 
-// collaction scan: city does not match the default collation
+// collecollction scan: city does not match the default collation
 > exp.update({ city : "" }, { $set : { address : "" }} )
 
 // index scan: declaring a collation that matches an index
