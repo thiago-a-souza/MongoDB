@@ -351,7 +351,9 @@ system.views
 
 ## Collations
 
-Collations are used to compare strings based on language rules. Unless specified, results are sorted using a binary comparison. Several levels can define collactions (e.g. collections, indexes, and CRUD), and more specific levels override general configurations. Although several fields are available, only *locale* is mandatory. Another key field is *strength*, allowing five levels of comparisons:
+Collations are used to compare strings based on language rules. Unless specified, results are sorted using a binary comparison. Collactions can be defined at several levels (e.g. collections, indexes, and CRUD), and more specific levels override general configurations. For CRUD operations, only functions that queries data (e.g. *find*, *remove*, *update*, etc) support collactions. Because *insert* does not query the data, it does not allow collations. In general, the collation is declared as an argument in the method, but for *find* and *sort* the function *cursor.collation* should be used. 
+
+Although several fields are available, only *locale* is mandatory. Another key field is *strength*, allowing five levels of comparisons.
 
 - **Level 1:** only base characters are considered, and ignores diacritics/case (a < b)
 - **Level 2:** base characters and diacritics are evaluated, and ignores case (as < às < at)
@@ -379,7 +381,7 @@ Because levels 1 and 2 are not case sensitive, they can be used to match not exa
   { "_id" : 1, "name" : "açaí" }
 ```
 
-Unless an index specifies a collation, indexes created will inherit the collation from the collection. These different settings influence how queries are executed. For an index scan, *find()* or *sort()* should use indexes with the same configuration, otherwise the collation must be explicitly declared. To avoid an in-memory sort, *sort()* should use indexes with the same collation of the source collection or a different collation must be declared. Tipically, duplicate indexes are not allowed, but if they have different collations they can be created using a provided name.
+Unless an index specifies a collation, indexes created inherit the collation from the collection. These different settings influence how CRUD operations are performed. For an index scan, *find()* or *sort()* should use indexes with the same configuration, otherwise the collation must be explicitly declared. To avoid an in-memory sort, *sort()* should use indexes with the same collation of the source collection or a different collation must be declared. Tipically, duplicate indexes are not allowed, but if they have different collations they can be created using a provided name. Finally, a collection scan is performed if there's no matching index collaction.
 
 
 ```
@@ -420,6 +422,9 @@ Unless an index specifies a collation, indexes created will inherit the collatio
 // index scan: explicitly declaring the index collation
 > db.employees.find({city : ""}).collation({ locale : "ru" })
 
+// collection scan: no matching collation
+> db.employees.find({city : ""}).collation({ locale : "ja" })
+
 
 
 // index scan and index sort: role has the same collation
@@ -441,6 +446,16 @@ Unless an index specifies a collation, indexes created will inherit the collatio
 
 // index scan and index sort: explicitly declaring the index collation
 > db.employees.find({role : ""}).collation({ locale : "pt" }).sort({ city : 1 })
+
+
+
+> exp = db.employees.explain()
+
+// collaction scan: city does not match the default collation
+> exp.update({ city : "" }, { $set : { address : "" }} )
+
+// index scan: declaring a collation that matches an index
+> exp.update({ city : "" }, { $set : { address : "" }}, { collation : { locale : "pt" }} )
 ```
 
 
