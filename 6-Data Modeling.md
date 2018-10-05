@@ -17,7 +17,7 @@ Thiago Alexandre Domingues de Souza
   * **[GridFS](#tree-structures)**
   * **[Views](#views)**
   * **[Collations](#collations)**
-  * **[NumberDecimal](#numberdecimal)**
+  * **[Data Types](#data-types)**
 - [References](./README.md#references)
 
 # Data Modeling
@@ -351,7 +351,7 @@ system.views
 
 ## Collations
 
-Collations are used to compare strings based on language rules. Unless specified, results are sorted using a binary comparison. Collations can be defined at several levels (e.g. collections, indexes, and CRUD), but collection's collation is used, except when an alternative configuration is provided. For CRUD operations, only functions that queries data (e.g. *find*, *remove*, *update*, etc) support collations. Because *insert* does not query data, it does not allow collations. In general, the collation is declared as an argument in the method, but for *find* and *sort* the function *cursor.collation* is used.
+Collations are used to compare strings based on language rules. Unless specified, results are sorted using a binary comparison. Collations can be defined at several levels (e.g. collections, indexes, and CRUD), but collection's collation is used, except when an alternative configuration is provided. The method *db.getCollectionInfos()* can be used to identify the default collaction for each collection. For CRUD operations, only functions that queries data (e.g. *find*, *remove*, *update*, etc) support collations. Because *insert* does not query data, it does not allow collations. In general, the collation is declared as an argument in the method, but for *find* and *sort* the function *cursor.collation* is used.
 
 Although several fields are available, only *locale* is mandatory. Another key field is *strength*, allowing five levels of comparisons.
 
@@ -460,4 +460,36 @@ Unless an index specifies a collation, indexes created inherit the collation fro
 
 
 
-## NumberDecimal
+## Data Types
+
+BSON supports several data types not available in the JSON specification.
+
+- ***Date()*** *Date()* returns the current date as a string, while *new Date()* returns a *Date* object
+- ***ISODate()*** *ISODate()* returns a *Date* object
+- ***ObjectId()*** wrapper class to store document IDs
+- ***NumberLong()*** by default, all numbers in mongo shell have a 64-bit double representation; this wrapper stores 64-bit integers.
+- ***NumberInt()*** wrapper stores 32-bit integers
+- ***NumberDecimal()*** wrapper stores 128-bit floating-point values; although it accepts a numeric representation, the value should be passed as a string to avoid losing precision.
+
+```
+> db.example.drop()
+> db.example.insertMany([
+{_id : 1, a : Date(), b : new Date(), c : ISODate()},
+{_id : 2, x : NumberDecimal("12345.6789"), y : NumberDecimal(12345.6789)}
+])
+
+> db.example.find().pretty()
+{
+	"_id" : 1,
+	"a" : "Fri Oct 05 2018 18:07:38 GMT+0000 (UTC)",
+	"b" : ISODate("2018-10-05T18:07:38.319Z"),
+	"c" : ISODate("2018-10-05T18:07:38.319Z")
+}
+{
+	"_id" : 2,
+	"x" : NumberDecimal("12345.6789"),
+	"y" : NumberDecimal("12345.6789000000")
+}
+
+
+```
