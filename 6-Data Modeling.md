@@ -381,7 +381,7 @@ Because levels 1 and 2 are not case sensitive, they can be used to match not exa
   { "_id" : 1, "name" : "açaí" }
 ```
 
-Unless an index specifies a collation, indexes created inherit the collation from the collection. These different settings influence how CRUD operations are performed. For an index scan, *find()* or *sort()* should use indexes with the same configuration, otherwise the collation must be explicitly declared. To avoid an in-memory sort, *sort()* should use indexes with the same collation of the source collection or a different collation must be declared. Tipically, duplicate indexes are not allowed, but if they have different collations they can be created using a provided name. Finally, a collection scan is performed if there's no matching index collaction.
+Unless an index specifies a collation, indexes created inherit the collation from the collection. These different settings influence how CRUD operations are performed. For an index scan, *find()* or *sort()* should use indexes with the same configuration, otherwise the collation must be explicitly declared. To avoid an in-memory sort, *sort()* should use indexes with the same collation of the source collection or a different collation must be declared. Tipically, duplicate indexes are not allowed, but if they have different collations they can be created using a provided name. Finally, a collection scan is performed if there's no matching index collation.
 
 
 ```
