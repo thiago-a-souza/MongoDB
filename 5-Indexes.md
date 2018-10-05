@@ -318,7 +318,7 @@ Compound multikey indexes is also possible, but at most one field can be an arra
 
 ### Text Indexes
 
-Text indexes create tokens from strings or arrays so it can be searched more efficiently with indexes. This search is not case sensitive and also matches plural and singular words. A collection can have only one text index, but multiple fields are allowed. In addition to that, text indexes provide a matching score, so it can be displayed and sorted using the *$meta* operator.
+Text indexes create tokens from strings or arrays, so it can be searched more efficiently with indexes. This search is not case sensitive and also matches plural and singular words. A collection can have only one text index, but multiple fields are allowed. In addition to that, text indexes provide a matching score, so it can be displayed and sorted using the *$meta* operator.
 
 
 ```
