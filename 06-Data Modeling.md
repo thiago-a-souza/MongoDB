@@ -18,6 +18,11 @@ Thiago Alexandre Domingues de Souza
   * **[Views](#views)**
   * **[Collations](#collations)**
   * **[Data Types](#data-types)**
+- [Aggregation](./07-Aggregation.md)
+- [Replication](./08-Replication.md)
+- [Sharding](./09-Sharding.md)
+- [Server Tools](./10-Server%20Tools.md)
+- [Storage Engines](./11-Storage%20Engines.md)  
 - [References](./README.md#references)
 
 # Data Modeling
