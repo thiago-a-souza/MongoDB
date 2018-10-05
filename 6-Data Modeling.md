@@ -351,38 +351,35 @@ system.views
 
 ## Collations
 
+Collations are used to compare strings based on language rules. Unless specified, results are sorted using a binary comparison. Several levels can define collactions (e.g. collections, indexes, and CRUD), and more specific levels override general configurations. Although several fields are available, only *locale* is mandatory. Another key field is *strength*, allowing five levels of comparisons:
 
-Case-insensitive collation with strength 3:
+- **Level 1:** only base characters are considered, and ignores diacritics/case (a < b)
+- **Level 2:** base characters and diacritics are evaluated, and ignores case (as < às < at)
+- **Level 3:** default option; examines base characters, diacritics, and case (ao < Ao < aó)
+
+Because levels 1 and 2 are not case sensitive, they can be used to match not exact strings, for example, level 1 can treat words with accents or not as if they were equal. This enables creating case-insensitive collections or indexes.
 
 ```
-> db.createCollection("ptStrength1", { collation : { locale: "pt", strength : 1}})
-> db.ptStrength1.insertMany([ {_id : 1, "str" : "ab"}, {_id : 2, str : "áb"}, {_id : 3, str : "Ab"}, {_id :4, str : "Áb"} ])  
-> db.ptStrength1.find().sort({"str" : 1 })
-  { "_id" : 1, "str" : "ab" }
-  { "_id" : 2, "str" : "áb" }
-  { "_id" : 3, "str" : "Ab" }
-  { "_id" : 4, "str" : "Áb" }
-> db.ptStrength1.find({ "str" : "ab" } ).sort({"str" : 1 })
-  { "_id" : 1, "str" : "ab" }
-  { "_id" : 2, "str" : "áb" }
-  { "_id" : 3, "str" : "Ab" }
-  { "_id" : 4, "str" : "Áb" }
-                            
-> db.createCollection("ptStrength3", { collation : { locale: "pt", strength : 3}})
-> db.ptStrength3.insertMany([ {_id : 1, "str" : "ab"}, {_id : 2, "str" : "áb"}, {_id : 3, "str" : "Ab"}, {_id : 4, "str" : "Áb"} ])                            
+> db.createCollection("strength1", { collation : { locale: "pt", strength : 1}})
+> db.strength1.insertMany([ {_id : 1, name : "açaí" }, {_id : 2, name : "Açaí" },
+                            {_id : 3, name : "Acaí" }, {_id : 4, name : "acai" } ])
 
-> db.ptStrength3.find().sort({"str" : 1 })
-  { "_id" : 1, "str" : "ab" }
-  { "_id" : 3, "str" : "Ab" }
-  { "_id" : 2, "str" : "áb" }
-  { "_id" : 4, "str" : "Áb" }
-> db.ptStrength3.find({ "str" : "ab" } ).sort({"str" : 1 })
-{ "_id" : 1, "str" : "ab" }
+// level 1 ignores diacritics/case 			    
+> db.strength1.find({"name" : "açaí" })
+  { "_id" : 1, "name" : "açaí" }
+  { "_id" : 2, "name" : "Açaí" }
+  { "_id" : 3, "name" : "Acaí" }
+  { "_id" : 4, "name" : "acai" }
+
+> db.createCollection("strength3", { collation : { locale: "pt", strength : 3}}) 
+> db.strength3.insertMany([ {_id : 1, name : "açaí" }, {_id : 2, name : "Açaí" },
+                            {_id : 3, name : "Acaí" }, {_id : 4, name : "acai" } ])
+// level 3 will match only words with the same diacritics/case
+> db.strength3.find({"name" : "açaí" })
+  { "_id" : 1, "name" : "açaí" }
 ```
 
-
-If an index has a collation different from the collection, it must be explicitly declared, otherwise it will run a collection scan.
-
+Unless an index specifies a collation, indexes created will inherit the collation from the collection. These different settings influence how queries are executed. For an index scan, *find()* or *sort()* should use indexes with the same configuration, otherwise the collation must be explicitly declared. To avoid an in-memory sort, *sort()* should use indexes with the same collation of the source collection or a different collation must be declared. Tipically, duplicate indexes are not allowed, but if they have different collations they can be created using a provided name.
 
 
 ```
@@ -414,8 +411,18 @@ If an index has a collation different from the collection, it must be explicitly
       "locale" : "ru",
         ...
 
+// index scan: role has the same collation
+> db.employees.find({role : ""})
 
-// index scan and index sort: role has the same collation as the index
+// collection scan: city has a different collation
+> db.employees.find({city : ""})
+
+// index scan: explicitly declaring the index collation
+> db.employees.find({city : ""}).collation({ locale : "ru" })
+
+
+
+// index scan and index sort: role has the same collation
 > db.employees.find().sort({ role : 1 })
 
 // collection scan and in-memory sort: city has a different collation
@@ -424,20 +431,13 @@ If an index has a collation different from the collection, it must be explicitly
 // index scan and index sort: explicitly declaring the index collation
 > db.employees.find().sort({ city : 1 }).collation({ locale : "pt" })
 
-// index scan: role has the same collation
-> db.employees.find({role : ""})
 
-// collection scan: city has a different collation
-> db.employees.find({city : ""})
 
-// index scan and index sort: explicitly declaring the index collation
-> db.employees.find({city : ""}).collation({ locale : "ru" })
-
-// index scan and index sort:
+// index scan and index sort: city has a different collation, but role has the same
 > db.employees.find({city : ""}).sort({ role : 1 })
 
 // index scan and in-memory sort: city has a different collation
-> db.employees.find({role : ""}).sort({ city : 1 }).explain()
+> db.employees.find({role : ""}).sort({ city : 1 })
 
 // index scan and index sort: explicitly declaring the index collation
 > db.employees.find({role : ""}).collation({ locale : "pt" }).sort({ city : 1 })
