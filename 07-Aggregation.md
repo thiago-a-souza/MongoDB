@@ -59,7 +59,7 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 }
 ```
 
-- **$match**:
+- **$match**: filters matching documents to limit the documents passing from one stage into another; it's recommended to place  *$match* at the beginning to take advantage of indexes and reduce the number of documents in the pipeline.
 
 ```
 > db.movies.aggregate([
@@ -82,7 +82,7 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 { "title" : "JL Ranch", "year" : 2016 }
 ```
 
-- **$sort**:
+- **$sort**: returns sorted documents to the next pipeline stage. This stage has a 100 Mb limit, and throws an error when this limit is exceeded.
 
 ```
 > db.movies.aggregate([
@@ -106,7 +106,7 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 { "title" : "Ég Man Þig", "year" : 2016 }
 ```
 
-- **$skip and $limit**:
+- **$skip and $limit**: useful for paginating results, but unlike the similar functions available for *find*, the order of *$skip* and *$limit* make a difference in the aggregation pipeline.
 
 ```
 > db.movies.aggregate([
@@ -141,7 +141,7 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 { "title" : "Elf ll", "year" : 2016 }
 ```
 
-- **$group**:
+- **$group**: allows grouping documents by one or more keys defined by the *_id* field. As a result, the *_id* field is mandatory. All other fields must be accumulators. This stage also has a 100 Mb limit, and throws an error when it is exceeded. Because one stage can be used by the next stage, it's possible to create a double grouping.
 
 ```
 > db.movies.aggregate([
@@ -159,9 +159,47 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 { "count" : 8, "year" : 2016 }
 { "count" : 73, "year" : 2015 }
 { "count" : 100, "year" : 2014 }
+
+// aggregating on multiple keys
+> db.movies.aggregate([
+...     { $match : { year : { $gt : 2014} } },
+...     { $group : {
+...             "_id": { year : "$year", rated : "$rated" },
+...             "count": { $sum : 1 }
+...         }
+...     },
+...     { $sort : { "_id": -1 } },
+... ])
+{ "_id" : { "year" : 2018, "rated" : null }, "count" : 1 }
+{ "_id" : { "year" : 2016, "rated" : null }, "count" : 8 }
+{ "_id" : { "year" : 2015, "rated" : "UNRATED" }, "count" : 1 }
+{ "_id" : { "year" : 2015, "rated" : "TV-14" }, "count" : 2 }
+{ "_id" : { "year" : 2015, "rated" : "R" }, "count" : 4 }
+{ "_id" : { "year" : 2015, "rated" : "PG-13" }, "count" : 3 }
+{ "_id" : { "year" : 2015, "rated" : "NOT RATED" }, "count" : 2 }
+{ "_id" : { "year" : 2015, "rated" : null }, "count" : 61 }
+
+// double grouping
+> db.movies.aggregate([
+...     { $match : { year : { $gt : 2014} } },
+...     { $group : {
+...             "_id": { year : "$year", rated : "$rated" },
+...             "count": { $sum : 1 }
+...       }
+...     },
+...     { $group : {
+...         "_id" : "$_id.year",
+...         "count" : { $sum : "$count" }
+...       }
+...     },
+...     { $sort : { "_id": -1 } }
+... ])
+{ "_id" : 2018, "count" : 1 }
+{ "_id" : 2016, "count" : 8 }
+{ "_id" : 2015, "count" : 73 }
 ```
 
-- **$unwind**:
+- **$unwind**: flattens an array and outputs a document for each element in the array so it can be grouped.
 
 ```
 > db.movies.aggregate([
@@ -200,6 +238,8 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 ```
 
 - **$out**:
+
+
 
 ```
 > db.movies.aggregate([
