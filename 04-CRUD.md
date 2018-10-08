@@ -254,7 +254,7 @@ db.collection.find(query, projection)
 > db.laureates.find().limit(1)
 ```
 
-- **Showing only specific fields:** the projection argument defines fields that should be displayed by providing the field name as the key and 1 as the value. By default, the *_id* is displayed, and to hide the value should be set to 0.
+- **Showing only specific fields:** the projection argument defines fields that should be displayed by providing the field name as the key and either 0/false to hide the field or 1/true to display it. By default, the *_id* field is displayed, to hide it must be explicitly set to 0. The projection parameter does not allow both inclusions and exclusions, except for the exclusion of the *_id* field. When an inclusion is performed, only fields specified are displayed. On the other hand, when an exclusion is executed, it displays everything, except excluded fields.
 
 ```
 // display the first name and the id for all documents (first argument should be empty or null)
@@ -263,8 +263,30 @@ db.collection.find(query, projection)
 { "_id" : ObjectId("5b9fb4c353cfac900ac2912a"), "firstname" : "Hendrik Antoon" }
 ...
 
-// display only the first name for all documents (first argument should be empty or null)
-> db.laureates.find(null, {"firstname" : 1, "_id" : 0 })
+// displays everything, except the first name
+> db.laureates.findOne({}, {"firstname" : 0})
+{
+	"_id" : ObjectId("5b9fb4c353cfac900ac29129"),
+	"surname" : "Röntgen",
+	"born" : "1845-03-27",
+	"died" : "1923-02-10",
+	"bornCountry" : "Prussia (now Germany)",
+	"bornCountryCode" : "DE",
+	"bornCity" : "Lennep (now Remscheid)",
+	"diedCountry" : "Germany",
+	"diedCountryCode" : "DE",
+	"diedCity" : "Munich",
+	"gender" : "male",
+	...
+
+// error: cannot mix inclusion and exclusion
+> db.laureates.findOne({}, {"firstname" : 1, "surname" : 0})
+
+// error: cannot mix inclusion of _id and exclusion of other fields
+> db.laureates.findOne({}, {"_id" : 1, "firstname" : 0})
+
+// it's ok the exclusion of _id and the inclusion of other fields
+> db.laureates.find(null, {"_id" : 0, "firstname" : 1 })
 { "firstname" : "Wilhelm Conrad" }
 { "firstname" : "Hendrik Antoon" }
 ...
