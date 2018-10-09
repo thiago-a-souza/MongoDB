@@ -221,27 +221,33 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 { "sum" : 7, "actors" : "Ewan McGregor" }
 ```
 
-- **$text**:
+- **$text**: the aggregation pipeline can benefit from text indexes as long as *$match* with *$text* is the first pipeline stage, otherwise it throws an error.
 
 ```
 > db.movies.createIndex({ "actors" : "text" })
 
 > db.movies.aggregate([
-...     { $match : { $text : { $search : "Portman Johansson Depardieu" } } },
-...     { $sort : { title : -1 } },
-...     { $limit : 3 },
-...     { $project : { _id : 0, "title" : 1, "actors" : 1  } }
+...  { $match : { $text : { $search : "Portman Johansson Depardieu" } } },
+...  { $sort : { score : { $meta : "textScore" } } },
+...  { $limit : 3 },
+...  { $project : { _id : 0, "title" : 1, "actors" : 1  } }
 ... ])
-{ "title" : "Where the Heart Is", "actors" : [ "Natalie Portman", "Ashley Judd", "Stockard Channing", "Joan Cusack" ] }
-{ "title" : "Thor: The Dark World", "actors" : [ "Chris Hemsworth", "Natalie Portman", "Tom Hiddleston", "Anthony Hopkins" ] }
-{ "title" : "The Other Woman", "actors" : [ "Natalie Portman", "Scott Cohen", "Lisa Kudrow", "Charlie Tahan" ] }
+{ "title" : "Tous les matins du monde", "actors" : [ "Jean-Pierre Marielle", "Gérard Depardieu", "Anne Brochet", "Guillaume Depardieu" ] }
+{ "title" : "Jean de Florette", "actors" : [ "Yves Montand", "Gérard Depardieu", "Daniel Auteuil", "Elisabeth Depardieu" ] }
+{ "title" : "The Other Boleyn Girl", "actors" : [ "Natalie Portman", "Scarlett Johansson", "Eric Bana", "Jim Sturgess" ] }
+
+// error: match should be the first stage
+> db.movies.aggregate([
+   { $project : { _id : 0, "title": 1, "actors": 1 } },
+   { $match : { $text : { $search : "Portman Johansson" } } }
+ ])
+
 ```
 
-- **$out**:
-
-
+- **$out**: writes to the provided collection the documents returned by the aggregation pipeline. If the collection already exists it overwrites the collection if the operation succeeds (documents are actually inserted into a temporary collection and then renamed to the collection provided). Because it writes documents into a collection, the *_id* field must be unique. This is particularly important when using *unwind* because it will generate duplicate ids.
 
 ```
+// when _id is ommitted in $project, it will generate an _id for each field when writing to the collection
 > db.movies.aggregate([
 ...     { $unwind : "$actors" },
 ...     { $group : { "_id" : "$actors", "sum" : { $sum : 1 } } },
