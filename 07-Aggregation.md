@@ -247,7 +247,7 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 - **$out**: writes to the provided collection the documents returned by the aggregation pipeline. If the collection already exists it overwrites the collection if the operation succeeds (documents are actually inserted into a temporary collection and then renamed to the collection provided). Because it writes documents into a collection, the *_id* field must be unique. This is particularly important when using *unwind* because it will generate duplicate ids.
 
 ```
-// when _id is ommitted in $project, it will generate an _id for each field when writing to the collection
+// when _id is excluded in $project, an _id for each document is generated when writing to the collection
 > db.movies.aggregate([
 ...     { $unwind : "$actors" },
 ...     { $group : { "_id" : "$actors", "sum" : { $sum : 1 } } },
