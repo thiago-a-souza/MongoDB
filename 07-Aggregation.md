@@ -141,7 +141,7 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 { "title" : "Elf ll", "year" : 2016 }
 ```
 
-- **$group**: allows grouping documents by one or more keys defined by the *_id* field. As a result, the *_id* field is mandatory. All other fields must be accumulators. This stage also has a 100 Mb limit, and throws an error when it is exceeded. Because one stage can be used by the next stage, it's possible to create a double grouping.
+- **$group**: allows grouping documents by a single or compound keys defined by the *_id* field. As a result, the *_id* field is mandatory. All other fields must be accumulators. This stage also has a 100 Mb limit, and throws an error when it is exceeded. Because one stage can be used by the next stage, it's possible to create a double grouping.
 
 ```
 > db.movies.aggregate([
@@ -160,7 +160,7 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 { "count" : 73, "year" : 2015 }
 { "count" : 100, "year" : 2014 }
 
-// aggregating on multiple keys
+// compound grouping
 > db.movies.aggregate([
 ...     { $match : { year : { $gt : 2014} } },
 ...     { $group : {
@@ -199,7 +199,7 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 { "_id" : 2015, "count" : 73 }
 ```
 
-- **$unwind**: flattens an array and outputs a document for each element in the array so it can be grouped.
+- **$unwind**: flattens an array and outputs a document for each element in the array so it can be grouped. Obviously, it's possible to unwind a second array, but it should used carefully because the number of documents may grow dramatically.
 
 ```
 > db.movies.aggregate([
@@ -219,6 +219,24 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 { "sum" : 8, "actors" : "Tom Hanks" }
 { "sum" : 7, "actors" : "B.B. King" }
 { "sum" : 7, "actors" : "Ewan McGregor" }
+
+// double unwind
+> db.movies.aggregate([
+...     { $match : { countries : "USA"} },
+...     { $unwind :  "$actors" },
+...     { $unwind :  "$writers" },
+...     { $group : {
+...             _id : {actor : "$actors", writer : "$writers" },
+...             count : { $sum : 1 }
+...       }
+...     },
+...     { $sort : { count : -1} }
+... ])
+{ "_id" : { "actor" : "George Kennedy", "writer" : "David Zucker" }, "count" : 6 }
+{ "_id" : { "actor" : "Priscilla Presley", "writer" : "David Zucker" }, "count" : 6 }
+{ "_id" : { "actor" : "Tom Hanks", "writer" : "Andrew Stanton" }, "count" : 6 }
+{ "_id" : { "actor" : "Louis C.K.", "writer" : "Louis C.K." }, "count" : 6 }
+
 ```
 
 - **$text**: the aggregation pipeline can benefit from text indexes as long as *$match* with *$text* is the first pipeline stage, otherwise it throws an error.
@@ -321,5 +339,68 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 
 - **$sum**:
 - **$avg**:
+
+- **$push**:
+
+```
+> db.movies.aggregate([
+...     { $match : { year : { $gte : 2013}, director : {$ne : null } } },
+...     { $group : {
+...          _id : "$director",
+...          movies : { $push : "$title"  } 
+...       }
+...     }
+... ])
+{ "_id" : "Jay Sin", "movies" : [ "TS Playground 4", "TS Playground 5", "TS Playground 7: Ebony Edition", "TS Playground 6" ] }
+{ "_id" : "G.M. Whiting", "movies" : [ "G.M. Whiting's: Notes", "G.M. Whiting's Enemy" ] }
+{ "_id" : "Cris D'Amato", "movies" : [ "S.O.S.: Mulheres ao Mar 2", "S.O.S.: Mulheres ao Mar" ] }
+```
+
 - **$addToSet**:
+
+```
+> db.movies.aggregate([
+...     { $match : { year : { $gte : 2000}, director : {$ne : null } } },
+...     { $group : {
+...          _id : "$director",
+...          years : { $addToSet : "$year"  } ,
+...         }
+...     }, 
+...     { $project : {
+...             _id : 0,
+...             director : "$_id",
+...             years : 1,
+...             length : { $size : "$years"}
+...       }
+...     },
+...     { $sort : { length : -1 } },
+...     { $limit : 5 }
+... ])
+{ "years" : [ 2011, 2009, 2013, 2015, 2010, 2007 ], "director" : "Louis C.K.", "length" : 6 }
+{ "years" : [ 2013, 2007, 2002, 2004 ], "director" : "Sam Raimi", "length" : 4 }
+{ "years" : [ 2011, 2008, 2013, 2010 ], "director" : "Syamsul Yusof", "length" : 4 }
+{ "years" : [ 2003, 2007, 2002, 2005 ], "director" : "Robert Rodriguez", "length" : 4 }
+{ "years" : [ 2006, 2008, 2012 ], "director" : "Jack Neo", "length" : 3 }
+```
+
+
+
 - **$max and $min**:
+
+```
+> db.movies.aggregate([
+...     { $match : { "awards" : { $exists : true }  }},
+...     { $group : {
+...         _id : "$year",
+...         max_wins : { $max : "$awards.wins"}
+...       }
+...     },
+...     { $sort : { "_id" : -1 } },
+...     { $limit : 5 }
+... ])
+{ "_id" : 2018, "max_wins" : 0 }
+{ "_id" : 2016, "max_wins" : 0 }
+{ "_id" : 2015, "max_wins" : 26 }
+{ "_id" : 2014, "max_wins" : 59 }
+{ "_id" : 2013, "max_wins" : 29 }
+```
