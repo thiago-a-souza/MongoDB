@@ -268,6 +268,55 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 { "sum" : 7, "actors" : "Ewan McGregor" }
 ```
 
+
+- **$count**: returns a document with the number of documents from the previous stage. It's the same as using *$group* with *$sum*
+
+```
+> db.movies.aggregate([
+...     { $match : { "awards.wins" : {$gt : 0 } } },
+...     { $count : "awarded movies"}
+... ])
+{ "awarded movies" : 652 }
+
+
+> db.movies.aggregate([
+...     { $match : { "awards.wins" : {$gt : 0 } } },
+...     { $group : { _id : null, "awarded-movies" : { $sum : 1 } } }    
+... ])
+{ "_id" : null, "awarded-movies" : 652 }
+```
+
+- **$replaceRoot**: replaces the document with a new root - can also be done manually in the *$project* stage
+
+```
+> db.movies.aggregate([
+...     {$replaceRoot : { newRoot : "$imdb"}},
+...     {$limit : 4}
+... ])
+{ "id" : "tt0105226", "rating" : 7, "votes" : 15007 }
+{ "id" : "tt0052077", "rating" : 4, "votes" : 29171 }
+{ "id" : "tt0117731", "rating" : 7.6, "votes" : 94153 }
+{ "id" : "tt0314331", "rating" : 7.7, "votes" : 306036 }
+```
+
+- **$addFields**: adds fields to documents, similar to adding fields using the *$project* stage
+
+```
+> db.movies.aggregate([
+...     { $addFields : { 
+...         total : { $sum : [ "$imdb.votes", "$tomato.userReviews" ] }
+...       }
+...     },
+...     { $project : { "_id": 0, "title": 1, "total": 1, "imdb.votes": 1, "tomato.userReviews": 1 } },
+...     { $limit : 5 }
+... ])
+{ "title" : "Red Rock West", "imdb" : { "votes" : 15007 }, "total" : 15007 }
+{ "title" : "Plan 9 from Outer Space", "imdb" : { "votes" : 29171 }, "total" : 29171 }
+{ "title" : "Star Trek: First Contact", "imdb" : { "votes" : 94153 }, "tomato" : { "userReviews" : 99646 }, "total" : 193799 }
+{ "title" : "Love Actually", "imdb" : { "votes" : 306036 }, "tomato" : { "userReviews" : 31625241 }, "total" : 31931277 }
+{ "title" : "Shakespeare in Love", "imdb" : { "votes" : 167371 }, "tomato" : { "userReviews" : 225871 }, "total" : 393242 }
+```
+
 ## Aggregation Pipeline Operators
 
 - **$sum**:
