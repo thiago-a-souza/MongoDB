@@ -449,7 +449,7 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 
 
 
-- **$max and $min**:
+- **$max and $min**: both can be used in the *$project* and *$group* stages. In the *$project* stage it allows an expression or an array of expressions. For the *$group* stage, it allows only an expression. Regardless the stage used, it ignores non-numeric values, and treat them as zero.
 
 ```
 > db.movies.aggregate([
@@ -467,9 +467,61 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 { "_id" : 2015, "max_wins" : 26 }
 { "_id" : 2014, "max_wins" : 59 }
 { "_id" : 2013, "max_wins" : 29 }
+
+
+> db.example.drop()
+> db.example.insertMany([
+  { _id : 1, a : [19, 4, 52, 183, 89, 3]},
+  { _id : 2, a : [5, 100, 29]},
+  { _id : 3, a : [6, 5, 4]},
+])
+> db.example.aggregate([
+...     { $project : {
+...            _id : 1,
+...            max_a : { $max : "$a" }
+...       }
+...     }
+... ])
+{ "_id" : 1, "max_a" : 183 }
+{ "_id" : 2, "max_a" : 100 }
+{ "_id" : 3, "max_a" : 6 }
 ```
 
 
-- **$first and $last**:
+- **$first and $last**: available only in the *$group* stage, and returns the first/last document in the group. The *$group* stage should be declared after the *sort* stage, so the data makes sense.
 
+```
+> db.movies.find({ "director" : "Steven Spielberg" }, { "_id" : 0, "director" : 1, "year" : 1 }).sort({ "year" : 1 })
+{ "year" : 1981, "director" : "Steven Spielberg" }
+{ "year" : 1982, "director" : "Steven Spielberg" }
+{ "year" : 1997, "director" : "Steven Spielberg" }
+{ "year" : 2001, "director" : "Steven Spielberg" }
+{ "year" : 2002, "director" : "Steven Spielberg" }
+{ "year" : 2011, "director" : "Steven Spielberg" }
 
+// sorted in ascending order
+> db.movies.aggregate([
+...   { $match : { director : "Steven Spielberg" } },
+...   { $sort :{ year : 1 } },
+...   { $group : {
+...       _id : {director : "$director"},
+...       firstyear : {$first : "$year"},
+...       lastyear : {$last : "$year"}
+...     }
+...   }
+... ])
+{ "_id" : { "director" : "Steven Spielberg" }, "firstyear" : 1981, "lastyear" : 2011 }
+
+// sorted in descending order
+> db.movies.aggregate([
+...   { $match : { director : "Steven Spielberg" } },
+...   { $sort :{ year : -1 } },
+...   { $group : {
+...       _id : {director : "$director"},
+...       firstyear : {$first : "$year"},
+...       lastyear : {$last : "$year"}
+...     }
+...   }
+... ])
+{ "_id" : { "director" : "Steven Spielberg" }, "firstyear" : 2011, "lastyear" : 1981 }
+```
