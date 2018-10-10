@@ -337,7 +337,7 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 
 ## Aggregation Pipeline Operators
 
-- **$sum**: it can be used in the *$project* and *$group* stages. In the *$project* stage it allows an expression or an array of expressions. For the *$group* stage, it allows only an expression. Regardless the stage used, it ignores non-numeric values, and treat them as zero.
+- **$sum and $avg**: both can be used in the *$project* and *$group* stages. In the *$project* stage it allows an expression or an array of expressions. For the *$group* stage, it allows only an expression. Regardless the stage used, it ignores non-numeric values, and treat them as zero.
 
 ```
 // using $sum in the $project stage
@@ -379,11 +379,7 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 { "totalUserReviews" : 34551101, "totalMovies" : 61, "year" : 2003 }
 { "totalUserReviews" : 32806773, "totalMovies" : 24, "year" : 1990 }
 { "totalUserReviews" : 32446019, "totalMovies" : 15, "year" : 1982 }
-```
 
-- **$avg**:
-
-```
 > db.movies.aggregate([
 ...    { $match : { "tomato.reviews" : { $ne : null } } },
 ...    { $group : {
@@ -406,6 +402,7 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 { "avgReviews" : 129.71428571428572, "year" : 2012 }
 { "avgReviews" : 133.27272727272728, "year" : 2011 }
 ```
+
 
 - **$push**:
 
