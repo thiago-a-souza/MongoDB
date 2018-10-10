@@ -337,8 +337,75 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 
 ## Aggregation Pipeline Operators
 
-- **$sum**:
+- **$sum**: it can be used in the *$project* and *$group* stages. In the *$project* stage it allows an expression or an array of expressions. For the *$group* stage, it allows only an expression. Regardless the stage used, it ignores non-numeric values, and treat them as zero.
+
+```
+// using $sum in the $project stage
+> db.movies.aggregate([
+...     { $project : {
+...         _id : 0,
+...         title : 1,
+...         myScore : { $sum : ["$tomato.meter", "$metacritic"] } }
+        },
+...     { $sort : { myScore : -1 }},
+...     { $limit : 5}
+... ])
+{ "title" : "Au Hasard Balthazar", "myScore" : 200 }
+{ "title" : "The Wizard of Oz", "myScore" : 199 }
+{ "title" : "The Adventures of Robin Hood", "myScore" : 197 }
+{ "title" : "The Night of the Hunter", "myScore" : 197 }
+{ "title" : "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb", "myScore" : 195 }
+
+// using $sum in the $group stage
+> db.movies.aggregate([
+...    { $group : {
+...            _id : "$year",
+...            totalUserReviews : { $sum : "$tomato.userReviews" },
+...            totalMovies : { $sum : 1 }
+...      }
+...    },
+...    { $sort : {totalUserReviews : -1 } },
+...    { $limit : 5 },
+...    { $project : {
+...        _id : 0,
+...        year : "$_id",
+...        totalUserReviews : 1,
+...        totalMovies : 1
+...        }
+...    }
+... ])
+{ "totalUserReviews" : 101679324, "totalMovies" : 73, "year" : 2005 }
+{ "totalUserReviews" : 37552454, "totalMovies" : 65, "year" : 2004 }
+{ "totalUserReviews" : 34551101, "totalMovies" : 61, "year" : 2003 }
+{ "totalUserReviews" : 32806773, "totalMovies" : 24, "year" : 1990 }
+{ "totalUserReviews" : 32446019, "totalMovies" : 15, "year" : 1982 }
+```
+
 - **$avg**:
+
+```
+> db.movies.aggregate([
+...    { $match : { "tomato.reviews" : { $ne : null } } },
+...    { $group : {
+...        _id : "$year",
+...        avgReviews : { $avg : "$tomato.reviews" }
+...      } 
+...     },
+...     { $sort : { _id : -1 } },
+...     { $limit : 5},
+...     { $project : {
+...             _id : 0,
+...             year : "$_id",
+...             avgReviews : 1
+...       }
+...     }
+...  ])
+{ "avgReviews" : 189.28571428571428, "year" : 2015 }
+{ "avgReviews" : 110.5, "year" : 2014 }
+{ "avgReviews" : 137.52380952380952, "year" : 2013 }
+{ "avgReviews" : 129.71428571428572, "year" : 2012 }
+{ "avgReviews" : 133.27272727272728, "year" : 2011 }
+```
 
 - **$push**:
 
@@ -404,3 +471,8 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 { "_id" : 2014, "max_wins" : 59 }
 { "_id" : 2013, "max_wins" : 29 }
 ```
+
+
+- **$first and $last**:
+
+
