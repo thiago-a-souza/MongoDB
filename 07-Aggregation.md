@@ -337,6 +337,8 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 
 ## Aggregation Pipeline Operators
 
+Each stage supports several operations. Some of them are present in both *$project* and *$group* stages like *$sum*,  *$avg*, *$min*, and *$max*, while others are only available in the *$group* stage such as *$push*, *$addToSet*, *$first*, and *$last*.
+
 - **$sum and $avg**: both can be used in the *$project* and *$group* stages. In the *$project* stage it allows an expression or an array of expressions. For the *$group* stage, it allows only an expression. Regardless the stage used, it ignores non-numeric values, and treat them as zero.
 
 ```
@@ -404,7 +406,7 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 ```
 
 
-- **$push**:
+- **$push**: only available in the *$group* stage, it adds items into an array.
 
 ```
 > db.movies.aggregate([
@@ -420,7 +422,7 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 { "_id" : "Cris D'Amato", "movies" : [ "S.O.S.: Mulheres ao Mar 2", "S.O.S.: Mulheres ao Mar" ] }
 ```
 
-- **$addToSet**:
+- **$addToSet**: similar to $push, but only unique items are added.
 
 ```
 > db.movies.aggregate([
@@ -488,7 +490,7 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 ```
 
 
-- **$first and $last**: available only in the *$group* stage, and returns the first/last document in the group. The *$group* stage should be declared after the *sort* stage, so the data makes sense.
+- **$first and $last**: only available in the *$group* stage, and returns the first/last document in the group. The *$group* stage should be declared after the *sort* stage, so the data makes sense.
 
 ```
 > db.movies.find({ "director" : "Steven Spielberg" }, { "_id" : 0, "director" : 1, "year" : 1 }).sort({ "year" : 1 })
