@@ -106,7 +106,7 @@ The aggregation framework provided by MongoDB is similar to the concept of Unix 
 { "title" : "Ég Man Þig", "year" : 2016 }
 ```
 
-- **$skip and $limit**: useful for paginating results, but unlike the similar functions available for *find*, the order of *$skip* and *$limit* make a difference in the aggregation pipeline.
+- **$skip and $limit**: useful for paginating results, but unlike the similar functions available in *find*, the order of *$skip* and *$limit* make a difference in the aggregation pipeline.
 
 ```
 > db.movies.aggregate([
