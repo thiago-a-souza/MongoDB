@@ -23,6 +23,21 @@ Thiago Alexandre Domingues de Souza
 
 The aggregation framework provided by MongoDB is similar to the concept of Unix pipes, in which each stage produces an output that is used as input to the next stage. As a result, the same type of stage can be used multiple times in the same pipeline.
 
+All pipeline stages are limited to 100 Mb, and MongoDB throws an error when that limit is exceeded. To overcome this limitation, the *allowDiskUse* option should be enabled. In addition to that, regardless if the aggregation is returning the data or storing the results in a collection, the documents have a maximum size of 16Mb.
+
+Unlike the *explain* in CRUD operations, the aggregate function allows passing *explain* as an option.
+
+**Syntax:**
+
+```
+db.collection.aggregate([ { stage1 }, { stage2 }, ..., { stageN } ])
+
+db.collection.aggregate([ { stage1 }, { stage2 }, ..., { stageN } ], { allowDiskUse : true })
+
+db.collection.aggregate([ { stage1 }, { stage2 }, ..., { stageN } ], { explain : true })
+```
+
+
 ## Aggregation Pipeline Stages
 
 - **$project**: allows including/excluding fields, modifying values or the document structure.
