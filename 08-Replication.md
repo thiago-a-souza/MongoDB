@@ -33,6 +33,8 @@ In addition to arbiters, there are some circumstances that it's desirable to vot
 
 Not all *replica set* members can vote. Actually, up to 7 members can vote out of the 50 members allowed in a *replica set*. To be eligible, it must have set the *votes* greater than 0 and the *state* must be *PRIMARY, SECONDARY, STARTUP2, RECOVERING, ARBITER,* or *ROLLBACK*. Non-voting members must have the priority and votes set to zero. Similarly, it's not allowed to have priorities greater than zero without votes.
 
+If the primary becomes unavailable during a write operation that was not replicated to secondaries, the former primary must rollback that data when it rejoins the *replica set* to preserve the data consistency. Obviously, a rollback does not take place if the data gets replicated to another node that remains available. To prevent rollbacks, write operations can enable journaling and specify a majority write concern, so the request is only acknowledged when the data gets replicated to most nodes.
+
 
 
 
