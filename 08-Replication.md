@@ -41,38 +41,92 @@ If the primary becomes unavailable during a write operation that was not replica
 After applying a write operation to the primary node, MongoDB records that information in a capped collection 
 known as *oplog* (operations log), which is stored in the *local* database as *oplog.rs*. And then, secondaries query primary's *oplog* for records newer than their latest *oplog* records. After that, they apply these modifications and  write them to their own *oplogs*. Each write operation produces a new *oplog* entry, including operations that modify multiple documents generate multiple *oplog* entries. To ensure that secondaries end up with the same data as the primary, *oplog* records must be idempotent, in other words, no matter how many times that particular operation is applied it will produce the same result.
 
+The following example illustrates how *oplog* works. First, two documents are inserted into the *example* collection, and then the *age* field is incremented. We can find the corresponding *oplog* entries in the *oplog.rs* collection. Even though two commands were executed, they affected four documents, so four *oplog* entries were produced. Also, notice that the *$inc* operation was replaced with *$set* with expected value to preserve the idempotency.
+
 ```
 myApp:PRIMARY> use mydb
 switched to db mydb
 
-myApp:PRIMARY> db.people.drop()
+myApp:PRIMARY> db.example.drop()
 false
-myApp:PRIMARY> db.people.insertMany([ {"_id" : 1, "name" : "john", "age" : 20 },
-...                        {"_id" : 2, "name" : "peter", "age" : 25 },
-...                        {"_id" : 3, "name" : "john", "age" : 38 }
-...                      ])
+myApp:PRIMARY> db.example.insertMany([ {"_id" : 1, "name" : "john", "age" : 20 },
+                                       {"_id" : 2, "name" : "peter", "age" : 25 }
+                                     ])
+
+myApp:PRIMARY> db.example.updateMany({}, {$inc : { age : 1 }})
 
 myApp:PRIMARY> use local
 switched to db local
 
-myApp:PRIMARY> db.oplog.rs.find({ns:/mydb.people/}).sort({wall:-1}).limit(1).pretty()                
+myApp:PRIMARY> db.oplog.rs.find({ns:/mydb.example/}).sort({wall:1}).pretty()                
 {
-	"ts" : Timestamp(1539484486, 2),
-	"t" : NumberLong(8),
-	"h" : NumberLong("-7590177575408800007"),
+	"ts" : Timestamp(1539553750, 2),
+	"t" : NumberLong(9),
+	"h" : NumberLong("-8362812390414468398"),
 	"v" : 2,
 	"op" : "i",
-	"ns" : "mydb.people",
-	"ui" : UUID("58e0a3f7-81e0-4b5f-8427-ef8cda741297"),
-	"wall" : ISODate("2018-10-14T02:34:46.969Z"),
+	"ns" : "mydb.example",
+	"ui" : UUID("2d5364c7-b17f-458b-914a-6c29b8babe55"),
+	"wall" : ISODate("2018-10-14T21:49:10.754Z"),
 	"o" : {
 		"_id" : 1,
 		"name" : "john",
 		"age" : 20
 	}
 }
-
-
+{
+	"ts" : Timestamp(1539553750, 3),
+	"t" : NumberLong(9),
+	"h" : NumberLong("4953900032754086238"),
+	"v" : 2,
+	"op" : "i",
+	"ns" : "mydb.example",
+	"ui" : UUID("2d5364c7-b17f-458b-914a-6c29b8babe55"),
+	"wall" : ISODate("2018-10-14T21:49:10.754Z"),
+	"o" : {
+		"_id" : 2,
+		"name" : "peter",
+		"age" : 25
+	}
+}
+{
+	"ts" : Timestamp(1539553806, 2),
+	"t" : NumberLong(9),
+	"h" : NumberLong("-7218810790864236062"),
+	"v" : 2,
+	"op" : "u",
+	"ns" : "mydb.example",
+	"ui" : UUID("2d5364c7-b17f-458b-914a-6c29b8babe55"),
+	"o2" : {
+		"_id" : 1
+	},
+	"wall" : ISODate("2018-10-14T21:50:06.914Z"),
+	"o" : {
+		"$v" : 1,
+		"$set" : {
+			"age" : 21
+		}
+	}
+}
+{
+	"ts" : Timestamp(1539553806, 3),
+	"t" : NumberLong(9),
+	"h" : NumberLong("-4662535812237866725"),
+	"v" : 2,
+	"op" : "u",
+	"ns" : "mydb.example",
+	"ui" : UUID("2d5364c7-b17f-458b-914a-6c29b8babe55"),
+	"o2" : {
+		"_id" : 2
+	},
+	"wall" : ISODate("2018-10-14T21:50:06.914Z"),
+	"o" : {
+		"$v" : 1,
+		"$set" : {
+			"age" : 26
+		}
+	}
+}
 ```
 
 
