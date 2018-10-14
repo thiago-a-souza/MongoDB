@@ -12,6 +12,7 @@ Thiago Alexandre Domingues de Souza
 - [Data Modeling](./06-Data%20Modeling.md)
 - [Aggregation](./07-Aggregation.md)
 - **[Replication](#replication)**
+  * **[Oplog](#oplog)**
 - [Sharding](./09-Sharding.md)
 - [Server Tools](./10-Server%20Tools.md)
 - [Storage Engines](./11-Storage%20Engines.md)
@@ -35,6 +36,43 @@ Not all *replica set* members can vote. Actually, up to 7 members can vote out o
 
 If the primary becomes unavailable during a write operation that was not replicated to secondaries, the former primary must rollback that data when it rejoins the *replica set* to preserve the data consistency. Obviously, a rollback does not take place if the data gets replicated to another node that remains available. To prevent rollbacks, write operations can enable journaling and specify a majority write concern, so the request is only acknowledged when the data gets replicated to most nodes.
 
+## Oplog
 
+After applying a write operation to the primary node, MongoDB records that information in a capped collection 
+known as *oplog* (operations log), which is stored in the *local* database as *oplog.rs*. And then, secondaries query primary's *oplog* for records newer than their latest *oplog* records. After that, they apply these modifications and  write them to their own *oplogs*. Each write operation produces a new *oplog* entry, including operations that modify multiple documents generate multiple *oplog* entries. To ensure that secondaries end up with the same data as the primary, *oplog* records must be idempotent, in other words, no matter how many times that particular operation is applied it will produce the same result.
+
+```
+myApp:PRIMARY> use mydb
+switched to db mydb
+
+myApp:PRIMARY> db.people.drop()
+false
+myApp:PRIMARY> db.people.insertMany([ {"_id" : 1, "name" : "john", "age" : 20 },
+...                        {"_id" : 2, "name" : "peter", "age" : 25 },
+...                        {"_id" : 3, "name" : "john", "age" : 38 }
+...                      ])
+
+myApp:PRIMARY> use local
+switched to db local
+
+myApp:PRIMARY> db.oplog.rs.find({ns:/mydb.people/}).sort({wall:-1}).limit(1).pretty()                
+{
+	"ts" : Timestamp(1539484486, 2),
+	"t" : NumberLong(8),
+	"h" : NumberLong("-7590177575408800007"),
+	"v" : 2,
+	"op" : "i",
+	"ns" : "mydb.people",
+	"ui" : UUID("58e0a3f7-81e0-4b5f-8427-ef8cda741297"),
+	"wall" : ISODate("2018-10-14T02:34:46.969Z"),
+	"o" : {
+		"_id" : 1,
+		"name" : "john",
+		"age" : 20
+	}
+}
+
+
+```
 
 
