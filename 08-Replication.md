@@ -136,5 +136,26 @@ myApp:PRIMARY> db.oplog.rs.find({ns:/mydb.example/}).sort({wall:1}).pretty()
 
 ## Read Preference
 
+By default, read operations are routed to the primary member of the *replica set*. However, MongoDB allows the application to specify more appropriate read preferences. This is particularly interesting to move expensive operations (e.g. analytics tasks) off the primary, so the primary can deliver faster business requests. It's important to highlight that moving reads off the primary is subject to the eventual consistency principle, in other words, reads from secondaries may not return the most recent data but eventually it will become consistent. There are several read preferences available, regardless of the option, they don't load balance requests across nodes, and *sharding* should be used to distribute the workload uniformly.
+
+
+
+- **primary:** default option, reads are performed on the primary
+- **primaryPreferred:** if the primary is not available, it reads from a secondary
+- **secondary:** reads from a secondary
+- **secondaryPreferred:** if secondaries are not available, it reads from the primary
+- **nearest:** reads from the nearest member in terms of network latency - useful if the client is not on the same data center and can tolerate eventual consistency.
+
+```
+// Mongo Shell allows reading from a secondary using the old rs.slaveOk() method
+> rs.slaveOk()
+
+// fine-grained readPref method
+> db.people.find().readPref("secondary")
+
+> db.people.find().readPref("primaryPreferred")
+```
+
+
 ## Write Concern
 
