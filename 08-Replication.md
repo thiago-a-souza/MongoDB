@@ -159,3 +159,41 @@ By default, read operations are routed to the primary member of the *replica set
 
 ## Write Concern
 
+Rollbacks occur when the primary becomes unavailable before a write operation propagates to any secondary node. To prevent rollbacks and ensure that the operation is durable at the cluster level, MongoDB allows specifying the level of acknowldegment for the write operation. There are several alternatives to get acknowledgements, including a specified number of members, the majority of the members, or instances with a given tag. The write concern also enables confirming that the operation has been written to the journal on the instances specified, and a timeout to complete the operation.
+
+Before version 2.6, the write concern was specified using the  *db.getLastError(<w>, <wtimeout>)* function. After that, the write concern was integrated as an option into write operations.
+
+
+```
+myApp:PRIMARY> db.example.drop()
+
+// gettting an ack from the majority of the members
+myApp:PRIMARY> db.example.insertOne( { _id : 1, "name" : "john", "age" : 20 }, 
+...                                  { writeConcern : { w : "majority", j : true, wtimeout : 1000 } } )
+{ "acknowledged" : true, "insertedId" : 1 }
+
+// gettting an ack from 2 members
+myApp:PRIMARY> db.example.insertOne( { _id : 2, "name" : "peter", "age" : 25 },
+...                                  { writeConcern : { w : 2, j : true } } )
+{ "acknowledged" : true, "insertedId" : 2 }
+
+// gettting an ack from 3 members
+myApp:PRIMARY> db.example.insertOne( { _id : 3, "name" : "alex", "age" : 36},
+...                                  { writeConcern : { w : 3, j : true } } )
+{ "acknowledged" : true, "insertedId" : 3 }
+
+// fire and forget: w = 0 and j = false does not get any acknowledgment that the change was applied
+myApp:PRIMARY> db.example.updateOne( { _id : 1 }, { $inc : { age : 1 } }, 
+...                                  { writeConcern : { w : 0, j : false} } )
+{ "acknowledged" : false }
+
+myApp:PRIMARY> db.example.deleteMany( {_id : { $gte : 2 } }, 
+...                                   { writeConcern : { w : "majority", j : true } } )
+{ "acknowledged" : true, "deletedCount" : 2 }
+```
+
+				  
+				  
+
+
+
