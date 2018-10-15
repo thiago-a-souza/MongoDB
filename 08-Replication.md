@@ -27,19 +27,101 @@ MongoDB provides a replication mechanism called *replica sets*, which maintains 
 
 *Replica set* members perform heartbeats to each other every 2 seconds. If a member does not respond a heartbeat in 10 seconds, the node is marked as inaccessible. If there is a consensus that the primary is inaccessible, in other words, it's not a network partition, an election is invoked to determine the new primary. While the election is in progress, *replica set* members can respond to reads but writes are not allowed until the election completes successfully. In addition to that, other events, such as initiating a *replica set*, adding a new node, or calling maintenance methods (e.g. *rs.stepDown()*, *rs.reconfig()*) can also trigger an election. 
 
-When an election is called, eligible members can vote to choose a new primary. Although a lower priority member can become primary for a short interval, elections are invoked until the primary represents the highest priority member. Reaching a majority in an election is tricky because it depends on the number of nodes that go down. To avoid having additional replicas, an arbiter can be configured. Arbiters cannot become a primary because they don't store any data, but they help breaking ties    in elections, protecting results from network partitions.
+When an election is called, eligible members can vote to choose a new primary. Although a lower priority member can become primary for a short interval, elections are invoked until the primary represents the highest priority member (default priority is equals 1). Reaching a majority in an election is tricky because it depends on the number of nodes that go down. To avoid having additional replicas, an arbiter can be configured. Arbiters cannot become a primary because they don't store any data, but they help breaking ties    in elections, protecting results from network partitions.
 
 In addition to arbiters, there are some circumstances that it's desirable to vote and hold the data but not allowing the member to become primary: 
 
 - **Priority 0:** by setting the member priority to 0, it cannot become primary or invoke elections, but it can vote
 - **Hidden:** this option makes the member invisible to client requests, and it's appropriate, for example, for high latency servers. When *hidden* is enabled, the *priority* must be set to 0.  
-- **Delayed:** stores delayed data for historical purposes. When this option is used, the priority must be set to 0, and  *hidden* should be enabled. 
+- **Delayed:** stores delayed data (in seconds) for historical purposes. When this option is used, the priority must be set to 0, and  *hidden* should be enabled. 
 
 Not all *replica set* members can vote. Actually, up to 7 members can vote out of the 50 members allowed in a *replica set*. To be eligible, it must have set the *votes* greater than 0 and the *state* must be *PRIMARY, SECONDARY, STARTUP2, RECOVERING, ARBITER,* or *ROLLBACK*. Non-voting members must have the priority and votes set to zero. Similarly, it's not allowed to have priorities greater than zero without votes.
 
 If the primary becomes unavailable during a write operation that was not replicated to secondaries, the former primary must rollback that data when it rejoins the *replica set* to preserve the data consistency. Obviously, a rollback does not take place if the data gets replicated to another node that remains available. To prevent rollbacks, write operations can enable journaling and specify a majority write concern, so the request is only acknowledged when the data gets replicated to most nodes.
 
 ## Configuring a Replica Set
+
+```
+$ mongod --replSet moonlight --dbpath /node1   --port 28001
+$ mongod --replSet moonlight --dbpath /node2   --port 28002
+$ mongod --replSet moonlight --dbpath /arbiter --port 28003
+$ mongod --replSet moonlight --dbpath /hidden  --port 28004
+$ mongod --replSet moonlight --dbpath /delayed --port 28005
+
+
+$ mongo --port 28001
+> cfg = {
+    _id : "moonlight",
+    members : [
+        { _id : 1, host : "localhost:28001" },
+        { _id : 2, host : "localhost:28002", priority : 2 },
+        { _id : 3, host : "localhost:28003", arbiterOnly : true },
+        { _id : 4, host : "localhost:28004", priority: 0, hidden : true },
+        { _id : 5, host : "localhost:28005", priority: 0, hidden : true, slaveDelay: 3600 }
+    ]
+}
+
+> rs.initiate(cfg)
+
+// node 2 should become primary because it has a higher priority
+$ mongo --port 28002
+
+moonlight:PRIMARY> rs.status()
+{
+	...
+	"members" : [
+	        ...
+		{
+			"_id" : 2,
+			"name" : "localhost:28002",
+			"health" : 1,
+			"state" : 1,
+			"stateStr" : "PRIMARY",
+			"uptime" : 246,
+			"optime" : {
+				"ts" : Timestamp(1539632702, 1),
+				"t" : NumberLong(2)
+			},
+			"optimeDate" : ISODate("2018-10-15T19:45:02Z"),
+			"electionTime" : Timestamp(1539632551, 1),
+			"electionDate" : ISODate("2018-10-15T19:42:31Z"),
+			"configVersion" : 1,
+			"self" : true
+		},
+		{
+			"_id" : 3,
+			"name" : "localhost:28003",
+			"health" : 1,
+			"state" : 7,
+			"stateStr" : "ARBITER",
+			"uptime" : 175,
+			"lastHeartbeat" : ISODate("2018-10-15T19:45:05.533Z"),
+			"lastHeartbeatRecv" : ISODate("2018-10-15T19:45:05.347Z"),
+			"pingMs" : NumberLong(0),
+			"configVersion" : 1
+		},
+		...
+```
+
+
+```
+$ mongod --replSet moonlight --dbpath /node6   --port 28006
+
+// adds a new replica set member - must be executed on the primary
+moonlight:PRIMARY> rs.add( { _id : 6, host : "localhost:28006" } )
+
+// removes a replica set member - must be executed on the primary
+moonlight:PRIMARY> rs.remove("localhost:28006")
+
+// overwrites the existing replica set configuration - must be executed on the primary
+moonlight:PRIMARY> rs.reconfig( { _id : "moonlight",
+                                  members : [
+                                     { _id : 1, host : "localhost:28001" },
+                                     { _id : 2, host : "localhost:28002", priority : 2 },
+                                     { _id : 3, host : "localhost:28003", arbiterOnly : true }
+                                  ] 
+				} )
+```
 
 ## Oplog
 
@@ -161,7 +243,7 @@ By default, read operations are routed to the primary member of the *replica set
 
 Rollbacks occur when the primary becomes unavailable before a write operation propagates to any secondary node. To prevent rollbacks and ensure that the operation is durable at the cluster level, MongoDB allows specifying the level of acknowldegment for the write operation. There are several alternatives to get acknowledgements, including a specified number of members, the majority of the members, or instances with a given tag. The write concern also enables confirming that the operation has been written to the journal on the instances specified, and a timeout to complete the operation.
 
-Before version 2.6, the write concern was specified using the  *db.getLastError(<w>, <wtimeout>)* function. After that, the write concern was integrated as an option into write operations.
+Before version 2.6, the write concern was specified using the  *db.getLastError()* function. After that, the write concern was integrated as an option into write operations.
 
 
 ```
