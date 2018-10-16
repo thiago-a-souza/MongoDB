@@ -41,13 +41,18 @@ If the primary becomes unavailable during a write operation that was not replica
 
 ## Configuring a Replica Set
 
+Configuring a *replica set* requires running the MongoDB daemon, *mongod*, on replication hosts. That should include the replica set name, the path where the instance stores the data, and the port it listens to requests.
+
+After starting the daemons, the *replica sets* should be initiated. If all members have no data, the *rs.initiate* command can be executed on any node. Otherwise it must be executed on the instance that already has an initial data and the other members must be empty. After initiating the *replica set*, their members can be verified using the *rs.status* command, and it displays information about each instance from the perspective of the current member. It's also possible to verify if the current member is master using the command *db.isMaster()*. Once the *replica set* is configured, it's also possible to add or remove members using the commands *rs.add* and *rs.remove*. In addition to that, it's possible to overwrite all configurations using the command *rs.reconfig*.
+
+Creating a *replica set* with 5 members:
+
 ```
 $ mongod --replSet moonlight --dbpath /node1   --port 28001
 $ mongod --replSet moonlight --dbpath /node2   --port 28002
 $ mongod --replSet moonlight --dbpath /arbiter --port 28003
 $ mongod --replSet moonlight --dbpath /hidden  --port 28004
 $ mongod --replSet moonlight --dbpath /delayed --port 28005
-
 
 $ mongo --port 28001
 > cfg = {
@@ -103,6 +108,7 @@ moonlight:PRIMARY> rs.status()
 		...
 ```
 
+Adding, removing, and reconfiguring an existing *replica set*:
 
 ```
 $ mongod --replSet moonlight --dbpath /node6   --port 28006
