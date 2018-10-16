@@ -247,7 +247,7 @@ By default, read operations are routed to the primary member of the *replica set
 
 ## Write Concern
 
-Rollbacks occur when the primary becomes unavailable before a write operation propagates to any secondary node. To prevent rollbacks and ensure that the operation is durable at the cluster level, MongoDB allows specifying the level of acknowldegment for the write operation. There are several alternatives to get acknowledgements, including a specified number of members, the majority of the members, or instances with a given tag. The write concern also enables confirming that the operation has been written to the journal on the instances specified, and a timeout to complete the operation.
+Rollbacks occur when the primary becomes unavailable before a write operation propagates to any secondary node. To prevent rollbacks and ensure that the operation is cluster-wide durable, MongoDB allows specifying the acknowledgment level for the write operation. There are several alternatives to get acknowledgements, including a specified number of members, the majority of the members, or instances with a given tag. The write concern also enables confirming that the operation has been written to the journal on the instances specified, and a timeout to complete the operation.
 
 Before version 2.6, the write concern was specified using the  *db.getLastError()* function. After that, the write concern was integrated as an option into write operations.
 
