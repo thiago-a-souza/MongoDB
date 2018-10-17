@@ -13,7 +13,8 @@ Thiago Alexandre Domingues de Souza
 - [Aggregation](./07-Aggregation.md)
 - [Replication](./08-Replication.md)
 - **[Sharding](#sharding)**
-  * **[Shard Keys and Chunks](#shard-key-and-chunks)**
+  * **[Chunks](#chunks)**
+  * **[Shard Keys](#shard-keys)**
   * **[Configuring a Sharded Cluster](#configuring-a-sharded-cluster)**
   * **[Queries in a Sharded Cluster](#queries-in-a-sharded-cluster)**  
 - [Server Tools](./10-Server%20Tools.md)
@@ -36,12 +37,13 @@ A *sharded cluster*, illustrated in Figure 3, comprises three components:
 <img src="./fig/sharded-cluster.png"  height="60%" width="60%"> <br>
 <b> Figure 3: </b> Sharded Cluster Components  <a href="./README.md#references">(4)</a> </p>
 
+## Chunks
 
-## Shard Keys and Chunks
+## Shard Keys
 
 Because the shard key determines the chunk that the data will be stored, a bad decision makes a difference between achieving a high performance or not. For example, writing only ascending shard keys will produce unbalanced chunks, overloading the last chunk and making MongoDB to split it into smaller chunks and then migrating them to other shards. Alternatively, if the shard key is coarsed grained, it will not be possible to split the chunk and spread them across different shards because each shard key is stored in a single chunk. In addition to that, if the shard key is not in the query, MongoDB will request all shards to perform the operation without benefiting from a targeted query. 
 
-Choosing a good shard key can be complicated because it has to ensure that reads target appropriate shards, writes are balanced across shards, and splits/migrations can occur appropriately. To evaluate a shard key, investigate how the  cardinality, frequency, and rate of change can influence its efficiency. Cardinality refers to the number of distinct shard keys, meaning that a high cardinality shard key does not guarantee an even distribution of data across shards, but can allows scaling out. Frequency describes how often a shard key is present, and high frequency shard keys should be avoided because they cannot be partitioned. Finally, the rate of change defines if the shard key increases or decreases monotonically, not distributing the data evenly.
+Choosing a good shard key can be complicated because it has to ensure that reads target appropriate shards, writes are balanced across shards, and splits/migrations can occur appropriately. To evaluate a shard key, investigate how the  cardinality, frequency, and rate of change can influence its efficiency. Cardinality refers to the number of distinct shard keys, meaning that a high cardinality shard key does not guarantee an even distribution of data across shards, but allows scaling out. Frequency describes how often a shard key is present, and high frequency shard keys should be avoided because they cannot be partitioned. Finally, the rate of change defines if the shard key increases or decreases monotonically, not distributing the data evenly.
 
 All sharded collections must have an index on the shard key or a compound index with the shard key as prefix. If the collection is empty, the function *sh.shardCollection()*  creates the index on the shard key if it does not exist, otherwise, if the collection is loaded, the index must be created before running the *sh.shardCollection()*. It's important to note that sharded collections only allow unique indexes on the *_id* and on the shard key, because allowing on other fields would require an inter-shard communication.
 
