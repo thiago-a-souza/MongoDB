@@ -28,7 +28,7 @@ Sharding is the method of partitioning the data into chunks based on a *shard ke
 A *sharded cluster*, illustrated in Figure 3, comprises three components:
 
 
-- **Shard:** starting in version 3.6, shards must be configured as a *mongod* replica set to store partitions.
+- **Shard:** starting in version 3.6, shards must be configured as *mongod* replica set to store partitions.
 - **mongos:** *mongos* caches config servers' metadata and routes reads/writes to the appropriate shard. As a result, it represents the front door to client requests. Because *mongos* processes are lightweight, they can be deployed together with the application server to deliver a higher throughput.
 - **Config servers:** they are *mongod* processes that store the cluster metadata, including databases/collections locations, the list of chunks on every shard and their ranges, etc. Because config servers must have the same data, it uses a two-phase commit to ensure the consistency needed.
 
