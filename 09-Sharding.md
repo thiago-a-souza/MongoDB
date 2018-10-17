@@ -13,8 +13,7 @@ Thiago Alexandre Domingues de Souza
 - [Aggregation](./07-Aggregation.md)
 - [Replication](./08-Replication.md)
 - **[Sharding](#sharding)**
-  * **[Shard Key](#shard-key)**
-  * **[Chunks](#chunks)**  
+  * **[Shard Keys and Chunks](#shard-key-and-chunks)**
   * **[Configuring a Sharded Cluster](#configuring-a-sharded-cluster)**
   * **[Queries in a Sharded Cluster](#queries-in-a-sharded-cluster)**  
 - [Server Tools](./10-Server%20Tools.md)
@@ -23,7 +22,7 @@ Thiago Alexandre Domingues de Souza
 
 # Sharding
 
-Sharding is the method of partitioning the data into chunks based on a *shard key*. Because each chunk has a lower and upper ranges based on the *shard key*, different chunks cannot have the same data. This process enables using commodity hardware to scale out the application rather than increasing the capacity of a single server (a.k.a. vertical scaling). Building a *sharded cluster* requires careful planning and should be used with very large data sets that could not be managed without partitioning.
+Sharding is the method of partitioning the data into chunks based on a *shard key*. Because each chunk has a lower and upper ranges based on the *shard key*, different chunks cannot have the same data. This process enables using commodity hardware to scale out the application rather than increasing the capacity of a single server (a.k.a. vertical scaling). Building a *sharded cluster* requires careful planning and should be used with very large data sets that could not be managed without partitioning. 
 
 A *sharded cluster*, illustrated in Figure 3, comprises three components:
 
@@ -38,7 +37,12 @@ A *sharded cluster*, illustrated in Figure 3, comprises three components:
 <b> Figure 3: </b> Sharded Cluster Components  <a href="./README.md#references">(4)</a> </p>
 
 
-## Shard Key
-## Chunks
+## Shard Keys and Chunks
+
+Because the shard key determines the chunk that the data will be stored, a bad decision makes a difference between achieving a high performance or not. For example, writing only ascending shard keys will produce unbalanced chunks, overloading the last chunk and making MongoDB to split it into smaller chunks and then migrating them to other shards. Also, if the shard key is coarsed grained, it will not be possible to split the chunk and spread them across different shards because each shard key is stored in a single chunk. Finally, if the shard key is not in the query, MongoDB will request all shards to perform the operation without benefiting from a targeted query.
+
+
+
+
 ## Configuring a Sharded Cluster
 ## Queries in a Sharded Cluster
