@@ -69,10 +69,10 @@ For aggregations, if the first pipeline is a *$match* on a shard key, all the pi
 Configuring a sharded cluster requires creating the shards and the config servers as *mongod* replica sets. After that, *mongos* processes should point to the config servers. Finally, the replica set shards should be added to the cluster using the command *sh.addShard*. To verify the sharding status, including the shards available, sharded collections, and chunks the function *sh.status* can be used. Before creating a sharded collection, it's required to enable sharding on the database using the *sh.enableSharding* function. The *sh.splitAt* function splits a chunk manually using the shard key provided.
 
 ```
-mkdir /data/{rs-a-1,rs-a-2,rs-a-3}
-mkdir /data/{rs-b-1,rs-b-2,rs-b-3}
-mkdir /data/{config-1,config-2,config-3}
-mkdir /data/logs
+$ mkdir /data/{rs-a-1,rs-a-2,rs-a-3}
+$ mkdir /data/{rs-b-1,rs-b-2,rs-b-3}
+$ mkdir /data/{config-1,config-2,config-3}
+$ mkdir /data/logs
 
 $ mongod --shardsvr --replSet shard-a --dbpath /data/rs-a-1 --port 3001 --logpath /data/logs/rs-a-1.log --fork 
 $ mongod --shardsvr --replSet shard-a --dbpath /data/rs-a-2 --port 3002 --logpath /data/logs/rs-a-2.log --fork
