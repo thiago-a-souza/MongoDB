@@ -56,6 +56,11 @@ All sharded collections must have an index on the shard key or a compound index 
 
 ## Queries in a Sharded Cluster
 
+Querying a sharded or a non-sharded collection is equivalent in terms of the syntax. However, CRUD operations require some understanding about *mongos* routing to take advantage of all computing power available in a sharded cluster. If *mongos* can determine the shard key, the operation is routed to the targeted shard, otherwise, the operation is broadcasted to all shards and then  the results are merged to the client. Writing a new document must include the shard key, and it throws an error otherwise. The methods *insertOne* and *insertMany* target a single shard based on the shard key. Obviously, depending on the shard key used in  *insertMany*, it may write into different shards. For *updateOne*, *replaceOne*, and *deleteOne* the query must include the shard key or the *_id*, otherwise an error is returned.
+
+Modifiers such as *sort*, *skip*, and *limit* have a particular behavior in sharded collections. If the query has a *sort* function, shards sort intermediate results and the primary shard runs a merge sort with all documents. When *limit* is used, each shard limits the number of results and *mongos* limits the final result. For *skip*, shards return all results and *mongos* skip the number of documents specified. Regarding indexes, queries on individual shards can be optimized to run index scans as if they were regular collections because each shard maintains its own indexes.
+
+For aggregations, if the first pipeline is a *$match* on a shard key, all the pipeline runs on the matching shard. However, if the aggregation requires multiple pipelines, the results are addressed to a random shard that merge them, that way it avoids overloading the primary shard.
 
 ## Configuring a Sharded Cluster
 
