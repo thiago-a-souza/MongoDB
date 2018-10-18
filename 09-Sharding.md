@@ -23,7 +23,7 @@ Thiago Alexandre Domingues de Souza
 
 # Sharding
 
-Sharding is the method of partitioning the data into chunks based on a *shard key*. Because each chunk has a lower and upper ranges based on the *shard key*, different chunks cannot have the same data. This process enables using commodity hardware to scale out the application rather than increasing the capacity of a single server (a.k.a. vertical scaling). Building a *sharded cluster* requires careful planning and should be used with very large data sets that could not be managed without partitioning. 
+Sharding is the method of partitioning the data into chunks based on a *shard key*. Because each chunk has a lower and upper ranges based on the *shard key*, different chunks cannot have the same data. This process enables using commodity hardware to scale out the application rather than increasing the capacity of a single server (a.k.a. vertical scaling). Building a *sharded cluster* requires careful planning and should be used with very large data sets that could not be managed without partitioning. Because a sharded cluster may have non-sharded collections, MongoDB defines the shard with least amount of data as *primary shard* to store all non-sharded collections.
 
 A *sharded cluster*, illustrated in Figure 3, comprises three components:
 
@@ -37,7 +37,7 @@ A *sharded cluster*, illustrated in Figure 3, comprises three components:
 <img src="./fig/sharded-cluster.png"  height="60%" width="60%"> <br>
 <b> Figure 3: </b> Sharded Cluster Components  <a href="./README.md#references">(4)</a> </p>
 
-Because a sharded cluster may have non-sharded collections, MongoDB defines the shard with least amount of data as *primary shard* to store all non-sharded collections.
+
 
 
 ## Chunks
