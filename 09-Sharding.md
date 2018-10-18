@@ -66,3 +66,56 @@ For aggregations, if the first pipeline is a *$match* on a shard key, all the pi
 
 ## Configuring a Sharded Cluster
 
+```
+mkdir /data/{rs-a-1,rs-a-2,rs-a-3}
+mkdir /data/{rs-b-1,rs-b-2,rs-b-3}
+mkdir /data/{config-1,config-2,config-3}
+mkdir /data/logs
+
+$ mongod --shardsvr --replSet shard-a --dbpath /data/rs-a-1 --port 3001 --logpath /data/logs/rs-a-1.log --fork 
+$ mongod --shardsvr --replSet shard-a --dbpath /data/rs-a-2 --port 3002 --logpath /data/logs/rs-a-2.log --fork
+$ mongod --shardsvr --replSet shard-a --dbpath /data/rs-a-3 --port 3003 --logpath /data/logs/rs-a-3.log --fork
+
+$ mongod --shardsvr --replSet shard-b --dbpath /data/rs-b-1 --port 3004 --logpath /data/logs/rs-b-1.log --fork
+$ mongod --shardsvr --replSet shard-b --dbpath /data/rs-b-2 --port 3005 --logpath /data/logs/rs-b-2.log --fork
+$ mongod --shardsvr --replSet shard-b --dbpath /data/rs-b-3 --port 3006 --logpath /data/logs/rs-b-3.log --fork
+
+$ mongo --port 3001
+> rs.initiate( { _id : "shard-a",
+                members : [ { _id : 1, host : "localhost:3001" },
+                            { _id : 2, host : "localhost:3002" },
+                            { _id : 3, host : "localhost:3003", arbiterOnly : true } ] } )
+> exit
+
+$ mongo --port 3004
+> rs.initiate( { _id : "shard-b",
+                 members : [ { _id : 1, host : "localhost:3004" },
+                             { _id : 2, host : "localhost:3005" },
+                             { _id : 3, host : "localhost:3006", arbiterOnly : true } ] } )
+> exit
+
+$ mongod --configsvr --replSet config --dbpath /data/config-1 --port 4001 --logpath /data/logs/config-1.log --fork
+$ mongod --configsvr --replSet config --dbpath /data/config-2 --port 4002 --logpath /data/logs/config-2.log --fork
+$ mongod --configsvr --replSet config --dbpath /data/config-3 --port 4003 --logpath /data/logs/config-3.log --fork
+
+$ mongo --port 4001
+> rs.initiate( { _id : "config",
+                 members : [ { _id : 1, host : "localhost:4001" },
+                             { _id : 2, host : "localhost:4002" },
+                             { _id : 3, host : "localhost:4003" } ] } )
+> exit
+
+$ mongos --configdb config/localhost:4001,localhost:4002,localhost:4003 --port 5000 --logpath /data/mongos.log --fork
+
+$ mongo --port 5000
+> sh.addShard("shard-a/localhost:3001,localhost:3002")
+> sh.addShard("shard-b/localhost:3004,localhost:3005")
+> sh.status()
+> sh.enableSharding("mydb")
+> sh.shardCollection("mydb.users", { username : 1, _id : 1,  } )
+> for(i=1; i<10000; i++){
+    db.users.insertOne( { username : "user"+i })
+  }
+> sh.splitAt( "mydb.users", { "_id" : ObjectId("5bc8f8673c6cb9da4ec6088e"), "username" : "user5000" } )
+```
+
