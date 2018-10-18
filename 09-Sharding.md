@@ -37,13 +37,18 @@ A *sharded cluster*, illustrated in Figure 3, comprises three components:
 <img src="./fig/sharded-cluster.png"  height="60%" width="60%"> <br>
 <b> Figure 3: </b> Sharded Cluster Components  <a href="./README.md#references">(4)</a> </p>
 
+Because a sharded cluster may have non-sharded collections, MongoDB defines the shard with least amount of data as *primary shard* to store all non-sharded collections.
+
+
 ## Chunks
 
-A chunk contains a subset of the data based on the shard key. When an insert or update makes the chunk exceed the default  size of 64 Mb, it triggers a split process to divide it into smaller chunks, and the balancer migrates them across shards. It's possible to modify the chunk size, but the frequency of migrations and the impact on queries executed should be monitored.
+A chunk contains a subset of the data based on the shard key. When an insert or update makes the chunk exceed the default  size of 64 Mb, it triggers a split process to divide it into smaller chunks, and the balancer migrates them across shards. It's possible to modify the chunk size, but the frequency of migrations and the impact on queries executed should be monitored. There are some circumstances that chunks can grow beyond the size limit. That usually happens when the chunk has a single shard key that cannot be split, and this behavior can impact the performance and the scalability if it continues to increase.
+
+The balancer is a background process that distributes chunks across shards, so they are evenly divided to avoid overloading a single shard. Because migrations move data between shards, they are very expensive and it can impact the performance of the database, but it does not prevent reads or writes.
 
 ## Shard Keys
 
-Because shard keys determine the chunk that will be store the data, a bad decision makes a difference between achieving a high performance or not. For example, writing only ascending shard keys will produce unbalanced chunks, overloading the last chunk and making MongoDB to split it into smaller chunks and then migrating them to other shards. Alternatively, if the shard key is coarsed grained, it will not be possible to split the chunk and spread them across different shards because each shard key must be stored in a single chunk. In addition to that, if the shard key is not in the query, MongoDB will request all shards to perform the operation without benefiting from a targeted query. 
+Shard key values are immutable, once a collection is loaded, the shard key cannot be modified. Because they determine the chunk that will be store the data, a bad decision makes a difference between achieving a high performance or not. For example, writing only ascending shard keys will produce unbalanced chunks, overloading the last chunk and making MongoDB to split it into smaller chunks and then migrating them to other shards. Alternatively, if the shard key is coarsed grained, it will not be possible to split the chunk and spread them across different shards because each shard key must be stored in a single chunk. In addition to that, if the shard key is not in the query, MongoDB will request all shards to perform the operation without benefiting from a targeted query. 
 
 Choosing a good shard key can be complicated because it has to ensure that reads target appropriate shards, writes are balanced across shards, and splits/migrations can occur appropriately. To evaluate a shard key, investigate how the  cardinality, frequency, and rate of change can influence its efficiency. Cardinality refers to the number of distinct shard keys, meaning that a high cardinality shard key does not guarantee an even distribution of data across shards, but allows scaling out. Frequency describes how often a shard key is present, and high frequency shard keys should be avoided because they cannot be partitioned. Finally, the rate of change defines if the shard key increases or decreases monotonically, not distributing the data evenly.
 
