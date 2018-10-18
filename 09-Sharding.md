@@ -160,3 +160,46 @@ $ mongo --port 5000
                         { "username" : "user5000", "_id" : ObjectId("5bc8f8673c6cb9da4ec6088e") } -->> { "username" : { "$maxKey" : 1 }, "_id" : { "$maxKey" : 1 } } on : shard-b Timestamp(2, 1)
 ```
 
+Switching to the config database from *mongos* displays the metadata collections used by the config server:
+
+```
+mongos> use config
+mongos> show collections
+actionlog
+changelog
+chunks
+collections
+databases
+lockpings
+locks
+migrations
+mongos
+shards
+tags
+transactions
+version
+
+mongos> db.chunks.findOne({_id : /mydb/})
+{
+	"_id" : "mydb.users-username_\"user5000\"_id_ObjectId('5bc8f8673c6cb9da4ec6088e')",
+	"lastmod" : Timestamp(2, 1),
+	"lastmodEpoch" : ObjectId("5bc8f84bacc984c7f950310d"),
+	"ns" : "mydb.users",
+	"min" : {
+		"username" : "user5000",
+		"_id" : ObjectId("5bc8f8673c6cb9da4ec6088e")
+	},
+	"max" : {
+		"username" : { "$maxKey" : 1 },
+		"_id" : { "$maxKey" : 1 }
+	},
+	"shard" : "shard-b"
+}
+
+mongos> db.shards.findOne()
+{
+	"_id" : "shard-a",
+	"host" : "shard-a/localhost:3001,localhost:3002",
+	"state" : 1
+}
+```
