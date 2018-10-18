@@ -66,6 +66,8 @@ For aggregations, if the first pipeline is a *$match* on a shard key, all the pi
 
 ## Configuring a Sharded Cluster
 
+Configuring a sharded cluster requires creating the shards and the config servers as *mongod* replica sets. After that, *mongos* processes should point to the config servers. Finally, the replica set shards should be added to the cluster using the command *sh.addShard*. To verify the sharding status, including the shards available, sharded collections, and chunks the function *sh.status* can be used. Before creating a sharded collection, it's required to enable sharding on the database using the *sh.enableSharding* function. The *sh.splitAt* function splits a chunk manually using the shard key provided.
+
 ```
 mkdir /data/{rs-a-1,rs-a-2,rs-a-3}
 mkdir /data/{rs-b-1,rs-b-2,rs-b-3}
@@ -110,12 +112,51 @@ $ mongos --configdb config/localhost:4001,localhost:4002,localhost:4003 --port 5
 $ mongo --port 5000
 > sh.addShard("shard-a/localhost:3001,localhost:3002")
 > sh.addShard("shard-b/localhost:3004,localhost:3005")
-> sh.status()
 > sh.enableSharding("mydb")
 > sh.shardCollection("mydb.users", { username : 1, _id : 1,  } )
 > for(i=1; i<10000; i++){
     db.users.insertOne( { username : "user"+i })
   }
 > sh.splitAt( "mydb.users", { "_id" : ObjectId("5bc8f8673c6cb9da4ec6088e"), "username" : "user5000" } )
+> sh.status()
+--- Sharding Status --- 
+  sharding version: {
+  	"_id" : 1,
+  	"minCompatibleVersion" : 5,
+  	"currentVersion" : 6,
+  	"clusterId" : ObjectId("5bc8eb65acc984c7f94ff30d")
+  }
+  shards:
+        {  "_id" : "shard-a",  "host" : "shard-a/localhost:3001,localhost:3002",  "state" : 1 }
+        {  "_id" : "shard-b",  "host" : "shard-b/localhost:3004,localhost:3005",  "state" : 1 }
+  active mongoses:
+        "3.6.5" : 1
+  autosplit:
+        Currently enabled: yes
+  balancer:
+        Currently enabled:  yes
+        Currently running:  no
+        Failed balancer rounds in last 5 attempts:  0
+        Migration Results for the last 24 hours: 
+                1 : Success
+  databases:
+        {  "_id" : "config",  "primary" : "config",  "partitioned" : true }
+                config.system.sessions
+                        shard key: { "_id" : 1 }
+                        unique: false
+                        balancing: true
+                        chunks:
+                                shard-a	1
+                        { "_id" : { "$minKey" : 1 } } -->> { "_id" : { "$maxKey" : 1 } } on : shard-a Timestamp(1, 0) 
+        {  "_id" : "mydb",  "primary" : "shard-b",  "partitioned" : true }
+                mydb.users
+                        shard key: { "username" : 1, "_id" : 1 }
+                        unique: false
+                        balancing: true
+                        chunks:
+                                shard-a	1
+                                shard-b	1
+                        { "username" : { "$minKey" : 1 }, "_id" : { "$minKey" : 1 } } -->> { "username" : "user5000", "_id" : ObjectId("5bc8f8673c6cb9da4ec6088e") } on : shard-a Timestamp(2, 0) 
+                        { "username" : "user5000", "_id" : ObjectId("5bc8f8673c6cb9da4ec6088e") } -->> { "username" : { "$maxKey" : 1 }, "_id" : { "$maxKey" : 1 } } on : shard-b Timestamp(2, 1)
 ```
 
