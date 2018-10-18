@@ -15,8 +15,8 @@ Thiago Alexandre Domingues de Souza
 - **[Sharding](#sharding)**
   * **[Chunks](#chunks)**
   * **[Shard Keys](#shard-keys)**
-  * **[Configuring a Sharded Cluster](#configuring-a-sharded-cluster)**
   * **[Queries in a Sharded Cluster](#queries-in-a-sharded-cluster)**  
+  * **[Configuring a Sharded Cluster](#configuring-a-sharded-cluster)**
 - [Server Tools](./10-Server%20Tools.md)
 - [Storage Engines](./11-Storage%20Engines.md)
 - [References](./README.md#references)
@@ -54,8 +54,8 @@ Choosing a good shard key can be complicated because it has to ensure that reads
 
 All sharded collections must have an index on the shard key or a compound index with the shard key as prefix. If the collection is empty, the function *sh.shardCollection()*  creates the index on the shard key if it does not exist, otherwise, if the collection is loaded, the index must be created before running the *sh.shardCollection()*. It's important to note that sharded collections only allow unique indexes on the *_id* and on the shard key, because allowing on other fields would require an inter-shard communication.
 
-
+## Queries in a Sharded Cluster
 
 
 ## Configuring a Sharded Cluster
-## Queries in a Sharded Cluster
+
