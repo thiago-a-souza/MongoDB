@@ -30,21 +30,31 @@ Imports data from JSON, CSV, or TSV into MongoDB. Although it helps importing th
 Importing a JSON file stored in contacts.json into the contacts collection in the users database:
 
 ```
-mongoimport --db users --collection contacts --file contacts.json
+$ mongoimport --db users --collection contacts --file contacts.json
 ```
 
 
 Importing a CSV file stored in contacts.csv into the contacts collection in the users database:
 
 ```
-mongoimport --db users --collection contacts --type csv --headerline --file contacts.csv
+$ mongoimport --db users --collection contacts --type csv --headerline --file contacts.csv
 ```
 
-
-
-
-
 ## mongoexport
+
+Exports the data stored in MongoDB into a JSON or CSV file format.
+
+Exporting the movies collection from the mydb database into the movies.json file:
+
+```
+$ mongoexport --db mydb --collection movies --out /movies.json
+```
+
+For CSV files, the field names must be specified using the option *--fields* or *--fieldFile*
+
+```
+$ mongoexport --db mydb --collection users --type csv --fields name,age --out /users.csv
+```
 
 ## mongostat
 
