@@ -133,6 +133,7 @@ db.collection.save(<document>, { writeConcern: <document> })
 ### findAndModify
 
 Modifies and returns one document. It can also insert a new document if the *upsert* option is enabled. By default, it returns the document before the modification takes place, but it can return the modified document if the *new* option is enabled.
+**Remark:** either *remove* or *update* must be provided.
 
 **Syntax:**
 
