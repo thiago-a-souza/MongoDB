@@ -116,14 +116,18 @@ db.collection.save(<document>, { writeConcern: <document> })
 **Examples:**
 
 ```
-> db.books.save({"title" : "Leonardo da Vinci"})
+// id does not exist, so document is inserted
+> db.books.drop()
+> var b = {"_id" : 0, "title" : "Leonardo da Vinci"};
+> db.books.save(b)
+> db.books.find()
+{ "_id" : 0, "title" : "Leonardo da Vinci" }
 
-> db.books.find({"title" : "Leonardo da Vinci"})
-{ "_id" : ObjectId("5b9c11f6d44947754a8d4370"), "title" : "Leonardo da Vinci" }
-
-// existing document is replaced
-> db.books.find({ "author" : "Walter Isaacson"})
-{ "_id" : ObjectId("5b9c11f6d44947754a8d4370"), "author" : "Walter Isaacson" }
+// id already exists, document will be replaced
+> var c = {"_id" : 0, "author" : "Walter Isaacson"}; 
+> db.books.save(c)
+> db.books.find()
+{ "_id" : 0, "author" : "Walter Isaacson" }
 ```
 
 ### findAndModify
