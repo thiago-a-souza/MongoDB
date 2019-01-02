@@ -405,7 +405,7 @@ db.laureates.find({ "prizes" : { $type : "array" }})
 ### Array operators
 
 - ***$all*** returns documents where all values match values stored in the array provided, regardless the order.
-- ***$size*** returns documents where the field is an array with a given size.
+- ***$size*** returns documents where the field is an array with a given size. **Remark:** $size does not accept ranges of values.
 - ***$elemMatch***  multiple criterias on arrays are evaluated separately, and it can return incorrect documents. To prevent this side effect, *$elemMatch* forces each condition to be evaluated.
 
 ```
