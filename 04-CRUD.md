@@ -367,7 +367,7 @@ By default, queries match documents using the equality operator, but it also sup
 
 ### Logical operators
 
-The logical operators ***$and, $not, $nor,*** and ***$or*** are performed on an array of expressions. The *$and* operator allows specifying multiple constraints on the same field.
+The logical operators ***$and, $nor,*** and ***$or*** are performed on an array of expressions. The *$and* operator allows specifying multiple constraints on the same field.
 
 ```
 // laureates who were born in Egypt or died in Australia
