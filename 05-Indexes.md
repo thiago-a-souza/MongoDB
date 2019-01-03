@@ -124,6 +124,15 @@ MongoDB allows running queries without examining any documents with covered quer
       "totalKeysExamined" : 970,
       "totalDocsExamined" : 961,
       ...
+
+// index scan and non-covered query: although a and b are part of the query, the _id field is displayed and it's a different index
+> db.example.find({a: { $gt : 300}, b : { $gt : 400} }, { a : 1, b : 1 }).explain("executionStats")
+   "executionStats" : {
+      "executionSuccess" : true,
+      "nReturned" : 961,
+      "executionTimeMillis" : 2,
+      "totalKeysExamined" : 970,
+      "totalDocsExamined" : 961,
 ```
 
 
