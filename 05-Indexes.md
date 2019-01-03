@@ -280,10 +280,10 @@ For single field indexes, the sorting direction using an index cannot make a que
 // index scan and index sort: the same order of the indexes
 > db.people.find().sort({"name" : 1, "age" : -1 })
 
-// index scan and index sort: the opposite order of the indexes
+// all documents are scanned and uses index sorting 
 > db.people.find().sort({"name" : -1, "age" : 1 })
 
-// collection scan and in-memory sorting: order is not the same/opposite
+// all documents are scanned and uses in-memory sorting because the sort order is not the same/opposite
 > db.people.find().sort({"name" : 1, "age" : 1 })
 
 // collection scan and in-memory sorting: order is not the same/opposite
@@ -295,7 +295,7 @@ For single field indexes, the sorting direction using an index cannot make a que
 // index scan and index sort: because name/age use an equality operator and preceed country it uses an index sort
 > db.people.find({"name" : "john", "age" : 25}).sort({"country" : 1})
 
-// index scand and in-memory sort: name/age are prefix but age is not using an equality, that's why it's an in-memory sort
+// index scan and in-memory sort: name/age are prefix but age is not using an equality, that's why it's an in-memory sort
 > db.people.find({"name" : "john", "age" : {$gt : 20 } }).sort({"country" : 1})
 ```
 
