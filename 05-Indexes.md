@@ -145,8 +145,6 @@ Several index types are supported for a wide range of purposes.
 This is the most basic index type. It allows creating indexes on a single field, including embedded fields, in ascending or descending order. If a non-index column is used to sort the documents, it will perform an in-memory sorting.
 Sort operations that use indexes have a better performance because they take advantage of index data structures to sort the results, rather than moving the data to memory and sorting. In addition to that, in-memory sorting fails if the operation exceeds 32mb.
 
-**Index scan is performed whenever *find()* or *sort()* use indexes, and an index sorting is executed if *sort()* use indexes, otherwise it runs in-memory sorting.**
-
 ```
 > db.people.drop()
 > db.people.insertMany([ 
