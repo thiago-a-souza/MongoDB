@@ -521,7 +521,7 @@ To iterate and manipulate the data, the cursor object provides several methods. 
 
 ## Update
 
-There are three update functions: *update*, *updateOne*, and *updateMany*. The first method, *update*, can replace the entire document using a key/value pair syntax as the update parameter or modify specific fields through update operators (e.g. *$set*, *$inc*, *$rename*, etc). By default, *update* affects a single document, but it allows updating multiple documents if update operators  are used. The other update functions, *updateOne* and *updateMany*, have a similar syntax, and allows only update operators, throwing an error if the key/value pair syntax is used.
+There are three update functions: *update*, *updateOne*, and *updateMany*. The first method, *update*, can replace the entire document using a key/value pair syntax as the update parameter or modify specific fields through update operators (e.g. *$set*, *$inc*, *$rename*, etc). **By default, *update* affects a single document, but it allows updating multiple documents if the *multi* option is enabled**. The other update functions, *updateOne* and *updateMany*, have a similar syntax, and allows only update operators, throwing an error if the key/value pair syntax is used.
 
 As expected, the update functions modify only matching documents, not changing anything if there are no matches. However,  enabling the *upsert* option allows inserting the data as a new document if no matches are found.
 
