@@ -331,7 +331,7 @@ Once an index has been flagged as multikey, it can never be un-multikeyed, even 
 > db.collection.insertOne({ "_id" : 4, "a" : [20, 21], "b" : [23, 25, 29]})
 
 
-// it's allowed to have more than one single field multikey indexes
+// it's allowed to have more than one single field multikey index
 > db.test.drop()
 > db.test.insert({_id : 0, x : [1,1,2], data : [3,5,8]})
 > db.test.createIndex({x : 1})
