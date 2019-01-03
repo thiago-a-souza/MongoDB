@@ -670,7 +670,7 @@ WriteResult({
 ```
 
 - ***$addToSet*** adds value to array unless it already exists
-- ***$pop*** removes the first (-1) or the last (1) item from the array
+- ***$pop*** removes the first (-1) or the last (1) item from the array (zero is not allowed)
 - ***$pull*** removes items that match a criteria
 - ***$pullAll*** removes items that match values from an array
 - ***$push*** appends an item to an array
