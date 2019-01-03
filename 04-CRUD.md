@@ -676,7 +676,7 @@ WriteResult({
 - ***$push*** appends an item to an array
   - ***$each*** allows appending array items into the document's array (also works with *$addToSet*)
   - ***$slice*** limits the resulting array with the initial/final items using a positive/negative argument and requires the *$each* modifier 
-  - ***$sort*** sorts the array and requires the *$each* modifier 
+  - ***$sort*** sorts the array and requires the *$each* modifier. When used with *$slice*, the data is sorted and then sliced, regardless of the order of the modifiers.
   - ***$position*** location where the data should be appended and requires the *$each* modifier
 - **Positional $ operator** identifies an element in the array without specifying the index; the array field name must appear in the query
 
