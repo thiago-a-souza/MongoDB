@@ -16,8 +16,8 @@ Thiago Alexandre Domingues de Souza
      * **[Single Field Indexes](#single-field-indexes)**
      * **[Compound Indexes](#compound-indexes)**
      * **[Multikey Indexes](#multikey-indexes)**
-     * **[Geo Indexes](#geo-indexes)**
      * **[Text Indexes](#text-indexes)**
+     * **[Geo Indexes](#geo-indexes)**
   * **[Index Options](#index-options)**
     * **[Unique](#unique)**
     * **[Sparse](#sparse)**
