@@ -305,10 +305,7 @@ For single field indexes, the sorting direction using an index cannot make a que
 
 MongoDB allows indexing arrays of scalars or embedded documents with multikey indexes. When an indexed field has an array, the index is marked as multikey. Once that happens, it cannot be unflagged unless the index is recreated after removing the array  field from all documents.
 
-Multikey indexes should be used carefully because the size of the index can grow very fast depending on the number of documents and the size of the array. Compound multikey indexes is also possible, but at most one field can be an array. If a compound index already exists in a collection, it will not allow violating this rule with an insert/update. Notice that it's possible to have more than one multikey indexes in the same collection, but they cannot be in the same index (compund).
-
-If any document has an array field for the indexed key, the index immediately is flagged as a multikey index
-Once an index has been flagged as multikey, it can never be un-multikeyed, even if all of the documents containing arrays in that field are removed. The only way to un-multikey it is to drop and recreate it.
+Multikey indexes should be used carefully because the size of the index can grow very fast depending on the number of documents and the size of the array. Compound multikey indexes is also possible, but at most one field of each document can be an array. For example, given a collection with a compound key (A,B), a document can have an array on A, another on B but no document can have an array on A and B simultaneously. If a compound index already exists in a collection, it will not allow violating this rule with an insert/update. Notice that it's possible to have more than one multikey indexes in the same document, but they cannot be in the same index (compound).
 
 ```
 > db.collection.drop()
