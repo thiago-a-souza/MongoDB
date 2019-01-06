@@ -530,6 +530,11 @@ Sparse indexes store only documents that contain the indexed field and it's not 
 
 This option removes documents after a specified time limit (in seconds) on a field whose value is either a date or an array of dates. In case of an array of dates, the minimum date is used to calculate the expiration limit. If the field does not exist or it's not a date, the document is not removed.
 
+Restrictions: 
+
+- compound indexes do not support TTL indexes and ignore the expireAfterSeconds option
+- the *_id* field does not support TTL indexes
+- capped collections do not support capped collections because their documents cannot be removed
 
 ```
 > db.example.drop()
