@@ -346,6 +346,8 @@ Multikey indexes should be used carefully because the size of the index can grow
 
 Text indexes create tokens from strings or arrays, so it can be searched more efficiently with indexes. This search is not case sensitive and also matches plural and singular words. A collection can have only one text index, but multiple fields are allowed. In addition to that, text indexes provide a matching score, so it can be displayed and sorted using the *$meta* operator.
 
+Unlike regular indexes, which can be dropped using a syntax similar to the way they were created, dropping a text index requires the index name that can be found using the function *getIndexes()*.
+
 
 ```
 > db.example.drop()
@@ -375,6 +377,15 @@ Text indexes create tokens from strings or arrays, so it can be searched more ef
 { "_id" : 2, "fruits" : "banana strawberry GRape lemon APPLES", "my-text-score" : 1.2 }
 { "_id" : 1, "fruits" : "mango Apple pear ORANGES avocado ", "my-text-score" : 0.6 }
 
+
+// finding the index name
+> db.example.getIndexes()
+    ...
+    "name" : "fruits_text",
+    ...    
+
+// dropping text index    
+> db.example.dropIndex("fruits_text")    
 ```
 
 
