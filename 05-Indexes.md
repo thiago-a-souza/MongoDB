@@ -515,11 +515,12 @@ Sparse indexes store only documents that contain the indexed field and it's not 
 // index scan and in-memory sorting
 > db.example.find({ name : "john" } ).sort({ ssn : 1})
 
-// collection scan
+// collection scan and in-memory sorting
 > db.example.find().sort({ ssn : 1 })
 
-// forces index scan but will not return documents that don't have the ssn field
-> db.example.find().hint({ ssn : 1 })
+// forces scanning all documents that have the ssn field and perform an index scan,
+// it will not return documents that don't have a ssn
+> db.example.find().sort({ ssn : 1 }).hint({ ssn : 1 })
 
 // all documents are scanned and perform an index sorting
 > db.example.find().sort({ name : 1 })
