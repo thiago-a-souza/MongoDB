@@ -207,11 +207,11 @@ Sort operations that use indexes have a better performance because they take adv
 // collection scan: no index used
 > db.people.find()
 
-// index scan: sorting is using an index
+// all documents are scanned and uses index sorting
 > db.people.find().sort({ "name" : 1 })
 
 // index scan and in-memory sorting: query is using a filter but the sort is not (stage is sort)
-> db.people.find({name : "john"}).sort({ "age" : 1 }).
+> db.people.find({name : "john"}).sort({ "age" : 1 }).explain()
    ...
    "winningPlan" : {
       "stage" : "SORT",
@@ -229,7 +229,8 @@ Sort operations that use indexes have a better performance because they take adv
                 },
                 ...				
 				
-// index scan and index sorting: query and sort are using indexes
+// indexes are different, the winning plan below chose to scan all documents and perform an index sorting rather than 
+// using an index scan and then an in-memory sort
 > db.people.find({name : "john"}).sort({ "addr.state" : 1 }).explain()
    ...
    "winningPlan" : {
