@@ -472,6 +472,9 @@ Unless an index specifies a collation, indexes created inherit the collation fro
 // all documents are scanned and index sort: role has the same collation
 > db.employees.find({city : ""}).sort({ role : 1 })
 
+// index scan and in-memory sort
+> db.employees.find({city : "são paulo"}).sort({ role : 1 }).collation({ locale : "pt"})
+
 // index scan and in-memory sort: city has a different collation
 > db.employees.find({role : ""}).sort({ city : 1 })
 
