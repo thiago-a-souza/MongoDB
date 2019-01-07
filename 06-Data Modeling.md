@@ -359,7 +359,7 @@ system.views
 
 Unlike regular collections, which can grow dynamically, capped collections have a fixed size, specified in advance, and when there's no space to add a new document, the oldest one is replaced, operating like a circular list. This behavior is particularly useful to store log files or caching data.
 
-To preserve these properties, some operations are now allowed on capped collections. Updates that cause an increase in the document size throw an error. Also, deletes are not allowed to maintain the insertion order. As a result, a document can be removed when it becomes the oldest document or the entire collection must be dropped. Finally, sharding is not available for capped collections.
+To preserve these properties, some operations are not allowed on capped collections. Updates that cause an increase in the document size throw an error. Also, deletes are not allowed to maintain the insertion order. As a result, a document can be removed when it becomes the oldest document or the entire collection must be dropped. Finally, sharding is not available for capped collections.
 
 Capped collections are created explicitly, and it requires the *size* option specifying the limit in bytes. Optionally, it's possible to specify the *max* number of documents allowed. Whichever option reached first becomes the limit of the capped collection.
 
