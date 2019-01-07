@@ -70,7 +70,7 @@ Embedding a document into another makes it easier to access all the information 
 
 ### One-to-Many
 
-There's no single solution to address this relationship, so they can be divided into three categories: one-to-few, one-to-many, and one-to-millions.
+There's no single solution to address this relationship, so they can be divided into three categories: one-to-few, one-to-many, and one-to-squillions.
 
 
 - **One-to-Few:** if the relationship has only a few documents or items, it's fine embedding into an array, and it would allow the application to retrieve all data at once.
