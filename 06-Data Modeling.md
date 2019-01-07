@@ -242,6 +242,8 @@ Because documents enable rich data structures, there are several alternatives to
 
 - **Child References:**
 
+ Suitable tree solution as long as subtrees are not changing
+
 ```
 > db.categories.find()
   { "_id" : "MongoDB", "children" : [ ] }
@@ -254,6 +256,8 @@ Because documents enable rich data structures, there are several alternatives to
 
 - **Ancestors References:**
 
+Efficient to find descendants and ancestors of a node. Slightly slower than the Materialized Paths but easier to use.
+
 ```
 > db.categories.find()
   { "_id" : "MongoDB", "ancestors" : [ "Books", "Programming", "Databases" ], "parent" : "Databases" }
@@ -264,7 +268,7 @@ Because documents enable rich data structures, there are several alternatives to
   { "_id" : "Books", "ancestors" : [ ], "parent" : null }
 ```
 
-- **Path Reference:**
+- **Materialized Paths:**
 
 ```
 > db.categories.find()
@@ -282,6 +286,11 @@ Because documents enable rich data structures, there are several alternatives to
 { "_id" : "MongoDB", "path" : ",Books,Programming,Databases," }
 { "_id" : "dbm", "path" : ",Books,Programming,Databases," }
 ```
+
+- **Nested Sets:**
+
+Fast and efficient to find subtrees but inefficient to modifications.
+
 
 
 ## GridFS
