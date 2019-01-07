@@ -449,31 +449,31 @@ Unless an index specifies a collation, indexes created inherit the collation fro
 
 
 
-// index scan and index sort: role has the same collation
+// all documents are scanned and index sort: role has the same collation
 > db.employees.find().sort({ role : 1 })
 
 // collection scan and in-memory sort: city has a different collation
 > db.employees.find().sort({ city : 1 })
 
-// index scan and index sort: explicitly declaring the index collation
+// all documents are scanned and index sort: explicitly declaring the index collation
 > db.employees.find().sort({ city : 1 }).collation({ locale : "pt" })
 
 
 
-// index scan and index sort: city has a different collation, but role has the same
+// all documents are scanned and index sort: role has the same collation
 > db.employees.find({city : ""}).sort({ role : 1 })
 
 // index scan and in-memory sort: city has a different collation
 > db.employees.find({role : ""}).sort({ city : 1 })
 
-// index scan and index sort: explicitly declaring the index collation
+// all documents are scanned and index sort: explicitly declaring the index collation
 > db.employees.find({role : ""}).collation({ locale : "pt" }).sort({ city : 1 })
 
 
 
 > exp = db.employees.explain()
 
-// collecollction scan: city does not match the default collation
+// collection scan: city does not match the default collation
 > exp.update({ city : "" }, { $set : { address : "" }} )
 
 // index scan: declaring a collation that matches an index
