@@ -228,9 +228,9 @@ By default, read operations are routed to the primary member of the *replica set
 
 
 
-- **primary:** default option, reads are performed on the primary
+- **primary:** default option, reads are performed on the primary, if the primary is unavailable it throws an error
 - **primaryPreferred:** if the primary is not available, it reads from a secondary
-- **secondary:** reads from a secondary
+- **secondary:** reads from a secondary, if no secondaries are unavailable it throws an error
 - **secondaryPreferred:** if secondaries are not available, it reads from the primary
 - **nearest:** reads from the nearest member in terms of network latency - useful if the client is not on the same data center and can tolerate eventual consistency.
 
