@@ -32,8 +32,8 @@ When an election is called, eligible members can vote to choose a new primary. O
 In addition to arbiters, there are some circumstances that it's desirable to vote and hold the data but not allowing the member to become primary: 
 
 - **Priority 0:** by setting the member priority to 0, it cannot become primary or invoke elections, but it can vote
-- **Hidden:** this option makes the member invisible to client requests, and it's appropriate, for example, for high latency servers. When *hidden* is enabled, the *priority* must be declared and set to 0.  
-- **Delayed:** stores delayed data (in seconds) for historical purposes. When this option is used, the priority must be declared and set to 0, and  *hidden* should be enabled. 
+- **Hidden:** this option makes the member invisible to client requests, and it's appropriate, for example, for high latency servers. When *hidden* is enabled, the ***priority* must be declared and set to 0**.  
+- **Delayed:** stores delayed data (in seconds) for historical purposes. When this option is used, **the priority must be declared and set to 0**, and  *hidden* should be enabled. 
 
 Not all *replica set* members can vote. Actually, up to 7 members can vote out of the 50 members allowed in a *replica set*. To be eligible, it must have set the *votes* greater than 0 and the *state* must be *PRIMARY, SECONDARY, STARTUP2, RECOVERING, ARBITER,* or *ROLLBACK*. Non-voting members must have the priority and votes set to zero. Similarly, it's not allowed to have priorities greater than zero without votes.
 
@@ -43,7 +43,7 @@ If the primary becomes unavailable during a write operation that was not replica
 
 Configuring a *replica set* requires running the MongoDB daemon, *mongod*, on replication hosts. That should include the replica set name, the path where the instance stores the data, and the port it listens to requests.
 
-After starting the daemons, the *replica sets* should be initiated. If all members have no data, the *rs.initiate* command can be executed on any node. Otherwise it must be executed on the instance that already has an initial data and the other members must be empty. After initiating the *replica set*, their members can be verified using the *rs.status* command, and it displays information about each instance from the perspective of the current member. It's also possible to verify if the current member is master using the command *db.isMaster()*. Once the *replica set* is configured, it's also possible to add or remove members using the commands *rs.add* and *rs.remove*. In addition to that, it's possible to overwrite all configurations using the command *rs.reconfig*.
+After starting the daemons, the *replica sets* should be initiated. If all members have no data, the *rs.initiate* command can be executed on any node. Otherwise it must be executed on the instance that already has an initial data and the other members must be empty. After initiating the *replica set*, their members can be verified using the *rs.status* command, and it displays information about each instance from the perspective of the current member. It's also possible to verify if the current member is master using the command *db.isMaster()* or *rs.isMaster()*. Once the *replica set* is configured, it's also possible to add or remove members using the commands *rs.add* and *rs.remove*. In addition to that, it's possible to overwrite all configurations using the command *rs.reconfig*. Finally, to display the current configuration, the function *rs.config()* should be used.
 
 Creating a *replica set* with 5 members:
 
@@ -106,6 +106,28 @@ moonlight:PRIMARY> rs.status()
 			"configVersion" : 1
 		},
 		...
+
+// displaying the current configuration
+moonlight:PRIMARY> rs.config()
+{
+	"_id" : "moonlight",
+	"version" : 1,
+	"protocolVersion" : NumberLong(1),
+	"members" : [
+		{
+			"_id" : 1,
+			"host" : "localhost:28001",
+			"arbiterOnly" : false,
+			"buildIndexes" : true,
+			"hidden" : false,
+			"priority" : 1,
+			"tags" : {
+				
+			},
+			"slaveDelay" : NumberLong(0),
+			"votes" : 1
+		},
+                ...		
 ```
 
 Adding, removing, and reconfiguring an existing *replica set*:
