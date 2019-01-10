@@ -257,7 +257,7 @@ By default, read operations are routed to the primary member of the *replica set
 - **nearest:** reads from the nearest member in terms of network latency - useful if the client is not on the same data center and can tolerate eventual consistency.
 
 ```
-// Mongo Shell allows reading from a secondary using the old rs.slaveOk() method
+// From Mongo Shell, to read from a secondary it's required to run the function *rs.slaveOk()*, otherwise it throws an error
 > rs.slaveOk()
 
 // fine-grained readPref method
