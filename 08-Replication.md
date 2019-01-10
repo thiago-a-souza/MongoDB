@@ -32,8 +32,8 @@ When an election is called, eligible members can vote to choose a new primary. O
 In addition to arbiters, there are some circumstances that it's desirable to vote and hold the data but not allowing the member to become primary: 
 
 - **Priority 0:** by setting the member priority to 0, it cannot become primary or invoke elections, but it can vote
-- **Hidden:** this option makes the member invisible to client requests, and it's appropriate, for example, for high latency servers. When *hidden* is enabled, the *priority* must be set to 0.  
-- **Delayed:** stores delayed data (in seconds) for historical purposes. When this option is used, the priority must be set to 0, and  *hidden* should be enabled. 
+- **Hidden:** this option makes the member invisible to client requests, and it's appropriate, for example, for high latency servers. When *hidden* is enabled, the *priority* must be declared and set to 0.  
+- **Delayed:** stores delayed data (in seconds) for historical purposes. When this option is used, the priority must be declared and set to 0, and  *hidden* should be enabled. 
 
 Not all *replica set* members can vote. Actually, up to 7 members can vote out of the 50 members allowed in a *replica set*. To be eligible, it must have set the *votes* greater than 0 and the *state* must be *PRIMARY, SECONDARY, STARTUP2, RECOVERING, ARBITER,* or *ROLLBACK*. Non-voting members must have the priority and votes set to zero. Similarly, it's not allowed to have priorities greater than zero without votes.
 
