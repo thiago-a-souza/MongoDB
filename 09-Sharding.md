@@ -44,7 +44,7 @@ A *sharded cluster*, illustrated in Figure 3, comprises three components:
 
 ## Chunks
 
-A chunk contains a subset of the data based on the shard key. When an insert or update makes the chunk exceed the default  size of 64 Mb, it triggers a split process to divide it into smaller chunks, and the balancer migrates them across shards. It's possible to modify the chunk size, but the frequency of migrations and the impact on queries executed should be monitored. There are some circumstances that chunks can grow beyond the size limit. That usually happens when the chunk has a single shard key that cannot be split, and this behavior can impact the performance and the scalability if it continues to increase.
+A chunk contains a subset of the data based on the shard key. When an insert or update makes the chunk exceed the default  size of 64 Mb, it triggers a split process to divide it into smaller chunks. A split is an efficient metadata process but does not affect the shards, the balancer automatically migrates chunks across shards to better distribute them. It's possible to modify the chunk size, but the frequency of migrations and the impact on queries executed should be monitored. There are some circumstances that chunks can grow beyond the size limit. That usually happens when the chunk has a single shard key that cannot be split, and this behavior can impact the performance and the scalability if it continues to increase.
 
 The balancer is a background process that distributes chunks across shards, so they are evenly divided to avoid overloading a single shard. Because migrations move data between shards, they are very expensive and it can impact the performance of the database, but it does not prevent reads or writes.
 
