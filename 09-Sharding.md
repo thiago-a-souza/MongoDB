@@ -251,6 +251,13 @@ mongos> db.test2.getIndexes()
 mongos> db.person.drop()
 mongos> sh.shardCollection("mydb.person", { name : 1, ssn : 1})
 mongos> db.person.insert({ _id : 1, name : "john", ssn : 123, age : 30, city : "New York" })
+mongos> db.person.insert({ _id : 2, name : "peter", ssn : 456, age : 35, city : "Philadelphia" })
+mongos> db.person.insert({ _id : 3, name : "joe", ssn : 789, age : 21, city : "Los Angeles" })
+
+// error: insert must include the complete shard key
+mongos> db.person.insert({ age : 27, city : "Miami"})
+
+
 
 // error: shard key is immutable, so the value cannot be modified
 mongos> db.person.update({ _id : 1 }, { $set : { name : "JOHN" }})
@@ -262,14 +269,25 @@ mongos> db.person.update({ _id : 1 }, { $set : { ssn : 234 }})
 mongos> db.person.update({ _id : 1 }, { $set : { city : "Los Angeles" }})
 
 // error: a single update on a sharded collection must contain an exact match on _id or contain the shard key 
-> db.person.update({ age : 30 }, { $set : { city : "Houston" }})
+mongos> db.person.update({ age : 30 }, { $set : { city : "Houston" }})
 
-// correct: multi update allows not specifying the _id or the shard key
-> db.person.update({ age : 30 }, { $set : { city : "Houston" }}, { multi : true })
+// correct: multi update does not need the _id or the shard key
+mongos> db.person.update({ age : 30 }, { $set : { city : "Houston" }}, { multi : true })
+
+// correct: multi update does not need the _id or the shard key
+mongos> db.person.updateMany({ age : { $gte : 30 }}, { $inc : { age : 1} })
 
 
 
+// error: single delete on a sharded collection must contain an exact match on _id or contain the shard key 
+mongos> db.person.deleteOne({ age : { $gte : 30 } })
 
+// correct: single delete contains an exact match on _id or contain the shard key 
+mongos> db.person.deleteOne({ _id : 1})
 
+// correct: single delete contains an exact match on _id or contain the shard key 
+mongos> db.person.deleteOne({ name : "peter", ssn : 456})
 
+// correct: remove does not need the _id or the shard key because it can remove multiple documents
+mongos> db.person.remove({ city : "Los Angeles"  })
 ```
