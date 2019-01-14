@@ -307,3 +307,718 @@ mongos> db.person.deleteOne({ name : "peter", ssn : 456})
 // correct: remove does not need the _id or the shard key because it can remove multiple documents
 mongos> db.person.remove({ city : "Los Angeles"  })
 ```
+
+
+Targeted queries and Scatter/gather
+
+```
+mongos> db.test.drop()
+mongos> db.test.createIndex({a : 1, b : 1, c : 1})
+mongos> db.test.createIndex({d : 1})
+
+mongos> for(i=1; i<=20000; i++) db.test.insertOne({ a: i, b : i, c : i, d : i})
+
+mongos> sh.shardCollection("mydb.test", {a : 1, b : 1})
+
+mongos> sh.splitAt( "mydb.test", { a : 10000, b : 10000, c : 10000 } )
+
+
+
+mongos> db.test.find({a : 8500}).explain()
+{
+	"queryPlanner" : {
+		"mongosPlannerVersion" : 1,
+		"winningPlan" : {
+			"stage" : "SINGLE_SHARD",
+			"shards" : [
+				{
+					"shardName" : "shard-a",
+					"connectionString" : "shard-a/localhost:3001,localhost:3002,localhost:3003",
+					"serverInfo" : {
+						"host" : "98afd47cbff5",
+						"port" : 3001,
+						"version" : "3.6.5",
+						"gitVersion" : "a20ecd3e3a174162052ff99913bc2ca9a839d618"
+					},
+					"plannerVersion" : 1,
+					"namespace" : "mydb.test",
+					"indexFilterSet" : false,
+					"parsedQuery" : {
+						"a" : {
+							"$eq" : 8500
+						}
+					},
+					"winningPlan" : {
+						"stage" : "FETCH",
+						"inputStage" : {
+							"stage" : "SHARDING_FILTER",
+							"inputStage" : {
+								"stage" : "IXSCAN",
+								"keyPattern" : {
+									"a" : 1,
+									"b" : 1,
+									"c" : 1
+								},
+								"indexName" : "a_1_b_1_c_1",
+								"isMultiKey" : false,
+								"multiKeyPaths" : {
+									"a" : [ ],
+									"b" : [ ],
+									"c" : [ ]
+								},
+								"isUnique" : false,
+								"isSparse" : false,
+								"isPartial" : false,
+								"indexVersion" : 2,
+								"direction" : "forward",
+								"indexBounds" : {
+									"a" : [
+										"[8500.0, 8500.0]"
+									],
+									"b" : [
+										"[MinKey, MaxKey]"
+									],
+									"c" : [
+										"[MinKey, MaxKey]"
+									]
+								}
+							}
+						}
+					},
+					"rejectedPlans" : [ ]
+				}
+			]
+		}
+	},
+	"ok" : 1,
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1547480892, 1),
+		"signature" : {
+			"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+			"keyId" : NumberLong(0)
+		}
+	},
+	"operationTime" : Timestamp(1547480892, 1)
+}
+
+mongos> db.test.find({a : 15000}).explain()
+{
+	"queryPlanner" : {
+		"mongosPlannerVersion" : 1,
+		"winningPlan" : {
+			"stage" : "SINGLE_SHARD",
+			"shards" : [
+				{
+					"shardName" : "shard-b",
+					"connectionString" : "shard-b/localhost:4001,localhost:4002,localhost:4003",
+					"serverInfo" : {
+						"host" : "98afd47cbff5",
+						"port" : 4003,
+						"version" : "3.6.5",
+						"gitVersion" : "a20ecd3e3a174162052ff99913bc2ca9a839d618"
+					},
+					"plannerVersion" : 1,
+					"namespace" : "mydb.test",
+					"indexFilterSet" : false,
+					"parsedQuery" : {
+						"a" : {
+							"$eq" : 15000
+						}
+					},
+					"winningPlan" : {
+						"stage" : "FETCH",
+						"inputStage" : {
+							"stage" : "SHARDING_FILTER",
+							"inputStage" : {
+								"stage" : "IXSCAN",
+								"keyPattern" : {
+									"a" : 1,
+									"b" : 1,
+									"c" : 1
+								},
+								"indexName" : "a_1_b_1_c_1",
+								"isMultiKey" : false,
+								"multiKeyPaths" : {
+									"a" : [ ],
+									"b" : [ ],
+									"c" : [ ]
+								},
+								"isUnique" : false,
+								"isSparse" : false,
+								"isPartial" : false,
+								"indexVersion" : 2,
+								"direction" : "forward",
+								"indexBounds" : {
+									"a" : [
+										"[15000.0, 15000.0]"
+									],
+									"b" : [
+										"[MinKey, MaxKey]"
+									],
+									"c" : [
+										"[MinKey, MaxKey]"
+									]
+								}
+							}
+						}
+					},
+					"rejectedPlans" : [ ]
+				}
+			]
+		}
+	},
+	"ok" : 1,
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1547480922, 1),
+		"signature" : {
+			"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+			"keyId" : NumberLong(0)
+		}
+	},
+	"operationTime" : Timestamp(1547480921, 1)
+}
+
+mongos> db.test.find({a : { $gt : 100}}).explain()
+{
+	"queryPlanner" : {
+		"mongosPlannerVersion" : 1,
+		"winningPlan" : {
+			"stage" : "SHARD_MERGE",
+			"shards" : [
+				{
+					"shardName" : "shard-b",
+					"connectionString" : "shard-b/localhost:4001,localhost:4002,localhost:4003",
+					"serverInfo" : {
+						"host" : "98afd47cbff5",
+						"port" : 4003,
+						"version" : "3.6.5",
+						"gitVersion" : "a20ecd3e3a174162052ff99913bc2ca9a839d618"
+					},
+					"plannerVersion" : 1,
+					"namespace" : "mydb.test",
+					"indexFilterSet" : false,
+					"parsedQuery" : {
+						"a" : {
+							"$gt" : 100
+						}
+					},
+					"winningPlan" : {
+						"stage" : "FETCH",
+						"inputStage" : {
+							"stage" : "SHARDING_FILTER",
+							"inputStage" : {
+								"stage" : "IXSCAN",
+								"keyPattern" : {
+									"a" : 1,
+									"b" : 1,
+									"c" : 1
+								},
+								"indexName" : "a_1_b_1_c_1",
+								"isMultiKey" : false,
+								"multiKeyPaths" : {
+									"a" : [ ],
+									"b" : [ ],
+									"c" : [ ]
+								},
+								"isUnique" : false,
+								"isSparse" : false,
+								"isPartial" : false,
+								"indexVersion" : 2,
+								"direction" : "forward",
+								"indexBounds" : {
+									"a" : [
+										"(100.0, inf.0]"
+									],
+									"b" : [
+										"[MinKey, MaxKey]"
+									],
+									"c" : [
+										"[MinKey, MaxKey]"
+									]
+								}
+							}
+						}
+					},
+					"rejectedPlans" : [ ]
+				},
+				{
+					"shardName" : "shard-a",
+					"connectionString" : "shard-a/localhost:3001,localhost:3002,localhost:3003",
+					"serverInfo" : {
+						"host" : "98afd47cbff5",
+						"port" : 3001,
+						"version" : "3.6.5",
+						"gitVersion" : "a20ecd3e3a174162052ff99913bc2ca9a839d618"
+					},
+					"plannerVersion" : 1,
+					"namespace" : "mydb.test",
+					"indexFilterSet" : false,
+					"parsedQuery" : {
+						"a" : {
+							"$gt" : 100
+						}
+					},
+					"winningPlan" : {
+						"stage" : "FETCH",
+						"inputStage" : {
+							"stage" : "SHARDING_FILTER",
+							"inputStage" : {
+								"stage" : "IXSCAN",
+								"keyPattern" : {
+									"a" : 1,
+									"b" : 1,
+									"c" : 1
+								},
+								"indexName" : "a_1_b_1_c_1",
+								"isMultiKey" : false,
+								"multiKeyPaths" : {
+									"a" : [ ],
+									"b" : [ ],
+									"c" : [ ]
+								},
+								"isUnique" : false,
+								"isSparse" : false,
+								"isPartial" : false,
+								"indexVersion" : 2,
+								"direction" : "forward",
+								"indexBounds" : {
+									"a" : [
+										"(100.0, inf.0]"
+									],
+									"b" : [
+										"[MinKey, MaxKey]"
+									],
+									"c" : [
+										"[MinKey, MaxKey]"
+									]
+								}
+							}
+						}
+					},
+					"rejectedPlans" : [ ]
+				}
+			]
+		}
+	},
+	"ok" : 1,
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1547480992, 1),
+		"signature" : {
+			"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+			"keyId" : NumberLong(0)
+		}
+	},
+	"operationTime" : Timestamp(1547480992, 1)
+}
+
+
+mongos> db.test.find({a : { $gt : 100}}).sort({a : 1, b : 1}).explain()
+{
+	"queryPlanner" : {
+		"mongosPlannerVersion" : 1,
+		"winningPlan" : {
+			"stage" : "SHARD_MERGE_SORT",
+			"shards" : [
+				{
+					"shardName" : "shard-a",
+					"connectionString" : "shard-a/localhost:3001,localhost:3002,localhost:3003",
+					"serverInfo" : {
+						"host" : "98afd47cbff5",
+						"port" : 3001,
+						"version" : "3.6.5",
+						"gitVersion" : "a20ecd3e3a174162052ff99913bc2ca9a839d618"
+					},
+					"plannerVersion" : 1,
+					"namespace" : "mydb.test",
+					"indexFilterSet" : false,
+					"parsedQuery" : {
+						"a" : {
+							"$gt" : 100
+						}
+					},
+					"winningPlan" : {
+						"stage" : "FETCH",
+						"inputStage" : {
+							"stage" : "SHARDING_FILTER",
+							"inputStage" : {
+								"stage" : "IXSCAN",
+								"keyPattern" : {
+									"a" : 1,
+									"b" : 1,
+									"c" : 1
+								},
+								"indexName" : "a_1_b_1_c_1",
+								"isMultiKey" : false,
+								"multiKeyPaths" : {
+									"a" : [ ],
+									"b" : [ ],
+									"c" : [ ]
+								},
+								"isUnique" : false,
+								"isSparse" : false,
+								"isPartial" : false,
+								"indexVersion" : 2,
+								"direction" : "forward",
+								"indexBounds" : {
+									"a" : [
+										"(100.0, inf.0]"
+									],
+									"b" : [
+										"[MinKey, MaxKey]"
+									],
+									"c" : [
+										"[MinKey, MaxKey]"
+									]
+								}
+							}
+						}
+					},
+					"rejectedPlans" : [ ]
+				},
+				{
+					"shardName" : "shard-b",
+					"connectionString" : "shard-b/localhost:4001,localhost:4002,localhost:4003",
+					"serverInfo" : {
+						"host" : "98afd47cbff5",
+						"port" : 4003,
+						"version" : "3.6.5",
+						"gitVersion" : "a20ecd3e3a174162052ff99913bc2ca9a839d618"
+					},
+					"plannerVersion" : 1,
+					"namespace" : "mydb.test",
+					"indexFilterSet" : false,
+					"parsedQuery" : {
+						"a" : {
+							"$gt" : 100
+						}
+					},
+					"winningPlan" : {
+						"stage" : "FETCH",
+						"inputStage" : {
+							"stage" : "SHARDING_FILTER",
+							"inputStage" : {
+								"stage" : "IXSCAN",
+								"keyPattern" : {
+									"a" : 1,
+									"b" : 1,
+									"c" : 1
+								},
+								"indexName" : "a_1_b_1_c_1",
+								"isMultiKey" : false,
+								"multiKeyPaths" : {
+									"a" : [ ],
+									"b" : [ ],
+									"c" : [ ]
+								},
+								"isUnique" : false,
+								"isSparse" : false,
+								"isPartial" : false,
+								"indexVersion" : 2,
+								"direction" : "forward",
+								"indexBounds" : {
+									"a" : [
+										"(100.0, inf.0]"
+									],
+									"b" : [
+										"[MinKey, MaxKey]"
+									],
+									"c" : [
+										"[MinKey, MaxKey]"
+									]
+								}
+							}
+						}
+					},
+					"rejectedPlans" : [ ]
+				}
+			]
+		}
+	},
+	"ok" : 1,
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1547481042, 1),
+		"signature" : {
+			"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+			"keyId" : NumberLong(0)
+		}
+	},
+	"operationTime" : Timestamp(1547481042, 1)
+}
+
+mongos> db.test.find({a : { $gt : 100}}).sort({c : 1}).explain()
+{
+	"queryPlanner" : {
+		"mongosPlannerVersion" : 1,
+		"winningPlan" : {
+			"stage" : "SHARD_MERGE_SORT",
+			"shards" : [
+				{
+					"shardName" : "shard-a",
+					"connectionString" : "shard-a/localhost:3001,localhost:3002,localhost:3003",
+					"serverInfo" : {
+						"host" : "98afd47cbff5",
+						"port" : 3001,
+						"version" : "3.6.5",
+						"gitVersion" : "a20ecd3e3a174162052ff99913bc2ca9a839d618"
+					},
+					"plannerVersion" : 1,
+					"namespace" : "mydb.test",
+					"indexFilterSet" : false,
+					"parsedQuery" : {
+						"a" : {
+							"$gt" : 100
+						}
+					},
+					"winningPlan" : {
+						"stage" : "SORT",
+						"sortPattern" : {
+							"c" : 1
+						},
+						"inputStage" : {
+							"stage" : "SORT_KEY_GENERATOR",
+							"inputStage" : {
+								"stage" : "FETCH",
+								"inputStage" : {
+									"stage" : "SHARDING_FILTER",
+									"inputStage" : {
+										"stage" : "IXSCAN",
+										"keyPattern" : {
+											"a" : 1,
+											"b" : 1,
+											"c" : 1
+										},
+										"indexName" : "a_1_b_1_c_1",
+										"isMultiKey" : false,
+										"multiKeyPaths" : {
+											"a" : [ ],
+											"b" : [ ],
+											"c" : [ ]
+										},
+										"isUnique" : false,
+										"isSparse" : false,
+										"isPartial" : false,
+										"indexVersion" : 2,
+										"direction" : "forward",
+										"indexBounds" : {
+											"a" : [
+												"(100.0, inf.0]"
+											],
+											"b" : [
+												"[MinKey, MaxKey]"
+											],
+											"c" : [
+												"[MinKey, MaxKey]"
+											]
+										}
+									}
+								}
+							}
+						}
+					},
+					"rejectedPlans" : [ ]
+				},
+				{
+					"shardName" : "shard-b",
+					"connectionString" : "shard-b/localhost:4001,localhost:4002,localhost:4003",
+					"serverInfo" : {
+						"host" : "98afd47cbff5",
+						"port" : 4003,
+						"version" : "3.6.5",
+						"gitVersion" : "a20ecd3e3a174162052ff99913bc2ca9a839d618"
+					},
+					"plannerVersion" : 1,
+					"namespace" : "mydb.test",
+					"indexFilterSet" : false,
+					"parsedQuery" : {
+						"a" : {
+							"$gt" : 100
+						}
+					},
+					"winningPlan" : {
+						"stage" : "SORT",
+						"sortPattern" : {
+							"c" : 1
+						},
+						"inputStage" : {
+							"stage" : "SORT_KEY_GENERATOR",
+							"inputStage" : {
+								"stage" : "FETCH",
+								"inputStage" : {
+									"stage" : "SHARDING_FILTER",
+									"inputStage" : {
+										"stage" : "IXSCAN",
+										"keyPattern" : {
+											"a" : 1,
+											"b" : 1,
+											"c" : 1
+										},
+										"indexName" : "a_1_b_1_c_1",
+										"isMultiKey" : false,
+										"multiKeyPaths" : {
+											"a" : [ ],
+											"b" : [ ],
+											"c" : [ ]
+										},
+										"isUnique" : false,
+										"isSparse" : false,
+										"isPartial" : false,
+										"indexVersion" : 2,
+										"direction" : "forward",
+										"indexBounds" : {
+											"a" : [
+												"(100.0, inf.0]"
+											],
+											"b" : [
+												"[MinKey, MaxKey]"
+											],
+											"c" : [
+												"[MinKey, MaxKey]"
+											]
+										}
+									}
+								}
+							}
+						}
+					},
+					"rejectedPlans" : [ ]
+				}
+			]
+		}
+	},
+	"ok" : 1,
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1547481112, 1),
+		"signature" : {
+			"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+			"keyId" : NumberLong(0)
+		}
+	},
+	"operationTime" : Timestamp(1547481112, 1)
+}
+
+mongos> db.test.find({ d : { $exists : true } } ).explain()
+{
+	"queryPlanner" : {
+		"mongosPlannerVersion" : 1,
+		"winningPlan" : {
+			"stage" : "SHARD_MERGE",
+			"shards" : [
+				{
+					"shardName" : "shard-a",
+					"connectionString" : "shard-a/localhost:3001,localhost:3002,localhost:3003",
+					"serverInfo" : {
+						"host" : "98afd47cbff5",
+						"port" : 3001,
+						"version" : "3.6.5",
+						"gitVersion" : "a20ecd3e3a174162052ff99913bc2ca9a839d618"
+					},
+					"plannerVersion" : 1,
+					"namespace" : "mydb.test",
+					"indexFilterSet" : false,
+					"parsedQuery" : {
+						"d" : {
+							"$exists" : true
+						}
+					},
+					"winningPlan" : {
+						"stage" : "SHARDING_FILTER",
+						"inputStage" : {
+							"stage" : "FETCH",
+							"filter" : {
+								"d" : {
+									"$exists" : true
+								}
+							},
+							"inputStage" : {
+								"stage" : "IXSCAN",
+								"keyPattern" : {
+									"d" : 1
+								},
+								"indexName" : "d_1",
+								"isMultiKey" : false,
+								"multiKeyPaths" : {
+									"d" : [ ]
+								},
+								"isUnique" : false,
+								"isSparse" : false,
+								"isPartial" : false,
+								"indexVersion" : 2,
+								"direction" : "forward",
+								"indexBounds" : {
+									"d" : [
+										"[MinKey, MaxKey]"
+									]
+								}
+							}
+						}
+					},
+					"rejectedPlans" : [ ]
+				},
+				{
+					"shardName" : "shard-b",
+					"connectionString" : "shard-b/localhost:4001,localhost:4002,localhost:4003",
+					"serverInfo" : {
+						"host" : "98afd47cbff5",
+						"port" : 4003,
+						"version" : "3.6.5",
+						"gitVersion" : "a20ecd3e3a174162052ff99913bc2ca9a839d618"
+					},
+					"plannerVersion" : 1,
+					"namespace" : "mydb.test",
+					"indexFilterSet" : false,
+					"parsedQuery" : {
+						"d" : {
+							"$exists" : true
+						}
+					},
+					"winningPlan" : {
+						"stage" : "SHARDING_FILTER",
+						"inputStage" : {
+							"stage" : "FETCH",
+							"filter" : {
+								"d" : {
+									"$exists" : true
+								}
+							},
+							"inputStage" : {
+								"stage" : "IXSCAN",
+								"keyPattern" : {
+									"d" : 1
+								},
+								"indexName" : "d_1",
+								"isMultiKey" : false,
+								"multiKeyPaths" : {
+									"d" : [ ]
+								},
+								"isUnique" : false,
+								"isSparse" : false,
+								"isPartial" : false,
+								"indexVersion" : 2,
+								"direction" : "forward",
+								"indexBounds" : {
+									"d" : [
+										"[MinKey, MaxKey]"
+									]
+								}
+							}
+						}
+					},
+					"rejectedPlans" : [ ]
+				}
+			]
+		}
+	},
+	"ok" : 1,
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1547481232, 1),
+		"signature" : {
+			"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+			"keyId" : NumberLong(0)
+		}
+	},
+	"operationTime" : Timestamp(1547481232, 1)
+}
+```
+
+
+
