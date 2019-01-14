@@ -206,7 +206,7 @@ mongos> db.shards.findOne()
 
 ## Playing around
 
-Creating a shard collection
+Creating a shard collection:
 
 ```
 mongos> db.test1.drop()
@@ -244,8 +244,7 @@ mongos> db.test2.getIndexes()
 ]
 ```
 
-
-
+Queries:
 
 ```
 mongos> db.person.drop()
