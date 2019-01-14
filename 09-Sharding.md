@@ -252,7 +252,7 @@ mongos> db.person.drop()
 mongos> sh.shardCollection("mydb.person", { name : 1, ssn : 1})
 mongos> db.person.insert({ _id : 1, name : "john", ssn : 123, age : 30, city : "New York" })
 mongos> db.person.insert({ _id : 2, name : "peter", ssn : 456, age : 35, city : "Philadelphia" })
-mongos> db.person.insert({ _id : 3, name : "joe", ssn : 789, age : 21, city : "Los Angeles" })
+mongos> db.person.insert({ _id : 3, name : "alex", ssn : 789, age : 21, city : "Los Angeles" })
 
 // error: insert must include the complete shard key
 mongos> db.person.insert({ age : 27, city : "Miami"})
