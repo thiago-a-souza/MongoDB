@@ -17,6 +17,7 @@ Thiago Alexandre Domingues de Souza
   * **[Shard Keys](#shard-keys)**
   * **[Queries in a Sharded Cluster](#queries-in-a-sharded-cluster)**  
   * **[Configuring a Sharded Cluster](#configuring-a-sharded-cluster)**
+  * **[Playing around](#playing-around)**
 - [Server Tools](./10-Server%20Tools.md)
 - [Storage Engines](./11-Storage%20Engines.md)
 - [References](./README.md#references)
@@ -202,3 +203,46 @@ mongos> db.shards.findOne()
 	"state" : 1
 }
 ```
+
+## Playing around
+
+Creating a shard collection
+
+```
+mongos> db.test1.drop()
+mongos> db.test1.createIndex({a: 1, b : 1})
+mongos> db.test1.insert({a : 100, b : 200})
+
+// error: collection is not empty, so shard key must be a prefix of an existing key
+mongos> sh.shardCollection("mydb.test1", {b : 1})
+
+// correct: the shard key "a" is a prefix of the existing index
+mongos> sh.shardCollection("mydb.test1", {a : 1})
+
+
+mongos> db.test2.drop()
+// correct: collection is empty, so command creates an index on the shard key
+mongos> sh.shardCollection("mydb.test2", {c : 1})
+mongos> db.test2.getIndexes()
+[
+	{
+		"v" : 2,
+		"key" : {
+			"_id" : 1
+		},
+		"name" : "_id_",
+		"ns" : "mydb.test2"
+	},
+	{
+		"v" : 2,
+		"key" : {
+			"c" : 1
+		},
+		"name" : "c_1",
+		"ns" : "mydb.test2"
+	}
+]
+```
+
+
+
