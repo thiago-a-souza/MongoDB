@@ -246,3 +246,30 @@ mongos> db.test2.getIndexes()
 
 
 
+
+```
+mongos> db.person.drop()
+mongos> sh.shardCollection("mydb.person", { name : 1, ssn : 1})
+mongos> db.person.insert({ _id : 1, name : "john", ssn : 123, age : 30, city : "New York" })
+
+// error: shard key is immutable, so the value cannot be modified
+mongos> db.person.update({ _id : 1 }, { $set : { name : "JOHN" }})
+
+// error: shard key is immutable, so the value cannot be modified
+mongos> db.person.update({ _id : 1 }, { $set : { ssn : 234 }})
+
+// correct: city is not the shard key
+mongos> db.person.update({ _id : 1 }, { $set : { city : "Los Angeles" }})
+
+// error: a single update on a sharded collection must contain an exact match on _id or contain the shard key 
+> db.person.update({ age : 30 }, { $set : { city : "Houston" }})
+
+// correct: multi update allows not specifying the _id or the shard key
+> db.person.update({ age : 30 }, { $set : { city : "Houston" }}, { multi : true })
+
+
+
+
+
+
+```
