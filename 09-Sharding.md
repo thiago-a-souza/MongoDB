@@ -242,6 +242,23 @@ mongos> db.test2.getIndexes()
 		"ns" : "mydb.test2"
 	}
 ]
+
+mongos> db.test3.drop()
+mongos> db.test3.createIndex({ a: 1 })
+mongos> db.test3.createIndex({ b: 1 }, { unique : true })
+
+// error: collection cannot have a unique index other than the _id or the shard key
+mongos> sh.shardCollection("mydb.test3", {a : 1})
+
+// correct: shard key allows a unique index
+mongos> sh.shardCollection("mydb.test3", {b : 1})
+
+
+
+mongos> db.test4.drop()
+mongos> db.test4.createIndex({ a: 1, b : 1}, { unique : 1 })
+// correct: it can use the prefix of a unique key
+mongos> sh.shardCollection("mydb.test4", {a : 1})
 ```
 
 Queries:
