@@ -34,10 +34,14 @@ $ mongoimport --db users --collection contacts --file contacts.json
 ```
 
 
-Importing a CSV file stored in contacts.csv into the contacts collection in the users database (*headerline* uses the first line in the CSV file as field names):
+Importing a CSV file requires one of the parameters *--headerline*, *--fields*, or *--fieldFile* to determine the field names.
 
 ```
+// using headerline instructs MongoDB to use the first line as field names
 $ mongoimport --db users --collection contacts --type csv --headerline --file contacts.csv
+
+// if headerline is not used, the field names must be provided using --fields or --fieldFile
+$ mongoimport --db mydb --collection movies --type csv --fields title,director,year --file movies.csv 
 ```
 
 ## mongoexport
