@@ -34,7 +34,7 @@ $ mongoimport --db users --collection contacts --file contacts.json
 ```
 
 
-Importing a CSV file stored in contacts.csv into the contacts collection in the users database:
+Importing a CSV file stored in contacts.csv into the contacts collection in the users database (*headerline* uses the first line in the CSV file as field names):
 
 ```
 $ mongoimport --db users --collection contacts --type csv --headerline --file contacts.csv
