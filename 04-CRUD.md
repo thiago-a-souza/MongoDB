@@ -473,12 +473,18 @@ The *find* command returns a cursor of objects, and it's up to the API to handle
 
 To iterate and manipulate the data, the cursor object provides several methods. They are efficient because the *find* command takes into account cursor methods before sending the request to the database, rather than submitting the request and then running cursor commands. Cursor methods that return another cursor (e.g. skip, limit, sort) can be chained together, regardless the order the outcome will be the same.
 
+**Remark:** cursor methods such as skip and limit cannot be applied after begin retrieving documents, in other words, they cannot be added after *next()* is called.
+
 ```
 // looping through the cursor result
 > var cur = db.laureates.find({ "prizes.category" : "physics" }, {"_id" : 0, "firstname" : 1 });
 > while(cur.hasNext()){
     printjson(cur.next())
   }
+
+// this is ok  
+var cur = db.laureates.find({ "prizes.category" : "physics" }, {"_id" : 0, "firstname" : 1 });  
+cur.limit(5); null
 ```
 
 - ***cursor.count()*** returns the number of documents referenced by the cursor. Unlike the *collection.count*, the *cursor.count* doesn't accept a query parameter.
