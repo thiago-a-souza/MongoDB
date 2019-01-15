@@ -665,6 +665,7 @@ WriteResult({
 { "name" : "Bob", "addr" : { "street" : "1000 5th Ave", "city" : "New York", "state" : "ny" } }
 
 // updating embedded document
+> db.users.update({ _id : 1 }, {$set : {"addr.state" : "NY"}})
 > db.users.find({"_id": 1}, {"_id" : 0, "name" : 1, "addr" : 1})
 { "name" : "Bob", "addr" : { "street" : "1000 5th Ave", "city" : "New York", "state" : "NY" } }
 
