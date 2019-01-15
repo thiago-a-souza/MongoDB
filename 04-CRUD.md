@@ -481,8 +481,14 @@ To iterate and manipulate the data, the cursor object provides several methods. 
 > while(cur.hasNext()){
     printjson(cur.next())
   }
+  
+// alternatively, null can be used to prevent printing the results, so it can be printed with *next()*
+cur = db.laureates.find({ "prizes.category" : "physics" }, {"_id" : 0, "firstname" : 1 }).limit(3); null
+while(cur.hasNext()){
+    printjson(cur.next())
+  }
 
-// this is ok  
+// this is ok
 var cur = db.laureates.find({ "prizes.category" : "physics" }, {"_id" : 0, "firstname" : 1 });  
 cur.limit(5); null
 ```
