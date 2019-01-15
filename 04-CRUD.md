@@ -47,7 +47,7 @@ Older versions do not support ACID transactions to insert/update/delete multiple
 
 Prior to version 3.2, inserting one or multiple documents into a collection was performed using the same *insert* function. This is still allowed for backward compatibility, but more appropriate functions were introduced, according to the number of documents loaded: *insertOne* and *insertMany*.
 
-If the document loaded does not specify the unique *_id* field, MongoDB creates automatically an *ObjectId*. This field represents the document's primary key, in other words, there are no duplicate documents with the same *_id* in the collection.
+If the document loaded does not specify the unique *_id* field, MongoDB creates automatically an *ObjectId*. This field represents the document's primary key, in other words, there are no duplicate documents with the same *_id* in the collection. Also, the *_id* is immutable, so the document is created its *_id* cannot be updated. It's important to highlight that  *_id* supports any data type other than array.
 
 ### insertOne
 
