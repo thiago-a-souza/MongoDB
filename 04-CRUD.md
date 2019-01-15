@@ -419,11 +419,13 @@ db.example.insertMany([{"fruits" : ["orange", "apple"]},
 > db.example.find({"fruits" : "orange"}).count()
 4
 
-// because it's an array comparison, it will match documents with the very same array
+// because it's an array comparison, it will match documents that only have these values (regardless the order)
 > db.example.find({"fruits" : ["orange", "apple"]}).count()
 1
+> db.example.find({"fruits" : ["apple", "orange"]}).count()
+1
 
-// match documents that have both orange and apple, regardless the order
+// match documents that have at least orange and apple, regardless the order
 > db.example.find({"fruits" : {$all : ["orange", "apple"]}}).count()
 4
 
