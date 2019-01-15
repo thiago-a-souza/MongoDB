@@ -342,6 +342,37 @@ db.collection.find(query, projection)
 1
 ```
 
+- **Regular expressions:** queries using regular expressions can be performed using the operator $regex or the */pattern/* notation. For case sensitive prefix expressions (expression starts with a caret (^) or a left anchor (\A)) can benefit from index scans. Case insensitive regular expressions may not use indexes it also does not support collation.
+
+```
+// syntaxes:
+{ <field>: { $regex: /pattern/, $options: '<options>' } }
+{ <field>: { $regex: /pattern/<options> } }
+{ <field>: { $regex: 'pattern', $options: '<options>' } }
+{ <field>: /pattern/<options> }
+
+> db.test.drop()
+> db.test.createIndex({a : 1})
+> db.test.insertOne({_id : 1, data : "a"})
+> db.test.insertOne({_id : 2, data : "ab"})
+> db.test.insertOne({_id : 3, data : "abc"})
+
+> db.test.find({ data : /^a/ })
+{ "_id" : 1, "data" : "a" }
+{ "_id" : 2, "data" : "ab" }
+{ "_id" : 3, "data" : "abc" }
+
+> db.test.find({ data : { $regex : 'b$' }})
+{ "_id" : 2, "data" : "ab" }
+
+> db.test.find({ data : { $regex : /.bc/ }})
+{ "_id" : 3, "data" : "abc" }
+
+> > db.test.find({ data : { $regex : /AB/i }})
+{ "_id" : 2, "data" : "ab" }
+{ "_id" : 3, "data" : "abc" }
+```
+
 ### Count
 
 There are two *count* functions: *collection.count* and *cursor.count*. The first one has a syntax similar to *find* and also can execute without arguments, while the second doesn't take a query. Executing the function without arguments returns approximate results based on the collection's metadata.
