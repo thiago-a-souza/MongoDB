@@ -536,25 +536,21 @@ As expected, the update functions modify only matching documents, not changing a
 // db.collection.update(query, update, options)
 
 > db.people.drop()
-> db.people.insertMany([ {"_id" : 1, "name" : "john", "age" : 25 },
-                         {"_id" : 2, "name" : "peter", "age" : 36 },
-                         {"_id" : 3, "name" : "alex", "age" : 36 }
+> db.people.insertMany([ {_id : 1, name : "john", age : 25 },
+                         {_id : 2, name : "peter", age : 36 },
+                         {_id : 3, name : "alex", age : 36 }
                        ])
 > db.people.find()
 { "_id" : 1, "name" : "john", "age" : 25 }
 { "_id" : 2, "name" : "peter", "age" : 36 }
 { "_id" : 3, "name" : "alex", "age" : 36 }
 
-// replacing all fields, except the _id
-> db.people.update({"name" : "john"}, {"gender" : "male"})
+// replacing all fields (except the _id) for a single document even if the query matches more documents
+> db.people.update({}, {gender : "male"})
 > db.people.find()
 { "_id" : 1, "gender" : "male" }
 { "_id" : 2, "name" : "peter", "age" : 36 }
 { "_id" : 3, "name" : "alex", "age" : 36 }
-
-// replacing a single document
-> db.people.update({"age" : 36}, {"gender" : "male"})
-WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 
 // it cannot replace multiple documents even with the multi option enabled
 > db.people.update({"age" : 36}, {"gender" : "male"}, { multi : true })
