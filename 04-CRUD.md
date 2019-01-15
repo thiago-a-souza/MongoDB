@@ -14,7 +14,9 @@ Thiago Alexandre Domingues de Souza
      * **[save](#save)**
      * **[findAndModify](#findandmodify)**
   * **[Read](#read)**
+     * **[Projection operators](#projection-operators)**
      * **[Count](#count)**
+     * **[Distinct](#distinct)**
      * **[Comparison operators](#comparison-operators)**
      * **[Logical operators](#logical-operators)**
      * **[Element operators](#element-operators)**   
@@ -372,6 +374,33 @@ db.collection.find(query, projection)
 { "_id" : 2, "data" : "ab" }
 { "_id" : 3, "data" : "abc" }
 ```
+
+### Projection operators
+
+The *$slice* operator used in the projection argument limits the documents displayed.
+
+```
+> db.test.drop()
+> db.test.insertOne({_id : 1, data : [10,20,30,40,50,60,70,80]})
+
+// displaying only the first 3 items in the array
+> db.test.find({}, { data : { $slice : 3 } })
+{ "_id" : 1, "data" : [ 10, 20, 30 ] }
+
+
+// displaying only the last 2 items in the array
+> db.test.find({}, { data : { $slice : -2 } })
+{ "_id" : 1, "data" : [ 70, 80 ] }
+
+// skipping the first 4 items and getting 2 items
+> db.test.find({}, { data : { $slice : [4,2] } })
+{ "_id" : 1, "data" : [ 50, 60 ] }
+
+// skipping the last 3 items and getting 2 items
+> db.test.find({}, { data : { $slice : [-3, 2] } })
+{ "_id" : 1, "data" : [ 60, 70 ] }
+```
+
 
 ### Count
 
