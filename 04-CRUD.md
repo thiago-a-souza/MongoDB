@@ -768,7 +768,7 @@ WriteResult({
 
 ## Delete
 
-Before release 3.0, deleting documents was performed with the *remove* method, and it deletes everything that matches a criteria. Although *remove* is still supported, it's recommended to use either *deleteOne* or *deleteMany* according to the number of documents that should be deleted. All three methods have a syntax similar to *find*, but they require at least an empty query, otherwise they throw an error. In addition to the delete methods, all documents can be removed using the *drop* function, which is preferred to remove all documents from a large collection.
+Before release 3.0, deleting documents was performed with *remove*, and it deletes everything that matches a criteria. Although *remove* is still supported, it's recommended to use either *deleteOne* or *deleteMany* according to the number of documents that should be deleted. All three methods have a syntax similar to *find*, but they require at least an empty query, otherwise they throw an error. In addition to the delete methods, all documents can be removed using the *drop* function, which is preferred to remove all documents from a large collection.
 
 
 ### remove
