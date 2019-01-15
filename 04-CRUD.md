@@ -401,6 +401,26 @@ The *$slice* operator used in the projection argument limits the documents displ
 { "_id" : 1, "data" : [ 60, 70 ] }
 ```
 
+The $ operator can be used to display the first matching item. It's important to highlight that the field must appear in the query and only one $ operator can be used.
+
+```
+> db.test.drop()
+> db.test.insertOne(
+  {
+    _id : 1,
+    comments : [
+                { author : "john", comment : "asdfg" },
+		{ author : "alex", comment : "qwert" },
+		{ author : "alice", comment : "zxcv" },
+		{ author : "alex", comment : "abcd" }
+    ]
+  }
+)
+
+// displaying the first matching item
+> db.test.find({ "comments.author" : "alex" }, { "comments.$" : 1 })
+{ "_id" : 1, "comments" : [ { "author" : "alex", "comment" : "qwert" } ] }
+```
 
 ### Count
 
