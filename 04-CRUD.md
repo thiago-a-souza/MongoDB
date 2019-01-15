@@ -552,9 +552,21 @@ As expected, the update functions modify only matching documents, not changing a
 { "_id" : 2, "name" : "peter", "age" : 36 }
 { "_id" : 3, "name" : "alex", "age" : 36 }
 
-// it cannot replace multiple documents
-> db.people.update({"age" : "36"}, {"gender" : "male"})
-WriteResult({ "nMatched" : 0, "nUpserted" : 0, "nModified" : 0 })
+// replacing a single document
+> db.people.update({"age" : 36}, {"gender" : "male"})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+// it cannot replace multiple documents even with the multi option enabled
+> db.people.update({"age" : 36}, {"gender" : "male"}, { multi : true })
+WriteResult({
+	"nMatched" : 0,
+	"nUpserted" : 0,
+	"nModified" : 0,
+	"writeError" : {
+		"code" : 9,
+		"errmsg" : "multi update only works with $ operators"
+	}
+})
 
 // modifying only specific fields with $set
 > db.people.update({"_id" : 1}, { $set : {"name" : "john", "age" : 25}})
