@@ -682,7 +682,7 @@ WriteResult({
 
 - ***$addToSet*** adds value to array unless it already exists
 - ***$pop*** removes the first (-1) or the last (1) item from the array (zero is not allowed)
-- ***$pull*** removes items that match a criteria
+- ***$pull*** removes items that match a criteria (does NOT use $elemMatch to evaluate multiple conditions on the same field)
 - ***$pullAll*** removes items that match values from an array
 - ***$push*** appends an item to an array
   - ***$each*** allows appending array items into the document's array (also works with *$addToSet*)
