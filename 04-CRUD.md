@@ -473,7 +473,7 @@ The *find* command returns a cursor of objects, and it's up to the API to handle
 
 To iterate and manipulate the data, the cursor object provides several methods. They are efficient because the *find* command takes into account cursor methods before sending the request to the database, rather than submitting the request and then running cursor commands. Cursor methods that return another cursor (e.g. skip, limit, sort) can be chained together, regardless the order the outcome will be the same.
 
-**Remark:** cursor methods such as skip and limit cannot be applied after begin retrieving documents, in other words, they cannot be added after *next()* is called.
+**Remark:** cursor methods such as skip and limit cannot be applied after begin retrieving documents, in other words, they cannot be added after *next()* or *hasNext()* is called.
 
 ```
 // looping through the cursor result
