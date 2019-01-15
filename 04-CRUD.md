@@ -308,6 +308,40 @@ db.collection.find(query, projection)
 ```
 
 
+- **Querying subdocuments:** there are two alternatives to query subdocuments. The first alternative searches for the exact subdocument (all fields must match, including the order). The most popular alternative uses the dot notation, which does not require the complete subdocument.
+
+
+```
+> db.users.drop()
+> db.users.insertOne(
+  {
+    "_id" : 1,
+    "name" : "Bob",
+    "address" : {
+                  "city" : "New York",
+                  "state" : "NY"
+    }
+  }
+ )
+
+// exact match on existing document
+> db.users.find({ address : { city : "New York", state : "NY" } }).count()
+1
+// no exact match
+> db.users.find({ address : { city : "New York" } }).count()
+0
+// no exact match, opposite order
+> db.users.find({ address : { state : "NY", city : "New York" } }).count()
+0
+
+// dot notation
+> db.users.find({ "address.state" : "NY"}).count()
+1
+// dot notation
+> db.users.find({ "address.city" : "New York"}).count()
+1
+```
+
 ### Count
 
 There are two *count* functions: *collection.count* and *cursor.count*. The first one has a syntax similar to *find* and also can execute without arguments, while the second doesn't take a query. Executing the function without arguments returns approximate results based on the collection's metadata.
