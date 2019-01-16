@@ -487,7 +487,7 @@ This index option enforces unique values, including nulls, for single or compoun
 
 ### Sparse
 
-Sparse indexes store only documents that contain the indexed field and it's not null. The sparse option combined with unique prevents loading duplicates but allows omitting the field - if only the unique option is used, it doesn't allow multiple documents missing the indexed field. Because the sparse index does not contain all documents, sort operations using a sparse index run a collection scan. The *hint* method can force a sparse index to be used but it may return incorrect results.
+Sparse indexes store in the B-tree only documents that contain the indexed field and it's not null. For that reason, sparse indexes are smaller than regular indexes. The sparse option combined with unique prevents loading duplicates but allows omitting the field - if only the unique option is used, it doesn't allow multiple documents missing the indexed field. Because the sparse index does not contain all documents, sort operations using a sparse index run a collection scan. The *hint* method can force a sparse index to be used but it may return incorrect results.
 
 
 ```
