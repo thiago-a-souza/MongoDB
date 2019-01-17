@@ -92,7 +92,7 @@ By default, the explain methods displays the information using the *queryPlanner
 
 ## Covered Query
 
-MongoDB allows running queries without examining any documents with covered queries. This situation happens when it uses an index scan and all fields returned are in the same index.
+MongoDB allows running queries without examining any documents with covered queries. This situation happens when it uses an index scan and all fields returned are in the same index. It's important to highlight that multikey indexes do not support covered queries.
 
 ```     
 > db.example.drop()
