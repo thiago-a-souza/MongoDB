@@ -32,6 +32,10 @@ Unlike the *explain* in CRUD operations, the aggregate function allows passing *
 ```
 db.collection.aggregate([ { stage1 }, { stage2 }, ..., { stageN } ])
 
+// without array
+db.collection.aggregate({ stage1 }, { stage2 }, ..., { stageN } )
+
+// array syntax allows additional options
 db.collection.aggregate([ { stage1 }, { stage2 }, ..., { stageN } ], { allowDiskUse : true })
 
 db.collection.aggregate([ { stage1 }, { stage2 }, ..., { stageN } ], { explain : true })
