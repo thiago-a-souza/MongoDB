@@ -323,7 +323,7 @@ db.collection.aggregate([ { stage1 }, { stage2 }, ..., { stageN } ], { explain :
 { "_id" : null, "awarded-movies" : 652 }
 ```
 
-- **$replaceRoot**: replaces the document with a new root - can also be done manually in the *$project* stage
+- **$replaceRoot**: replaces the current document root with a new document - can also be done manually in the *$project* stage. The newRoot expression requires a document (object) otherwise it throws an error.
 
 ```
 > db.movies.aggregate([
