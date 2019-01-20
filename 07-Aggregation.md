@@ -326,14 +326,33 @@ db.collection.aggregate([ { stage1 }, { stage2 }, ..., { stageN } ], { explain :
 - **$replaceRoot**: replaces the current document root with a new document - can also be done manually in the *$project* stage. The newRoot expression requires a document (object) otherwise it throws an error.
 
 ```
-> db.movies.aggregate([
-...     {$replaceRoot : { newRoot : "$imdb"}},
-...     {$limit : 4}
-... ])
-{ "id" : "tt0105226", "rating" : 7, "votes" : 15007 }
-{ "id" : "tt0052077", "rating" : 4, "votes" : 29171 }
-{ "id" : "tt0117731", "rating" : 7.6, "votes" : 94153 }
-{ "id" : "tt0314331", "rating" : 7.7, "votes" : 306036 }
+> db.users.drop()
+> db.users.insertMany([
+  {
+    "_id" : 1,
+    "name" : "Bob",
+    "address" : {
+                  "street" : "1855 Broadway",
+                  "city" : "New York",
+                  "state" : "NY"
+    }
+  },
+  {
+    "_id" : 2,
+    "name" : "Peter",
+    "address" : {
+                  "street" : "Spring Garden",
+                  "city" : "Philadelphia",
+                  "state" : "PA"
+    }
+  }
+])
+
+> db.users.aggregate([
+     { $replaceRoot : {newRoot : "$address"} }
+  ])
+{ "street" : "1855 Broadway", "city" : "New York", "state" : "NY" }
+{ "street" : "Spring Garden", "city" : "Philadelphia", "state" : "PA" }
 ```
 
 - **$addFields**: adds fields to documents, similar to adding fields using the *$project* stage
