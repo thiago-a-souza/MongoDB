@@ -31,11 +31,11 @@ When an election is called, eligible members can vote to choose a new primary. O
 
 In addition to arbiters, there are some circumstances that it's desirable to vote and hold the data but not allowing the member to become primary: 
 
-- **Priority 0:** by setting the member priority to 0, it cannot become primary or invoke elections, but it can vote
+- **Priority 0:** by setting the member priority to 0, it cannot become primary or invoke elections, but it can vote. By default, arbiters have priority 0 and primary/secondary have priority 1, but it can set to 0-1000.
 - **Hidden:** this option makes the member invisible to client requests, and it's appropriate, for example, for high latency servers. When *hidden* is enabled, the ***priority* must be declared and set to 0**.  
 - **Delayed:** stores delayed data (in seconds) for historical purposes. When this option is used, **the priority must be declared and set to 0**, and  *hidden* should be enabled. 
 
-Not all *replica set* members can vote. Actually, up to 7 members can vote out of the 50 members allowed in a *replica set* - it throws an error if you try to create or modify a *replica set* with more than 7 voting members. To be eligible, it must have set the *votes* greater than 0 and the *state* must be *PRIMARY, SECONDARY, STARTUP2, RECOVERING, ARBITER,* or *ROLLBACK*. Non-voting members must have the priority and votes set to zero. Similarly, it's not allowed to have priorities greater than zero without votes.
+Not all *replica set* members can vote. Actually, up to 7 members can vote out of the 50 members allowed in a *replica set* - it throws an error if you try to create or modify a *replica set* with more than 7 voting members. To be eligible, it must have set the *votes* equals 1 and the *state* must be *PRIMARY, SECONDARY, STARTUP2, RECOVERING, ARBITER,* or *ROLLBACK*. Non-voting members must have the priority and votes set to zero. Similarly, it's not allowed to have priorities greater than zero without votes. Remark: *votes* allows 0 or 1.
 
 If the primary becomes unavailable during a write operation that was not replicated to secondaries, the former primary must rollback that data when it rejoins the *replica set* to preserve the data consistency. Obviously, a rollback does not take place if the data gets replicated to another node that remains available. To prevent rollbacks, write operations can enable journaling and specify a majority write concern, so the request is only acknowledged when the data gets replicated to most nodes.
 
