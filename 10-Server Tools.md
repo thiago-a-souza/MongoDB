@@ -27,6 +27,16 @@ Thiago Alexandre Domingues de Souza
 
 Imports data from JSON, CSV, or TSV into MongoDB. Although it helps importing the data, it shouldn't be used to restore backups because these formats don't preserve BSON data types. 
 
+```
+--db or -d: source database
+--collection -c: source collection
+--type: file type to import 
+--file: input file
+--fields or -f: comma separated list of field names 
+--fieldFile: file storing field names
+--headerline: first line represents field names
+```
+
 Importing a JSON file stored in contacts.json into the contacts collection in the users database:
 
 ```
@@ -47,6 +57,10 @@ $ mongoimport --db mydb --collection movies --type csv --fields title,director,y
 ## mongoexport
 
 Exports the data stored in MongoDB into a JSON or CSV file format.
+
+```
+--out or -o: file to export the data
+```
 
 Exporting the movies collection from the mydb database into the movies.json file:
 
