@@ -33,22 +33,22 @@ The storage engine manages how the data is read/written to disk. Because the sto
 
 ```
 // explicitly defining WiredTiger the storage engine
-mongod --port 2801 --storageEngine wiredTiger --dbpath /data/wt1
+$ mongod --port 2801 --storageEngine wiredTiger --dbpath /data/wt1
 
 // wiredTiger is the default storage engine as of version 3.2
-mongod --port 2802 --dbpath /data/wt2
+$ mongod --port 2802 --dbpath /data/wt2
 
 // defining MMAPv1 storage engine
-mongod --port 2803 --storageEngine mmapv1 --dbpath /data/mmapv1
+$ mongod --port 2803 --storageEngine mmapv1 --dbpath /data/mmapv1
 
 // error: directory already contains WiredTiger data files
-mongod --port 2804 --storageEngine mmapv1 --dbpath /data/wt1
+$ mongod --port 2804 --storageEngine mmapv1 --dbpath /data/wt1
 
 // error: directory already contains MMAPv1 data files 
-mongod --port 2805 --storageEngine wiredTiger --dbpath /data/mmapv1
+$ mongod --port 2805 --storageEngine wiredTiger --dbpath /data/mmapv1
 
 // correct: MongoDB identifies the storage engine
-mongod --port 2806 --dbpath /data/mmapv1
+$ mongod --port 2806 --dbpath /data/mmapv1
 ```
 
 
@@ -60,5 +60,55 @@ mongod --port 2806 --dbpath /data/mmapv1
 - **Record Allocation:** all documents are stored in a contiguous memory region, meaning that when they exceed their allocated size, they are moved to another region and their indexes are updated to reflect the new address. To minimize movements and fragmentation, MongoDB uses a power of 2 bytes strategy (e.g. 32, 64, 128, 256, 512, ..., documents larger than 2 MB are rounded up to the nearest multiple of 2 MB) with padding to allow the document to grow. For collections whose document sizes  don't grow, padding can be disabled to reduce the data files.
 - **Memory:** it uses all free memory as its cache, but it can release memory to other processes.
 - **Data Files:** data files double their size until it reaches 2Gb, from there it allocates 2Gb for new data files.
+
+
+```
+$ rm -rf /data/mmapv1
+
+$ mongod --port 3000 --storageEngine mmapv1 --dbpath /data/mmapv1
+$ mongo --port 3000
+> use mydb
+> for(i=0; i<100000; i++) db.foo.insert({a : 1 , b : new Date() })
+> exit
+
+$ cd /data/mmapv1/
+$ ls -lrt
+total 245784
+-rw------- 1 root root       69 Jan 25 19:06 storage.bson
+-rw------- 1 root root        4 Jan 25 19:06 mongod.lock
+-rw------- 1 root root 16777216 Jan 25 19:06 admin.ns
+-rw------- 1 root root 67108864 Jan 25 19:06 admin.0
+-rw------- 1 root root 16777216 Jan 25 19:06 local.ns
+-rw------- 1 root root 67108864 Jan 25 19:06 local.0
+drwx------ 2 root root     4096 Jan 25 19:07 journal
+drwx------ 2 root root     4096 Jan 25 19:07 _tmp
+-rw------- 1 root root 16777216 Jan 25 19:07 mydb.ns
+-rw------- 1 root root 67108864 Jan 25 19:08 mydb.0
+drwx------ 2 root root     4096 Jan 25 19:10 diagnostic.data
+
+
+$ mongo --port 3000
+> use testing
+> db.createCollection("my_collection", { noPadding : true })
+> for(i=0; i<100000; i++) db.my_collection.insert({a : 1 , b : new Date() })
+> exit
+
+$ ls -lrt
+-rw------- 1 root root       69 Jan 25 19:06 storage.bson
+-rw------- 1 root root        4 Jan 25 19:06 mongod.lock
+-rw------- 1 root root 16777216 Jan 25 19:06 admin.ns
+-rw------- 1 root root 67108864 Jan 25 19:06 admin.0
+-rw------- 1 root root 16777216 Jan 25 19:06 local.ns
+-rw------- 1 root root 67108864 Jan 25 19:06 local.0
+drwx------ 2 root root     4096 Jan 25 19:07 journal
+-rw------- 1 root root 16777216 Jan 25 19:07 mydb.ns
+-rw------- 1 root root 67108864 Jan 25 19:08 mydb.0
+-rw------- 1 root root 16777216 Jan 25 19:11 config.ns
+-rw------- 1 root root 67108864 Jan 25 19:11 config.0
+drwx------ 2 root root     4096 Jan 25 19:14 _tmp
+-rw------- 1 root root 16777216 Jan 25 19:15 testing.ns
+-rw------- 1 root root 67108864 Jan 25 19:15 testing.0
+drwx------ 2 root root     4096 Jan 25 19:16 diagnostic.data
+```
 
 
