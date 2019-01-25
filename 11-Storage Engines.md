@@ -31,6 +31,26 @@ The storage engine manages how the data is read/written to disk. Because the sto
 - **Memory:** WiredTiger uses an internal cache and the filesystem cache. During a checkpoint, the data is sent from the internal cache to the filesystem cache and then it's written to disk. The data in the filesystem cache is the same as the on-disk format, including the compression. Indexes and the collection data in the WiredTiger internal cache have a different representation to the on-disk format, and indexes are compressed, while the collection data is not.
 
 
+```
+// explicitly defining WiredTiger the storage engine
+mongod --port 2801 --storageEngine wiredTiger --dbpath /data/wt1
+
+// wiredTiger is the default storage engine as of version 3.2
+mongod --port 2802 --dbpath /data/wt2
+
+// defining MMAPv1 storage engine
+mongod --port 2803 --storageEngine mmapv1 --dbpath /data/mmapv1
+
+// error: directory already contains WiredTiger data files
+mongod --port 2804 --storageEngine mmapv1 --dbpath /data/wt1
+
+// error: directory already contains MMAPv1 data files 
+mongod --port 2805 --storageEngine wiredTiger --dbpath /data/mmapv1
+
+// error: directory already contains MMAPv1 data files 
+mongod --port 2806 --dbpath /data/mmapv1
+```
+
 
 ## MMAPv1
 
