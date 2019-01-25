@@ -23,7 +23,7 @@ The storage engine manages how the data is read/written to disk. Because the sto
 
 ## WiredTiger
 
-- **B-trees:** the data and the indexes are stored in B-trees.
+- **B-trees:** data and indexes are stored in B-trees.
 - **Document Level Concurrency:** multiple users can modify different documents at the same time
 - **Snapshots and Checkpoints:** to allow multiple readers while a write is in progress, MongoDB implements MultiVersion Concurrency Control (MVCC). As a result, each user sees a different snapshot of the data from a particular point in time. WiredTiger performs writes all the data in a snapshot to disk in a consistent way, that represents a new checkpoint, which can be used for recovery purposes. By default, snapshots are written to disk to create a new snapshot every 60s. WiredTiger can recover from failures that happened up to the last checkpoint even if journaling is not enabled, but if the failure happened after the last checkpoint journaling should be active.
 - **Journal:** combining checkpoints with journaling ensures data durability in the event of failures. WiredTiger journal is compressed using snappy.
