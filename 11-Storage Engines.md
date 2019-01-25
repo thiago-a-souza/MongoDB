@@ -47,7 +47,7 @@ mongod --port 2804 --storageEngine mmapv1 --dbpath /data/wt1
 // error: directory already contains MMAPv1 data files 
 mongod --port 2805 --storageEngine wiredTiger --dbpath /data/mmapv1
 
-// error: directory already contains MMAPv1 data files 
+// correct: MongoDB identifies the storage engine
 mongod --port 2806 --dbpath /data/mmapv1
 ```
 
