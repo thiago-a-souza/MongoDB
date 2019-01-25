@@ -33,3 +33,9 @@ The storage engine manages how the data is read/written to disk. Because the sto
 
 
 ## MMAPv1
+
+- **Mapping:** maps data files into virtual memory, making the operating system responsible for most of the work of the storage engine.
+- **Collection Level Concurrency:** as of version 3.0, concurrent users can modify different collections of the same database, so it's not possible multiple writers modifying different documents of the same collection. Before that version, it  MMAPv1 used a database level locking.
+- **Journal:** journaling is enabled by default to ensure that changes are durable, all modifications are written to an on-disk journal every 100ms and then flushed from the journal to the data files every 60s.
+- **Record Allocation:**
+
