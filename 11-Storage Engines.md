@@ -39,6 +39,6 @@ The storage engine manages how the data is read/written to disk. Because the sto
 - **Journal:** journaling is enabled by default to ensure that changes are durable, all modifications are written to an on-disk journal every 100ms and then flushed from the journal to the data files every 60s.
 - **Record Allocation:** all documents are stored in a contiguous memory region, meaning that when they exceed their allocated size, they are moved to another region and their indexes are updated to reflect the new address. To minimize movements and fragmentation, MongoDB uses a power of 2 bytes strategy (e.g. 32, 64, 128, 256, 512, ..., documents larger than 2 MB are rounded up to the nearest multiple of 2 MB) with padding to allow the document to grow. For collections whose document sizes  don't grow, padding can be disabled to reduce the data files.
 - **Memory:** it uses all free memory as its cache, but it can release memory to other processes.
-
+- **Data Files:** data files double their size until it reaches 2Gb, from there it allocates 2Gb for new data files.
 
 
