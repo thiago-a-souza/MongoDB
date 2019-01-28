@@ -815,7 +815,7 @@ WriteResult({
   - ***$slice*** limits the resulting array with the initial/final items using a positive/negative argument and requires the *$each* modifier. A zero argument removes all array items. Unlike the *$slice* used in projection, it only accepts an integer as argument.
   - ***$sort*** sorts the array and requires the *$each* modifier. When used with *$slice*, the data is sorted and then sliced, regardless of the order of the modifiers.
   - ***$position*** location where the data should be appended and requires the *$each* modifier
-- **Positional $ operator** identifies an element in the array without specifying the index; the array field name must appear in the query. If there are multiple matches, only the first occurrence will be updated
+- **Positional $ operator** identifies an element in the array without specifying the index; the array field name must appear in the query. If there are multiple matches, only the first occurrence will be updated. Field must be enclosed in quotes otherwise it throws an error.
 
 ```
 > db.example.drop()
