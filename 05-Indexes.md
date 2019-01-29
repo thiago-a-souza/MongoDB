@@ -334,12 +334,11 @@ Multikey indexes should be used carefully because the size of the index can grow
 
 // it's allowed to have more than one single field multikey index
 > db.test.drop()
-> db.test.insert({_id : 0, x : [1,1,2], data : [3,5,8]})
+> db.test.insert({_id : 0, x : [1,1,2], y : [3,5,8]})
 > db.test.createIndex({x : 1})
 > db.test.createIndex({y : 1})
 > db.test.find()
-{ "_id" : 0, "x" : [ 1, 1, 2 ], "data" : [ 3, 5, 8 ] }
-
+{ "_id" : 0, "x" : [ 1, 1, 2 ], "y" : [ 3, 5, 8 ] }
 ```
 
 ### Text Indexes
