@@ -523,6 +523,23 @@ Sparse indexes store in the B-tree only documents that contain the indexed field
 
 // all documents are scanned and perform an index sorting
 > db.example.find().sort({ name : 1 })
+
+
+
+> db.foo.drop()
+> db.foo.createIndex({ a : 1, b : 1 }, { unique : true, sparse : true })
+
+// correct: unique value (100, 200)
+> db.foo.insert({a : 100, b : 200 })
+
+// correct: unique value (100, null)
+> db.foo.insert({a : 100 })
+
+// error: duplicate (100, null)
+> db.foo.insert({a : 100 })
+
+// correct: unique value ( null, 200)
+> db.foo.insert({b : 200 })
 ```
 
 ### TTL
