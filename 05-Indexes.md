@@ -540,6 +540,11 @@ Sparse indexes store in the B-tree only documents that contain the indexed field
 
 // correct: unique value ( null, 200)
 > db.foo.insert({b : 200 })
+
+// correct: the entire key is null
+> db.foo.insert({x : -1 })
+> db.foo.insert({x : -1 })
+> db.foo.insert({x : -1 })
 ```
 
 ### TTL
