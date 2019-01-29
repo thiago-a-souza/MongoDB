@@ -488,6 +488,42 @@ This index option enforces unique values, including nulls, for single or compoun
 
 Sparse indexes store in the B-tree only documents that contain the indexed field and it's not null. For that reason, sparse indexes are smaller than regular indexes. The sparse option combined with unique prevents loading duplicates but allows omitting the field - if only the unique option is used, it doesn't allow multiple documents missing the indexed field. Because the sparse index does not contain all documents, sort operations using a sparse index run a collection scan. The *hint* method can force a sparse index to be used but it may return incorrect results.
 
+Sparse with unique:
+
+```
+> db.foo.drop()
+> db.foo.createIndex({ a : 1 } , { unique : true, sparse : true })
+
+// correct: it allows multiple documents that omit the sparse unique key
+> db.foo.insert({ x : 1 })
+> db.foo.insert({ x : 1 })
+
+// first command completes successfully but the second fails - null does not mean OMIT!!! 
+> db.foo.insert({ x : 1, a : null})
+> db.foo.insert({ x : 1, a : null})
+
+> db.bar.drop()
+> db.bar.createIndex({ a : 1, b : 1 }, { unique : true, sparse : true })
+
+// correct: unique value (100, 200)
+> db.bar.insert({a : 100, b : 200 })
+
+// correct: unique value (100, null)
+> db.bar.insert({a : 100 })
+
+// error: duplicate (100, null)
+> db.bar.insert({a : 100 })
+
+// correct: unique value ( null, 200)
+> db.bar.insert({b : 200 })
+
+// correct: omitting the entire unique sparse key
+> db.bar.insert({x : -1 })
+> db.bar.insert({x : -1 })
+> db.bar.insert({x : -1 })
+```
+
+Explain plan:
 
 ```
 > db.example.drop()
@@ -523,28 +559,6 @@ Sparse indexes store in the B-tree only documents that contain the indexed field
 
 // all documents are scanned and perform an index sorting
 > db.example.find().sort({ name : 1 })
-
-
-
-> db.foo.drop()
-> db.foo.createIndex({ a : 1, b : 1 }, { unique : true, sparse : true })
-
-// correct: unique value (100, 200)
-> db.foo.insert({a : 100, b : 200 })
-
-// correct: unique value (100, null)
-> db.foo.insert({a : 100 })
-
-// error: duplicate (100, null)
-> db.foo.insert({a : 100 })
-
-// correct: unique value ( null, 200)
-> db.foo.insert({b : 200 })
-
-// correct: the entire key is null
-> db.foo.insert({x : -1 })
-> db.foo.insert({x : -1 })
-> db.foo.insert({x : -1 })
 ```
 
 ### TTL
