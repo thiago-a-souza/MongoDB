@@ -273,6 +273,16 @@ Rollbacks occur when the primary becomes unavailable before a write operation pr
 
 Before version 2.6, the write concern was specified using the  *db.getLastError()* function. After that, the write concern was integrated as an option into write operations.
 
+- **w option:** 
+	- **w:0** requests no acknowledgment, but if *j:true* it ignores that and requests acknowledgment from the primary
+        - **w:1** default, requests acknowledgment from primary member
+	- **w:N** for N > 0, it requests acknowledgment from the primary and other members, including secondaries, hidden, delayed, and priority 0 members
+	- **w:"majority"** requests acknowledgment from them majority - it implies in *j:true*
+
+- **j option:** when *j:true*, it returns after the number the specified in *w*, including the primary, have written to the journal.
+
+- **wtimeout:** applicable when *w* is greater than 1, and sets a time limit (in ms) for the write concern.
+
 
 ```
 myApp:PRIMARY> db.example.drop()
