@@ -106,6 +106,7 @@ insert query update delete getmore command dirty  used flushes vsize  res qrw ar
 ## mongotop
 
 *mongotop* displays reading/writing statistics at a collection level. By default, stats are refreshed every second.
+Mongotop cannot run against mongos.
 
 Displaying stats every 5 seconds while loading the employees collection:
 
