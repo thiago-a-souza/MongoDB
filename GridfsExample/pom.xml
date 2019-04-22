@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.thiago</groupId>
-    <artifactId>MongoClient</artifactId>
+    <artifactId>GridfsExample</artifactId>
     <version>1.0</version>
 
     <dependencies>
@@ -17,7 +17,7 @@
     </dependencies>
 
     <build>
-        <finalName>MongoClient</finalName>
+        <finalName>GridfsExample</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -26,7 +26,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>MongoClient</finalName>
+                    <finalName>GridfsExample</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>
