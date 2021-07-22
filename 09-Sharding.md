@@ -36,7 +36,7 @@ A *sharded cluster*, illustrated in Figure 3, comprises three components:
 
 
 <p align="center">
-<img src="./fig/sharded-cluster.png"  height="60%" width="60%"> <br>
+<img src="https://user-images.githubusercontent.com/17576728/126627746-d2590b05-1b72-418d-8f13-166c4e7ab38d.png"  height="60%" width="60%"> <br>
 <b> Figure 3: </b> Sharded Cluster Components  <a href="./README.md#references">(4)</a> </p>
 
 
